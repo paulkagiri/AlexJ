@@ -9,13 +9,13 @@ import javax.swing.JFrame;
  * @author jflesch
  */
 public class MainWindow {
-    private Main main;
+  private Main main;
 
-    /**
-     * Creates new form MainWindow
-     * @param main
-     */
-    public MainWindow(Main main) {
-        this.main = main;
-    }
+  /**
+   * Creates new form MainWindow
+   * @param main
+   */
+  public MainWindow(Main main) {
+    this.main = main;
+  }
 }

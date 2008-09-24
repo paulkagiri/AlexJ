@@ -26,7 +26,7 @@ public class Main {
     }
 
     try {
-      clientFile = new ClientFile("CLIENT.DAT");
+      clientFile = new ClientFile(".", "CLIENT.DAT");
     } catch (ClientFile.InvalidClientFileException e) {
       JOptionPane.showMessageDialog(null,
 				    "Fichier client invalide. Utilisation non-autorisée",
