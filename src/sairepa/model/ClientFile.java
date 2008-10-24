@@ -2,7 +2,7 @@ package sairepa.model;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -15,20 +15,9 @@ public class ClientFile {
   private String zipCode;
   private String commune;
 
-  public ClientFile(String dirPath, String filename) throws InvalidClientFileException {
-    load(getFile(dirPath, filename));
-  }
-
-  public class FileFilterIgnoringCase implements FileFilter {
-    private String filename;
-
-    public FileFilterIgnoringCase(String filename) {
-      this.filename = filename;
-    }
-
-    public boolean accept(File file) {
-      return (file.getName().equalsIgnoreCase(filename));
-    }
+  public ClientFile(File dirPath, String filename)
+      throws InvalidClientFileException, FileNotFoundException {
+    load(Util.getFile(dirPath, filename));
   }
 
   public class InvalidClientFileException extends Exception {
@@ -41,18 +30,6 @@ public class ClientFile {
     protected InvalidClientFileException(String msg, Throwable cause) {
       super(msg, cause);
     }
-  }
-
-  protected File getFile(String dirPath, String filename)
-      throws InvalidClientFileException {
-    File[] files = new File(dirPath).listFiles(
-	new FileFilterIgnoringCase(filename));
-
-    if (files.length < 1) {
-      throw new InvalidClientFileException("File not found.");
-    }
-
-    return files[0];
   }
 
   protected void load(File file) throws InvalidClientFileException {

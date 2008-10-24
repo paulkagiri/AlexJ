@@ -10,47 +10,41 @@
 
 	<property name="final.dir" value="bin" />
 
-	<!-- HSQLDB -->
-	<!-- <property name="hsqldb.location" value="${lib.dir}/hsqldb.jar" />
-	<available file="${hsqldb.location}" property="hsqldb_available" />
-	<fail unless="hsqldb_available" status="1"
-	message="You need to download hsqldb.jar from http://sourceforge.net/projects/hsqldb/ and to put it in lib/ or set the ant property 'hsqldb.location' to the correct path (filename included)" /> -->
+	<!-- xbase -->
+	<property name="xbase.location" value="${lib.dir}/xBaseJMicro.jar" />
+	<available file="${xbase.location}" property="xbase_available" />
+	<fail unless="xbase_available" status="1"
+	message="You need to download xBaseJMicro.jar from http://sourceforge.net/projects/xbasej/ and to put it in lib/" />
 
 	<target name="compile">
 		<mkdir dir="${bin.dir}" />
-
 		<javac srcdir="${src.dir}" destdir="${bin.dir}" debug="true" optimize="true" encoding="UTF8">
-
 			<compilerarg value="-Xlint" />
 			<classpath>
-				<!-- <pathelement location="${hsqldb.location}"/>-->
+				<pathelement location="${xbase.location}"/>
 			</classpath>
 		</javac>
-
 		<copy todir="${bin.dir}">
 		        <fileset dir="${images.dir}" />
 			<fileset dir="${src.dir}">
 				<include name="**/*.properties" />
 			</fileset>
+			<zipfileset src="${xbase.location}" />
 		</copy>
 	</target>
 
-
 	<target name="jar" depends="compile" description="Make the Jar" >
 		<mkdir dir="${final.dir}" />
-
 		<jar jarfile="${final.dir}/SaiRePa.jar" basedir="${bin.dir}">
 		        <manifest>
 			        <attribute name="Main-Class" value="sairepa.Main" />
 				<attribute name="Class-Path" value="." />
 			</manifest>
-
 			<fileset dir="${bin.dir}">
 			   <include name="**" />
 			</fileset>
 		</jar>
 	</target>
-
 
 	<target name="javadoc">
 		<javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}">

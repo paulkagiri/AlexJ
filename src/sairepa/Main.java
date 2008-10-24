@@ -1,43 +1,30 @@
 package sairepa;
 
-import sairepa.model.ClientFile;
+import sairepa.model.Model;
 import sairepa.gui.MainWindow;
 
+import java.io.File;
+import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-
 
 /**
  * Where everything starts.
  * @author jflesch
  */
 public class Main {
-  private ClientFile clientFile;
-  private MainWindow mainWindow;
+  private Model model;
 
   private Main() throws Exception {
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     } catch (Exception e) {
+      // TODO display exception
       System.err.println("WARNING - Can't set look'n'feel, because: "
 			 + e.toString());
       System.err.println("Message: " + e.getMessage());
       e.printStackTrace();
     }
-
-    try {
-      clientFile = new ClientFile(".", "CLIENT.DAT");
-    } catch (ClientFile.InvalidClientFileException e) {
-      JOptionPane.showMessageDialog(null,
-				    "Fichier client invalide. Utilisation non-autorisée",
-				    "Fichier client invalide",
-				    JOptionPane.ERROR_MESSAGE);
-      throw e;
-    }
-
-    System.out.println("Client file:\n" + clientFile);
-
-    mainWindow = new MainWindow(this);
   }
 
   /**
@@ -45,7 +32,19 @@ public class Main {
    * Will take care of the confirmation dialogs / savings.
    */
   public void quit() {
-    System.exit(0);
+    try {
+      model.save();
+      System.exit(0);
+    } catch (SQLException e) {
+      System.out.println(e.toString());
+      e.printStackTrace();
+      // TODO: display the exception in a better way
+    }
+  }
+
+  public void init() throws Exception {
+    Model model = new Model(new File("koe"));
+    model.init();
   }
 
   /**
@@ -56,6 +55,7 @@ public class Main {
     System.out.println("SAIsie des REgistres PAroissiaux");
     System.out.println("");
 
-    new Main();
+    // TODO: catch exceptions
+    new Main().init();
   }
 }
