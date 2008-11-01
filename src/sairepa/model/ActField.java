@@ -18,6 +18,10 @@ public class ActField
     return fieldPrototype.getName();
   }
 
+  public boolean isMemo() {
+    return (fieldPrototype instanceof MemoField);
+  }
+
   /**
    * Called by ActEntry when modified
    * sub-classes can change the behavior of this method (but must call it !).
@@ -35,7 +39,12 @@ public class ActField
     }
   }
 
-  public Field createDBFField() throws CloneNotSupportedException {
-    return (Field)fieldPrototype.clone();
+  public Field createDBFField() {
+    try {
+      return (Field)fieldPrototype.clone();
+    } catch (CloneNotSupportedException e) {
+      // not supposed to happen.
+      throw new RuntimeException(e);
+    }
   }
 }

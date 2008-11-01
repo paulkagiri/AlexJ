@@ -38,7 +38,7 @@ public class WeddingListFactory extends ActListFactory
 	new ActField(new CharField("PRN3", 23)),
 	new ActField(new CharField("NOM3", 20)),
 	new ActField(new CharField("LOC3", 50)),
-	new ActField(new CharField("LOC3ID", 23)),
+	new ActField(new CharField("LOC3ID", 38)),
 	new ActField(new CharField("CVF3", 1)),
 	new ActField(new CharField("NOT3", 40)),
 	new ActField(new CharField("PRN6", 23)),

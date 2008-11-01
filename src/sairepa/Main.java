@@ -41,11 +41,11 @@ public class Main {
       model.save();
       System.exit(code);
     } catch (SQLException e) {
-      System.out.println(e.toString());
+      System.out.println("SQLException: " + e.toString());
       e.printStackTrace();
       // TODO: display the exception in a better way
     } catch (IOException e) {
-      System.out.println(e.toString());
+      System.out.println("IOException: " + e.toString());
       e.printStackTrace();
       // TODO: display the exception in a better way
     }

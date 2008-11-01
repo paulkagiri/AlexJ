@@ -8,10 +8,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.xBaseJ.micro.DBF;
 import org.xBaseJ.micro.xBaseJException;
 import org.xBaseJ.micro.fields.Field;
+import org.xBaseJ.micro.fields.MemoField;
 
 public abstract class ActListFactory
 {
@@ -52,6 +55,7 @@ public abstract class ActListFactory
 
       } else if (/* (dbf exists) && */ mustRereadDbf()) {
 
+	System.out.println("Loading '" + dbf.getPath() + "' ...");
 	purgeFieldsAndEntries();
 	reloadDbf();
 	updateDbfSyncTimestamp();
@@ -63,6 +67,7 @@ public abstract class ActListFactory
   public void save() throws SQLException, IOException {
     synchronized(db) {
       if (mustRewriteDbf()) {
+	System.out.println("Writing '" + dbf.getPath() + "' ...");
 	rewriteDbf();
 	updateDbfSyncTimestamp();
       }
@@ -183,19 +188,6 @@ public abstract class ActListFactory
     st.execute();
   }
 
-  private int getOrCreateFieldId(String name) throws SQLException {
-    int fieldId;
-
-    if ( (fieldId = getFieldId(name)) < 0) {
-      System.out.println("WARNING: Field '" + name + "' from file '" +
-			 dbf.getPath() + "' didn't exist");
-      createField(name);
-      Util.check( (fieldId = getFieldId(name)) >= 0);
-    }
-
-    return fieldId;
-  }
-
   private void insertEntry(int fieldId, int row, String value)
       throws SQLException {
     PreparedStatement st =
@@ -227,7 +219,8 @@ public abstract class ActListFactory
 	for (int i = 1 ; i <= dbfFile.getFieldCount() ; i++) {
 	  Field field = dbfFile.getField(i);
 	  Util.check(field.get() != null);
-	  int fieldId = getOrCreateFieldId(field.getName());
+	  int fieldId = getFieldId(field.getName());
+	  Util.check(fieldId != -1);
 	  insertEntry(fieldId, row, field.get());
 	}
 	dbfFile.read();
@@ -248,11 +241,63 @@ public abstract class ActListFactory
         "UPDATE files SET lastDbfSync = ? WHERE id = ?");
     st.setTimestamp(1, new Timestamp(dbf.lastModified()));
     st.setInt(2, fileId);
-    //st.execute();
+    st.execute();
   }
 
-  private void rewriteDbf() {
-    // TODO
+  private void rewriteDbf() throws SQLException, IOException {
+    try {
+      Map<String, Field> dbfFields = new HashMap<String, Field>();
+
+      for (ActField field : fields) {
+	dbfFields.put(field.getName(), field.createDBFField());
+      }
+
+      DBF dbfFile = new DBF(dbf.getPath(), (int)DBF.DBASEIII_WITH_MEMO, true);
+
+      for (Field field : dbfFields.values()) {
+	dbfFile.addField(field);
+      }
+
+      PreparedStatement st = db.prepareStatement(
+          "SELECT fields.name, entries.row, entries.value " +
+	  "FROM fields INNER JOIN entries ON fields.id = entries.field " +
+	  "WHERE fields.file = ? ORDER BY entries.row");
+      st.setInt(1, fileId);
+
+      ResultSet set = st.executeQuery();
+
+      int currentRow = 0;
+
+      while(set.next()) {
+	String fieldName = set.getString(1);
+	int row = set.getInt(2);
+	String value = set.getString(3);
+
+	Field field = dbfFields.get(fieldName);
+	Util.check(field != null);
+
+	if (row != currentRow) {
+	  dbfFile.write();
+	  currentRow = row;
+	}
+
+	if ((!(field instanceof MemoField)) && value.length() > field.Length) {
+	  System.err.println("VALUE TOO LONG : "+ field.getClass().getName() + " : " +
+			     field.getName() + " : " +
+			     Integer.toString(field.Length) +" : '"+ value+"' : " +
+			     Integer.toString(value.length()));
+	}
+
+	field.put(value);
+      }
+
+      dbfFile.write();
+      dbfFile.close();
+
+      set.close();
+    } catch (xBaseJException e) {
+      throw new IOException(e);
+    }
   }
 
   public ActList getList() throws IOException {
