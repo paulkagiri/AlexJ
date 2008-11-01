@@ -12,8 +12,13 @@ public class ActEntry
 
   public ActEntry(Act act, ActField field, String value) {
     this.act = act;
+    Util.check(field != null);
     this.field = field;
     this.value = value;
+  }
+
+  public void setAct(Act act) {
+    this.act = act;
   }
 
   public Act getAct() {

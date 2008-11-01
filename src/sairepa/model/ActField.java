@@ -47,4 +47,8 @@ public class ActField
       throw new RuntimeException(e);
     }
   }
+
+  public ActEntry createEntry(Act act) {
+    return new ActEntry(act, this);
+  }
 }
