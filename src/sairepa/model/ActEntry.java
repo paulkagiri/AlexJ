@@ -29,7 +29,7 @@ public class ActEntry
   }
 
   public void setValue(String value, boolean notify) {
-    this.value = value;
+    this.value = value.trim();
 
     if (notify) {
       field.notifyUpdate(this);

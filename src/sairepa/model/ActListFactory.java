@@ -221,7 +221,7 @@ public abstract class ActListFactory
 	  Util.check(field.get() != null);
 	  int fieldId = getFieldId(field.getName());
 	  Util.check(fieldId != -1);
-	  insertEntry(fieldId, row, field.get());
+	  insertEntry(fieldId, row, field.get().trim());
 	}
 	dbfFile.read();
 	row++;
