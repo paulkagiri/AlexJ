@@ -4,6 +4,7 @@ import sairepa.model.Model;
 import sairepa.gui.MainWindow;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -32,10 +33,18 @@ public class Main {
    * Will take care of the confirmation dialogs / savings.
    */
   public void quit() {
+    quit(0);
+  }
+
+  public void quit(int code) {
     try {
       model.save();
-      System.exit(0);
+      System.exit(code);
     } catch (SQLException e) {
+      System.out.println(e.toString());
+      e.printStackTrace();
+      // TODO: display the exception in a better way
+    } catch (IOException e) {
       System.out.println(e.toString());
       e.printStackTrace();
       // TODO: display the exception in a better way
@@ -44,7 +53,12 @@ public class Main {
 
   public void init() throws Exception {
     Model model = new Model(new File("koe"));
-    model.init();
+    try {
+      model.init();
+      model.save();
+    } finally {
+      model.close();
+    }
   }
 
   /**
@@ -52,7 +66,7 @@ public class Main {
    */
   public static void main(String[] args) throws Exception {
     System.out.println("");
-    System.out.println("SAIsie des REgistres PAroissiaux");
+    System.out.println("SAIREPA : SAIsie des REgistres PAroissiaux");
     System.out.println("");
 
     // TODO: catch exceptions

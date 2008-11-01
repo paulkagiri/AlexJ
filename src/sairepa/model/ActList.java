@@ -1,8 +1,5 @@
 package sairepa.model;
 
-import org.xBaseJ.micro.DBF;
-import org.xBaseJ.micro.xBaseJException;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -86,5 +83,13 @@ public class ActList implements Iterable<Act>
 
   public ListIterator<Act> iterator() {
     return new ActListIterator();
+  }
+
+  /**
+   * this act is not stored until added to the list
+   */
+  public Act createAct() {
+    // TODO
+    return null;
   }
 }

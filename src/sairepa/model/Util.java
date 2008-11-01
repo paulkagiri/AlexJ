@@ -36,4 +36,13 @@ public class Util
 
     return files[0];
   }
+
+  /**
+   * Assertion
+   */
+  public static void check(boolean b) {
+    if (!b) {
+      throw new AssertionError();
+    }
+  }
 }

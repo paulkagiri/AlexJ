@@ -6,6 +6,10 @@ public class ActEntry
   private ActField field;
   private String value;
 
+  public ActEntry(Act act, ActField field) {
+    this(act, field, "");
+  }
+
   public ActEntry(Act act, ActField field, String value) {
     this.act = act;
     this.field = field;
@@ -24,8 +28,15 @@ public class ActEntry
     return value;
   }
 
-  public void setValue(String value) {
+  public void setValue(String value, boolean notify) {
     this.value = value;
-    field.notifyUpdate(this);
+
+    if (notify) {
+      field.notifyUpdate(this);
+    }
+  }
+
+  public void setValue(String value) {
+    setValue(value, true);
   }
 }

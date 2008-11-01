@@ -2,6 +2,7 @@ package sairepa.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,7 +18,7 @@ public class Model
     this.projectDir = projectDir;
   }
 
-  public void init() throws SQLException, FileNotFoundException {
+  public void init() throws SQLException, FileNotFoundException, IOException {
     db = new Hsqldb();
     db.connect();
 
@@ -25,7 +26,8 @@ public class Model
 
     factories = new ActListFactory[] {
       new BaptismListFactory(db.getConnection(), projectDir),
-      // TODO
+      new WeddingListFactory(db.getConnection(), projectDir),
+      new SepulchreListFactory(db.getConnection(), projectDir)
     };
 
     for (ActListFactory factory : factories) {
@@ -33,10 +35,14 @@ public class Model
     }
   }
 
-  public void save() throws SQLException {
+  public void save() throws SQLException, IOException {
     for (ActListFactory factory : factories) {
       factory.save();
     }
+  }
+
+  public void close() throws SQLException {
+    db.disconnect();
   }
 
   private void createTables() throws SQLException {
@@ -45,13 +51,13 @@ public class Model
 		   + "id INTEGER NOT NULL IDENTITY, "
 		   + "file VARCHAR NOT NULL, " // "dir/file.dbf"
 		   + "lastDbfSync TIMESTAMP NULL, "
-		   + "PRIMARY KEY id, UNIQUE file"
+		   + "PRIMARY KEY (id), UNIQUE (file)"
 		   + ");");
       executeQuery("CREATE CACHED TABLE fields ("
 		   + "id INTEGER NOT NULL IDENTITY, "
 		   + "file INTEGER NOT NULL, "
 		   + "name VARCHAR NOT NULL, "
-		   + "PRIMARY KEY id, "
+		   + "PRIMARY KEY (id), "
 		   + "UNIQUE (file, name), "
 		   + "FOREIGN KEY (file) REFERENCES files (id)"
 		   + ");");
@@ -60,7 +66,7 @@ public class Model
 		   + "field INTEGER NOT NULL, "
 		   + "row INTEGER NOT NULL, "
 		   + "value VARCHAR NOT NULL, "
-		   + "PRIMARY KEY id, "
+		   + "PRIMARY KEY (id), "
 		   + "UNIQUE (field, row), "
 		   + "FOREIGN KEY (field) REFERENCES fields (id)"
 		   + ");");

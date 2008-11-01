@@ -2,13 +2,21 @@ package sairepa.model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Hsqldb {
   public static final Object dbLock = new Object();
   private Connection connection = null;
 
-  public Hsqldb() { }
+  public Hsqldb() throws SQLException {
+    try {
+      Class.forName("org.hsqldb.jdbcDriver");
+    } catch (ClassNotFoundException e) {
+      throw new SQLException(
+           "Cannot init database (ClassNotFoundException)", e);
+    }
+  }
 
   public void connect() throws java.sql.SQLException {
     synchronized(dbLock) {

@@ -1,18 +1,20 @@
 package sairepa.model;
 
+import java.util.List;
+
 public class Act
 {
-  private ActField[] fields;
+  private List<ActEntry> entries;
 
-  public Act(ActField[] fields) {
-    this.fields = fields;
+  public Act(List<ActEntry> entries) {
+    this.entries = entries;
   }
 
-  public ActField[] getFields() {
-    return fields;
+  public List<ActEntry> getEntries() {
+    return entries;
   }
 
   public void update() {
-
+    // TODO : Update DB
   }
 }
