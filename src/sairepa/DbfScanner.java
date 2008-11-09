@@ -12,6 +12,9 @@ import org.xBaseJ.micro.fields.MemoField;
 import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
+/**
+ * Simple main() class/function to scan quickly a dbf file
+ */
 public class DbfScanner
 {
     public static void main(String args[]) throws Exception

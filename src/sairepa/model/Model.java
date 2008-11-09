@@ -3,9 +3,10 @@ package sairepa.model;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+import java.util.Vector;
 
 public class Model
 {
@@ -14,8 +15,29 @@ public class Model
 
   private ActListFactory[] factories;
 
-  public Model(File projectDir) {
+  protected Model(File projectDir) {
     this.projectDir = projectDir;
+  }
+
+  public static Vector<Project> locateProjects(File baseDir) {
+    Vector<Project> projects = new Vector<Project>();
+
+    for (File file : baseDir.listFiles(new Util.ProjectFileFilter())) {
+      try {
+	Project p = new Project(file);
+	projects.add(p);
+      } catch (ClientFile.InvalidClientFileException e) {
+	System.err.println("WARNING - Invalid project: " + file.getPath());
+	System.err.println("Reason: " + e.toString());
+	e.printStackTrace(System.err);
+      } catch (FileNotFoundException e) {
+	System.err.println("WARNING - Invalid project: " + file.getPath());
+	System.err.println("Reason: " + e.toString());
+	e.printStackTrace(System.err);
+      }
+    }
+
+    return projects;
   }
 
   public void init() throws SQLException, FileNotFoundException, IOException {

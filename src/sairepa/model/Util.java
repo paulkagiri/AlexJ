@@ -20,6 +20,14 @@ public class Util
     }
   }
 
+  public static class ProjectFileFilter implements FileFilter {
+    public ProjectFileFilter() { }
+
+    public boolean accept(File file) {
+      return (file.isDirectory() && file.getName().length() == 3);
+    }
+  }
+
   public static File getFile(File dirPath, String filename)
       throws FileNotFoundException {
     File[] files = dirPath.listFiles(
