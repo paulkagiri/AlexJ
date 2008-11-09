@@ -211,7 +211,7 @@ public abstract class ActListFactory
     try {
       dbfFile = new DBF(dbf.getPath(), DBF.READ_ONLY);
     } catch (xBaseJException e) {
-      throw new IOException(e);
+	throw new IOException("xBaseJException while opening the DBF file: " + e.toString());
     }
 
     int row = 0;
@@ -298,7 +298,7 @@ public abstract class ActListFactory
 
       set.close();
     } catch (xBaseJException e) {
-      throw new IOException(e);
+	throw new IOException("xBaseJException while reading the dbf file: " + e.toString());
     }
   }
 

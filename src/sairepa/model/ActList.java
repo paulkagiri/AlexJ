@@ -53,22 +53,18 @@ public class ActList implements Iterable<Act>
 
     public ActListIterator() { }
 
-    @Override
     public void add(Act a) {
       insert(a, currentRow + 1);
     }
 
-    @Override
     public boolean hasNext() {
       return (currentRow < rowCount - 1);
     }
 
-    @Override
     public boolean hasPrevious() {
       return (currentRow > 0);
     }
 
-    @Override
     public Act next() {
       synchronized(db) {
 	if (!hasNext()) {
@@ -79,12 +75,10 @@ public class ActList implements Iterable<Act>
       }
     }
 
-    @Override
     public int nextIndex() {
       return currentRow + 1;
     }
 
-    @Override
     public Act previous() {
       synchronized(db) {
 	if (!hasPrevious()) {
@@ -102,17 +96,14 @@ public class ActList implements Iterable<Act>
       }
     }
 
-    @Override
     public int previousIndex() {
       return currentRow - 1;
     }
 
-    @Override
     public void remove() {
       delete(lastActReturned);
     }
 
-    @Override
     public void	set(Act a) {
       synchronized(db) {
 	a.setRow(currentRow, false);
