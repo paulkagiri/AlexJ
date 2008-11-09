@@ -13,8 +13,10 @@ public class Hsqldb {
     try {
       Class.forName("org.hsqldb.jdbcDriver");
     } catch (ClassNotFoundException e) {
+      System.err.println("ClassNotFoundException: " + e.toString());
+      e.printStackTrace(System.err);
       throw new SQLException(
-           "Cannot init database (ClassNotFoundException)", e);
+           "Cannot init database (ClassNotFoundException)");
     }
   }
 
