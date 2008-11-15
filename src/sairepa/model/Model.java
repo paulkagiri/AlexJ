@@ -42,7 +42,7 @@ public class Model
 
   public void init() throws SQLException, FileNotFoundException, IOException {
     db = new Hsqldb();
-    db.connect();
+    db.connect(projectDir.getName());
 
     createTables();
 

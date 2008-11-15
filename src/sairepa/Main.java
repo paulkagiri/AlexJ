@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
+import sairepa.controller.Controller;
 import sairepa.model.Model;
 import sairepa.model.Project;
 import sairepa.view.ErrorMessage;
@@ -22,42 +23,19 @@ import sairepa.view.View;
 public class Main {
   private Model model;
   private View view;
+  private Controller controller;
 
   private Main() throws Exception {
-    try {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    } catch (Exception e) {
-      System.err.println("WARNING - Can't set look'n'feel, because: "
-			 + e.toString());
-      System.err.println("Message: " + e.getMessage());
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * Called when the user asked to stop the application.
-   * Will take care of the confirmation dialogs / savings.
-   */
-  public void quit() {
-    quit(0);
-  }
-
-  public void quit(int code) {
-    try {
-      view.close();
-      model.save();
-      model.close();
-
-      System.exit(code);
-    } catch (SQLException e) {
-      System.out.println("SQLException: " + e.toString());
-      e.printStackTrace();
-      ErrorMessage.displayError("Erreur au moment de quitter", e);
-    } catch (IOException e) {
-      System.out.println("IOException: " + e.toString());
-      e.printStackTrace();
-      ErrorMessage.displayError("Erreur au moment de quitter", e);
-    }
+    /*
+     * try {
+     *  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+     * } catch (Exception e) {
+     *  System.err.println("WARNING - Can't set look'n'feel, because: "
+     * 			 + e.toString());
+     *  System.err.println("Message: " + e.getMessage());
+     *  e.printStackTrace();
+     * }
+     */
   }
 
   public Project promptForProject() {
@@ -86,11 +64,14 @@ public class Main {
     try {
       model = p.createModel();
       view = new View(model);
+      controller = new Controller(model, view);
 
       model.init();
+      controller.init();
       view.init();
     } catch (Exception e) {
       view.close();
+      controller.close();
       model.close(); // no saving.
       throw e;
     }
@@ -104,16 +85,12 @@ public class Main {
     System.out.println("SAIREPA : SAIsie des REgistres PAroissiaux");
     System.out.println("");
 
-    Main main;
-
     try {
-      main = new Main();
+      Main main = new Main();
       main.init();
     } catch(Exception e) {
       ErrorMessage.displayError("Erreur lors de l'initialisation de SaiRePa", e);
       throw e;
     }
-
-    main.quit();
   }
 }

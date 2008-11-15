@@ -14,6 +14,10 @@ public class View
     mainWindow.setVisible(true);
   }
 
+  public MainWindow getMainWindow() {
+    return mainWindow;
+  }
+
   public void close() {
     mainWindow.setVisible(false);
     mainWindow.dispose();

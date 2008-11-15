@@ -20,14 +20,14 @@ public class Hsqldb {
     }
   }
 
-  public void connect() throws java.sql.SQLException {
+  public void connect(String projectName) throws java.sql.SQLException {
     synchronized(dbLock) {
       if (connection != null) {
 	disconnect();
       }
 
-      connection = DriverManager.getConnection("jdbc:hsqldb:file:sairepa.db;shutdown=true",
-					       "sa", "");
+      connection = DriverManager.getConnection(
+          "jdbc:hsqldb:file:sairepa_" + projectName + ".db;shutdown=true", "sa", "");
       synchronized(connection) {
 	executeQuery("SET LOGSIZE 50;");
 	executeQuery("SET CHECKPOINT DEFRAG 50;");
