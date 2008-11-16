@@ -18,7 +18,7 @@ import org.xBaseJ.micro.fields.MemoField;
 
 public abstract class ActListFactory
 {
-  private ActField[] fields;
+  private FieldLayout fields;
 
   private ActList actList;
 
@@ -27,7 +27,7 @@ public abstract class ActListFactory
 
   private Connection db;
 
-  public ActListFactory(File dbf, ActField[] fields) {
+  public ActListFactory(File dbf, FieldLayout fields) {
     this.fields = fields;
     this.dbf = dbf;
   }

@@ -1,9 +1,12 @@
 package sairepa.model;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.xBaseJ.micro.fields.Field;
 import org.xBaseJ.micro.fields.MemoField;
 
-public class ActField
+public class ActField implements FieldLayoutElement
 {
   private Field fieldPrototype;
 
@@ -50,5 +53,11 @@ public class ActField
 
   public ActEntry createEntry(Act act) {
     return new ActEntry(act, this);
+  }
+
+  public Iterator<ActField> iterator() {
+    ArrayList<ActField> list = new ArrayList<ActField>();
+    list.add(this);
+    return list.iterator();
   }
 }

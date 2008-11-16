@@ -17,11 +17,11 @@ public class ActList implements Iterable<Act>
 {
   private Connection db;
   private int fileId;
-  private ActField[] fields;
+  private FieldLayout fields;
   private int rowCount;
   private String name;
 
-  public ActList(Connection db, int fileId, ActField[] fields, String name)
+  public ActList(Connection db, int fileId, FieldLayout fields, String name)
       throws SQLException, IOException {
     this.db = db;
     this.fileId = fileId;

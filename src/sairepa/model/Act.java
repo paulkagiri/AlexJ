@@ -12,13 +12,13 @@ public class Act
   private int row = -1;
   private Connection db;
   private ActList actList;
-  private ActField[] fields;
+  private FieldLayout fields;
   private List<ActEntry> entries;
 
   /**
    * Create a brand new and empty act
    */
-  public Act(Connection db, ActList actList, ActField[] fields) {
+  public Act(Connection db, ActList actList, FieldLayout fields) {
     this.db = db;
     this.actList = actList;
     entries = new Vector<ActEntry>();
@@ -31,7 +31,7 @@ public class Act
   /**
    * Already existing act loaded from the db
    */
-  public Act(Connection db, ActList actList, ActField[] fields, int row) throws SQLException {
+  public Act(Connection db, ActList actList, FieldLayout fields, int row) throws SQLException {
     this.db = db;
     this.fields = fields;
     this.row = row;

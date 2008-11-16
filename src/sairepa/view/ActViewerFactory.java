@@ -1,6 +1,9 @@
 package sairepa.view;
 
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JButton;
+import javax.swing.JTextField;
 
 import sairepa.gui.IconBox;
 import sairepa.model.ActList;
