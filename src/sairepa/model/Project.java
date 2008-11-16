@@ -2,6 +2,7 @@ package sairepa.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 
 public class Project
 {
@@ -23,7 +24,7 @@ public class Project
     return clientFile;
   }
 
-  public Model createModel() {
+  public Model createModel() throws SQLException, FileNotFoundException {
     return new Model(projectDir);
   }
 

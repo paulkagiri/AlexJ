@@ -6,6 +6,8 @@ import javax.swing.ImageIcon;
 public class IconBox
 {
   public final static ImageIcon minTabClose = loadIcon("tab-close.png");
+  public final static ImageIcon actList     = loadIcon("act-list.png");
+  public final static ImageIcon act         = loadIcon("act.png");
 
   private IconBox() { }
 

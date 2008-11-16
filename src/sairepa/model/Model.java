@@ -15,8 +15,21 @@ public class Model
 
   private ActListFactory[] factories;
 
-  protected Model(File projectDir) {
+  protected Model(File projectDir) throws SQLException, FileNotFoundException {
     this.projectDir = projectDir;
+
+    db = new Hsqldb();
+    db.connect(projectDir.getName());
+
+    factories = new ActListFactory[] {
+      new BaptismListFactory(projectDir),
+      new WeddingListFactory(projectDir),
+      new SepulchreListFactory(projectDir)
+    };
+  }
+
+  public ActListFactory[] getFactories() {
+    return factories;
   }
 
   public static Vector<Project> locateProjects(File baseDir) {
@@ -40,20 +53,11 @@ public class Model
     return projects;
   }
 
-  public void init() throws SQLException, FileNotFoundException, IOException {
-    db = new Hsqldb();
-    db.connect(projectDir.getName());
-
+  public void init() throws SQLException, IOException {
     createTables();
 
-    factories = new ActListFactory[] {
-      new BaptismListFactory(db.getConnection(), projectDir),
-      new WeddingListFactory(db.getConnection(), projectDir),
-      new SepulchreListFactory(db.getConnection(), projectDir)
-    };
-
     for (ActListFactory factory : factories) {
-      factory.init();
+      factory.init(db.getConnection());
     }
   }
 

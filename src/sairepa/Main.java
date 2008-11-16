@@ -25,17 +25,8 @@ public class Main {
   private View view;
   private Controller controller;
 
-  private Main() throws Exception {
-    /*
-     * try {
-     *  UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-     * } catch (Exception e) {
-     *  System.err.println("WARNING - Can't set look'n'feel, because: "
-     * 			 + e.toString());
-     *  System.err.println("Message: " + e.getMessage());
-     *  e.printStackTrace();
-     * }
-     */
+  private Main() {
+
   }
 
   public Project promptForProject() {

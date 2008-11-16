@@ -28,6 +28,12 @@ public class Util
     }
   }
 
+  /**
+   * Try to find a file matching the filename (without the case sensitivity).
+   * Returns dirPath + File.separator + filename if none exists
+   * @throws FileNotFoundException if many files with the same name
+   * but a different case exist
+   */
   public static File getFile(File dirPath, String filename)
       throws FileNotFoundException {
     File[] files = dirPath.listFiles(

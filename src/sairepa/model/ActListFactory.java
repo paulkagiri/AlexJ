@@ -26,14 +26,14 @@ public abstract class ActListFactory
 
   private Connection db;
 
-  public ActListFactory(Connection db, File dbf,
-			ActField[] fields) {
+  public ActListFactory(File dbf, ActField[] fields) {
     this.fields = fields;
-    this.db = db;
     this.dbf = dbf;
   }
 
-  public void init() throws SQLException, IOException {
+  public void init(Connection db) throws SQLException, IOException {
+    this.db = db;
+
     synchronized(db) {
       if ((fileId = getFileId()) < 0) {
 	createFileEntry();
@@ -305,4 +305,6 @@ public abstract class ActListFactory
   public ActList getList() throws IOException {
     return actList;
   }
+
+  public abstract String toString();
 }

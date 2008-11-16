@@ -1,10 +1,14 @@
 package sairepa.view;
 
+import java.awt.BorderLayout;
 import javax.swing.AbstractButton;
+import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JLabel;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 
 import sairepa.model.Model;
 
@@ -19,6 +23,12 @@ public class MainWindow extends JFrame {
   private int DEFAULT_SIZE_Y = 600;
 
   private JMenuItem menuFileQuit;
+  private TabSelecter tabOpener;
+
+  private final static ViewerFactory[] viewerFactories = new ViewerFactory[] {
+    new ActViewerFactory(),
+    new ActListViewerFactory(),
+  };
 
   /**
    * Creates new form MainWindow
@@ -27,16 +37,33 @@ public class MainWindow extends JFrame {
   public MainWindow(Model model) {
     super("SaiRePa");
 
+    this.getContentPane().setLayout(new BorderLayout(5, 5));
+
+    this.setJMenuBar(createMenuBar());
+
+    this.getContentPane().add(new JLabel("TODO"), BorderLayout.CENTER);
+    this.getContentPane().add(new JScrollPane(tabOpener = createTabSelecter(model)),
+			      BorderLayout.WEST);
+
+    setSize(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
+  }
+
+  public ViewerFactory[] getViewerFactories() {
+    return viewerFactories;
+  }
+
+  private JMenuBar createMenuBar() {
     JMenuBar menuBar = new JMenuBar();
     JMenu menuFile = new JMenu("Fichier");
     menuFileQuit = new JMenuItem("Quitter");
-
     menuFile.add(menuFileQuit);
     menuBar.add(menuFile);
 
-    this.setJMenuBar(menuBar);
+    return menuBar;
+  }
 
-    setSize(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
+  private TabSelecter createTabSelecter(Model model) {
+    return new TabSelecter(model.getFactories(), getViewerFactories());
   }
 
   public AbstractButton getQuitButton() {
