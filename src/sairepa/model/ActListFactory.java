@@ -19,6 +19,7 @@ import org.xBaseJ.micro.fields.MemoField;
 public abstract class ActListFactory
 {
   private ActField[] fields;
+
   private ActList actList;
 
   private File dbf;
@@ -63,7 +64,7 @@ public abstract class ActListFactory
       }
     }
 
-    actList = new ActList(db, fileId, fields);
+    actList = new ActList(db, fileId, fields, toString());
   }
 
   public void save() throws SQLException, IOException {
@@ -302,7 +303,7 @@ public abstract class ActListFactory
     }
   }
 
-  public ActList getList() throws IOException {
+  public ActList getList() {
     return actList;
   }
 

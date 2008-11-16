@@ -21,6 +21,8 @@ public class TabSelecter extends JPanel
   public TabSelecter(ActListFactory[] actListFactories, ViewerFactory[] viewerFactories) {
     super(new BorderLayout());
 
+    observers = new ArrayList<TabSelecterObserver>();
+
     JPanel sub = new JPanel(new GridLayout(actListFactories.length, 1, 20, 20));
 
     for (ActListFactory actListFactory : actListFactories) {
@@ -63,7 +65,7 @@ public class TabSelecter extends JPanel
     }
   }
 
-  public interface TabSelecterObserver {
+  public static interface TabSelecterObserver {
     public void tabSelected(ActListFactory actListFactory, ViewerFactory viewerFactory);
   }
 

@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
+import sairepa.gui.CloseableTabbedPane;
 import sairepa.model.Model;
 
 /**
@@ -24,6 +25,7 @@ public class MainWindow extends JFrame {
 
   private JMenuItem menuFileQuit;
   private TabSelecter tabOpener;
+  private CloseableTabbedPane tabs;
 
   private final static ViewerFactory[] viewerFactories = new ViewerFactory[] {
     new ActViewerFactory(),
@@ -41,7 +43,7 @@ public class MainWindow extends JFrame {
 
     this.setJMenuBar(createMenuBar());
 
-    this.getContentPane().add(new JLabel("TODO"), BorderLayout.CENTER);
+    this.getContentPane().add(tabs = new CloseableTabbedPane(), BorderLayout.CENTER);
     this.getContentPane().add(new JScrollPane(tabOpener = createTabSelecter(model)),
 			      BorderLayout.WEST);
 
@@ -66,7 +68,15 @@ public class MainWindow extends JFrame {
     return new TabSelecter(model.getFactories(), getViewerFactories());
   }
 
+  public TabSelecter getTabSelecter() {
+    return tabOpener;
+  }
+
   public AbstractButton getQuitButton() {
     return menuFileQuit;
+  }
+
+  public void addViewer(Viewer v) {
+    tabs.addTab(v.getName(), v.getIcon(), v);
   }
 }

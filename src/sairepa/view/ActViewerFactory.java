@@ -7,18 +7,39 @@ import sairepa.model.ActList;
 
 public class ActViewerFactory implements ViewerFactory
 {
+  public final static String NAME = "Actes";
+  public final static ImageIcon ICON = IconBox.act;
+
   public ActViewerFactory() { }
 
   public String getName() {
-    return "Actes";
+    return NAME;
   }
 
   public ImageIcon getIcon() {
-    return IconBox.act;
+    return ICON;
+  }
+
+  /**
+   * is a JPanel displaying one act at a time.
+   */
+  protected class ActViewer extends Viewer {
+    public final static long serialVersionUID = 1;
+
+    public ActViewer(ActList actList) {
+      super(actList.getName(), NAME, ICON);
+    }
+
+    public void refresh() {
+      System.err.println("TODO");
+    }
+
+    public void close() {
+      System.err.println("TODO");
+    }
   }
 
   public Viewer createViewer(ActList list) {
-    // TODO
-    return null;
+    return new ActViewer(list);
   }
 }

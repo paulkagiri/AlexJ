@@ -19,13 +19,19 @@ public class ActList implements Iterable<Act>
   private int fileId;
   private ActField[] fields;
   private int rowCount;
+  private String name;
 
-  public ActList(Connection db, int fileId, ActField[] fields)
+  public ActList(Connection db, int fileId, ActField[] fields, String name)
       throws SQLException, IOException {
     this.db = db;
     this.fileId = fileId;
     this.fields = fields;
     this.rowCount = computeRowCount();
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public int computeRowCount() throws SQLException {

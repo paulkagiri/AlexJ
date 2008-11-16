@@ -18,7 +18,8 @@ public class Controller
         new ActionQuit(model, view, this));
     view.getMainWindow().getQuitButton().addActionListener(
 	new ActionQuit(model, view, this));
-
+    view.getMainWindow().getTabSelecter().addObserver(
+        new TabManager(model, view));
   }
 
   public void close() {
