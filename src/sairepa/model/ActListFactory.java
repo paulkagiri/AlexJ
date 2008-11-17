@@ -226,6 +226,7 @@ public abstract class ActListFactory
 
     try {
       while(true) {
+	dbfFile.read();
 	for (int i = 1 ; i <= dbfFile.getFieldCount() ; i++) {
 	  Field field = dbfFile.getField(i);
 	  Util.check(field.get() != null);
@@ -233,7 +234,6 @@ public abstract class ActListFactory
 	  Util.check(fieldId != -1);
 	  insertEntry(fieldId, row, field.get().trim());
 	}
-	dbfFile.read();
 	row++;
       }
     } catch (xBaseJException e) {
