@@ -3,6 +3,8 @@ package sairepa.view;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.ArrayList;
@@ -32,14 +34,18 @@ public class ActViewer extends Viewer
   public final static long serialVersionUID = 1;
   private ListIterator<Act> actListIterator;
   private Act currentAct;
+  private boolean newAct;
+
+  private List<VisualActField> visualActFields = new ArrayList<VisualActField>();
 
   public ActViewer(ActList actList, String name, ImageIcon icon) {
     super(actList.getName(), name, icon);
     prepareUI(actList);
+    connectUIComponents(actList);
     initActList(actList);
   }
 
-  protected class VisualActField {
+  protected class VisualActField implements ActionListener {
     private final long serialVersionUID = 1;
 
     private VisualActField nextField = null;
@@ -48,7 +54,9 @@ public class ActViewer extends Viewer
 
     public VisualActField(ActField field) {
       if (!field.isMemo()) {
-	textComponent = new JTextField(maximizeLength(field.getLength()));
+	JTextField f = new JTextField(maximizeLength(field.getLength()));
+	f.addActionListener(this);
+	textComponent = f;
 	component = textComponent;
       } else {
 	JTextArea area = new JTextArea(5, MAX_LINE_LENGTH/2);
@@ -65,6 +73,18 @@ public class ActViewer extends Viewer
 
     public JComponent getComponent() {
       return component;
+    }
+
+    public void focus() {
+      textComponent.requestFocus();
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      if (nextField != null) {
+	nextField.focus();
+      } else {
+	validateAct();
+      }
     }
   }
 
@@ -155,7 +175,7 @@ public class ActViewer extends Viewer
       l.setVerticalAlignment(JLabel.TOP);
     }
     VisualActField f = new VisualActField(field);
-
+    visualActFields.add(f);
     JPanel panel = new JPanel(new BorderLayout(5, 5));
 
     panel.add(l, BorderLayout.WEST);
@@ -195,10 +215,21 @@ public class ActViewer extends Viewer
     return globalPanel;
   }
 
+  private void connectUIComponents(ActList actList) {
+    for (int i = 0 ; i < visualActFields.size() ; i++) {
+      VisualActField f = visualActFields.get(i);
+      VisualActField next = (((i+1) < visualActFields.size()) ? visualActFields.get(i+1) : null);
+      f.setNextField(next);
+    }
+  }
+
   private void initActList(ActList actList) {
 
   }
 
+  public void validateAct() {
+
+  }
 
   public void refresh() {
     System.err.println("TODO");
