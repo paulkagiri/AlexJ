@@ -43,9 +43,14 @@ public class MainWindow extends JFrame {
 
     this.setJMenuBar(createMenuBar());
 
+    JScrollPane tabOpenerScrollPane;
+
     this.getContentPane().add(tabs = new CloseableTabbedPane(), BorderLayout.CENTER);
-    this.getContentPane().add(new JScrollPane(tabOpener = createTabSelecter(model)),
+    this.getContentPane().add(tabOpenerScrollPane =
+                              new JScrollPane(tabOpener = createTabSelecter(model)),
 			      BorderLayout.WEST);
+
+    tabOpenerScrollPane.setPreferredSize(new java.awt.Dimension(120, 120));
 
     setSize(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
   }

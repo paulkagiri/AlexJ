@@ -73,6 +73,8 @@ public abstract class ActListFactory
 	System.out.println("Writing '" + dbf.getPath() + "' ...");
 	rewriteDbf();
 	updateDbfSyncTimestamp();
+      } else {
+	System.out.println("DBF file '" + dbf.getPath() + "' already up-to-date");
       }
     }
   }
@@ -81,6 +83,11 @@ public abstract class ActListFactory
    * @return -1 if must read, +1 if must rewrite
    */
   private int mustSyncDbf() throws SQLException {
+    if (!dbf.exists()) {
+      // let's create it
+      return 1;
+    }
+
     PreparedStatement st = db.prepareStatement(
         "SELECT lastDbfSync FROM files WHERE LOWER(file) = ? LIMIT 1");
     st.setString(1, dbf.getPath().toLowerCase());

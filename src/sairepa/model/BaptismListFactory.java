@@ -79,7 +79,12 @@ public class BaptismListFactory extends ActListFactory
 
   public BaptismListFactory(File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "bapteme5.dbf"), fields);
+    this(projectDir, "bapteme5.dbf");
+  }
+
+  protected BaptismListFactory(File projectDir, String filename)
+      throws java.io.FileNotFoundException {
+    super(Util.getFile(projectDir, filename), fields);
   }
 
   public String toString() {

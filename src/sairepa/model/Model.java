@@ -23,6 +23,7 @@ public class Model
 
     factories = new ActListFactory[] {
       new BaptismListFactory(projectDir),
+      new ConfirmationListFactory(projectDir),
       new WeddingListFactory(projectDir),
       new SepulchreListFactory(projectDir)
     };
