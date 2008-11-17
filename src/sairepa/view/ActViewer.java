@@ -33,7 +33,7 @@ import sairepa.model.Util;
 /**
  * is a JPanel displaying one act at a time.
  */
-public class ActViewer extends Viewer
+public class ActViewer extends Viewer implements ActionListener
 {
   public final static long serialVersionUID = 1;
   private ActList actList;
@@ -221,13 +221,19 @@ public class ActViewer extends Viewer
     JPanel buttonPanel = new JPanel(new BorderLayout(5, 5));
     JPanel bigButtonsPanel = new JPanel(new GridLayout(1, 2));
     bigButtonsPanel.add(applyButton);
+    applyButton.addActionListener(this);
     bigButtonsPanel.add(deleteButton);
+    deleteButton.addActionListener(this);
 
     JPanel smallButtonsPanel = new JPanel(new GridLayout(1, 4));
     smallButtonsPanel.add(beginningButton);
+    beginningButton.addActionListener(this);
     smallButtonsPanel.add(previousButton);
+    previousButton.addActionListener(this);
     smallButtonsPanel.add(nextButton);
+    nextButton.addActionListener(this);
     smallButtonsPanel.add(endButton);
+    endButton.addActionListener(this);
 
     buttonPanel.add(bigButtonsPanel, BorderLayout.WEST);
     buttonPanel.add(smallButtonsPanel, BorderLayout.CENTER);
@@ -238,9 +244,36 @@ public class ActViewer extends Viewer
     return globalPanel;
   }
 
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == beginningButton) {
+      currentAct = actListIterator.seek(0);
+      newAct = false;
+      refresh();
+    } else if (e.getSource() == previousButton) {
+      if (actListIterator.hasPrevious()) {
+	currentAct = actListIterator.previous();
+	newAct = false;
+	refresh();
+      }
+    } else if (e.getSource() == nextButton) {
+      if (actListIterator.hasNext()) {
+	currentAct = actListIterator.next();
+	newAct = false;
+	refresh();
+      }
+    } else if (e.getSource() == endButton) {
+      currentAct = actListIterator.seek(actList.getRowCount()-1);
+      newAct = false;
+      refresh();
+    } else {
+      System.err.println("Button non supporte => TODO");
+      Util.check(false);
+    }
+  }
+
   private void updatePositionLabel() {
     if (!newAct) {
-      positionLabel.setText(Integer.toString(actListIterator.currentIndex())
+      positionLabel.setText(Integer.toString(actListIterator.currentIndex()+1)
 			    + " / " + Integer.toString(actList.getRowCount()));
     } else {
       positionLabel.setText("[nouveau] / " + Integer.toString(actList.getRowCount()));
