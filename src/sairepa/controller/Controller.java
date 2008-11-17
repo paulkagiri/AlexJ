@@ -19,7 +19,7 @@ public class Controller
     view.getMainWindow().getQuitButton().addActionListener(
 	new ActionQuit(model, view, this));
     view.getMainWindow().getTabSelecter().addObserver(
-        new TabManager(model, view));
+        new TabController(model, view));
   }
 
   public void close() {

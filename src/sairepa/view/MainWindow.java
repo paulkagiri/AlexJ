@@ -85,4 +85,8 @@ public class MainWindow extends JFrame {
     //tabs.addTab(v.getName(), v.getIcon(), v);
     tabs.addTab(v.getName(), v);
   }
+
+  public void removeViewer(Viewer v) {
+    tabs.remove(v);
+  }
 }

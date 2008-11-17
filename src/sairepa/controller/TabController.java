@@ -8,12 +8,15 @@ import sairepa.view.View;
 import sairepa.view.Viewer;
 import sairepa.view.ViewerFactory;
 
-public class TabManager implements TabSelecter.TabSelecterObserver
+/**
+ * Controls the Tab selecter.
+ */
+public class TabController implements TabSelecter.TabSelecterObserver
 {
   private Model model;
   private View view;
 
-  public TabManager(Model model, View view) {
+  public TabController(Model model, View view) {
     this.model = model;
     this.view = view;
   }
@@ -21,6 +24,7 @@ public class TabManager implements TabSelecter.TabSelecterObserver
   public void tabSelected(ActListFactory actListFactory, ViewerFactory viewerFactory) {
     Viewer v = viewerFactory.createViewer(actListFactory.getList());
     Util.check(v != null);
+    v.addObserver(new ViewerController(model, view));
     view.getMainWindow().addViewer(v);
   }
 }

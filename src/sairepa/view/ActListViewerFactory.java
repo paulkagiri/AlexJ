@@ -33,10 +33,6 @@ public class ActListViewerFactory implements ViewerFactory
     public void refresh() {
       System.err.println("TODO");
     }
-
-    public void close() {
-      System.err.println("TODO");
-    }
   }
 
   public Viewer createViewer(ActList list) {

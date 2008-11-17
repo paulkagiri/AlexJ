@@ -21,8 +21,8 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
     observers = new Vector<ViewerObserver>();
   }
 
-  public interface ViewerObserver {
-    public void viewerClosing();
+  public static interface ViewerObserver {
+    public void viewerClosing(Viewer v);
   }
 
   public ImageIcon getIcon() {
@@ -40,7 +40,7 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
     observers.add(obs);
   }
 
-  public void deleteObserver(ViewerObsever obs) {
+  public void deleteObserver(ViewerObserver obs) {
     observers.remove(obs);
   }
 
@@ -50,7 +50,7 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
 
   public void close() {
     for (ViewerObserver obs : observers) {
-      obs.viewerClosing();
+      obs.viewerClosing(this);
     }
   }
 }
