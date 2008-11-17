@@ -5,6 +5,7 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import sairepa.model.Act;
 import sairepa.gui.CloseableTabbedPane;
 
 public abstract class Viewer extends JPanel implements CloseableTabbedPane.CloseableTab
@@ -22,6 +23,22 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
   }
 
   public static interface ViewerObserver {
+    /**
+     * should add it to the model and start a new one in the view
+     */
+    public void newAct(Viewer v, Act a);
+
+    /**
+     * must update the model if ack
+     * and next call refresh()
+     */
+    public void actChanged(Viewer v, Act a);
+
+    public void actDeleted(Viewer v, Act a);
+
+    /**
+     * must remove from the main window if ack
+     */
     public void viewerClosing(Viewer v);
   }
 

@@ -34,6 +34,10 @@ public class ActList implements Iterable<Act>
     return name;
   }
 
+  public FieldLayout getFields() {
+    return fields;
+  }
+
   public int computeRowCount() throws SQLException {
     synchronized(db) {
       PreparedStatement st = db.prepareStatement(

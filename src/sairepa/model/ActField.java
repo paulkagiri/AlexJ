@@ -25,6 +25,10 @@ public class ActField implements FieldLayoutElement
     return (fieldPrototype instanceof MemoField);
   }
 
+  public int getLength() {
+    return fieldPrototype.Length;
+  }
+
   /**
    * Called by ActEntry when modified
    * sub-classes can change the behavior of this method (but must call it !).

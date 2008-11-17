@@ -23,22 +23,7 @@ public class ActViewerFactory implements ViewerFactory
     return ICON;
   }
 
-  /**
-   * is a JPanel displaying one act at a time.
-   */
-  protected class ActViewer extends Viewer {
-    public final static long serialVersionUID = 1;
-
-    public ActViewer(ActList actList) {
-      super(actList.getName(), NAME, ICON);
-    }
-
-    public void refresh() {
-      System.err.println("TODO");
-    }
-  }
-
   public Viewer createViewer(ActList list) {
-    return new ActViewer(list);
+    return new ActViewer(list, NAME, ICON);
   }
 }

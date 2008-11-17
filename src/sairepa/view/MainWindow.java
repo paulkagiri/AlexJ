@@ -86,6 +86,10 @@ public class MainWindow extends JFrame {
     tabs.addTab(v.getName(), v);
   }
 
+  public void selectViewer(Viewer v) {
+    tabs.setSelectedComponent(v);
+  }
+
   public void removeViewer(Viewer v) {
     tabs.remove(v);
   }

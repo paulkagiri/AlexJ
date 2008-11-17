@@ -21,6 +21,10 @@ public class FieldLayout implements Iterable<ActField>, FieldLayoutElement
     this.elements = elements;
   }
 
+  public String getTitle() {
+    return title;
+  }
+
   public FieldLayoutElement[] getElements() {
     return elements;
   }
