@@ -6,6 +6,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import sairepa.model.Act;
+import sairepa.model.ActList;
 import sairepa.gui.CloseableTabbedPane;
 
 public abstract class Viewer extends JPanel implements CloseableTabbedPane.CloseableTab
@@ -14,11 +15,13 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
   private String viewerName;
   private ImageIcon icon;
   private List<ViewerObserver> observers;
+  private ActList actList;
 
-  public Viewer(String factoryName, String viewerName, ImageIcon icon) {
+  public Viewer(String factoryName, String viewerName, ImageIcon icon, ActList actList) {
     this.factoryName = factoryName;
     this.viewerName = viewerName;
     this.icon = icon;
+    this.actList = actList;
     observers = new Vector<ViewerObserver>();
   }
 
@@ -52,6 +55,9 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
 
   public abstract void refresh();
 
+  public ActList getActList() {
+    return actList;
+  }
 
   public void addObserver(ViewerObserver obs) {
     observers.add(obs);

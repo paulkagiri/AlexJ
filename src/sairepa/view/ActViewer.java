@@ -5,9 +5,12 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.ArrayList;
+import java.util.Map;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -20,6 +23,7 @@ import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
 import sairepa.model.Act;
+import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.ActList;
 import sairepa.model.FieldLayout;
@@ -32,17 +36,21 @@ import sairepa.model.Util;
 public class ActViewer extends Viewer
 {
   public final static long serialVersionUID = 1;
-  private ListIterator<Act> actListIterator;
+  private ActList actList;
+  private ActList.ActListIterator actListIterator;
   private Act currentAct;
   private boolean newAct;
 
-  private List<VisualActField> visualActFields = new ArrayList<VisualActField>();
+  private List<VisualActField> visualActFieldsOrdered = new ArrayList<VisualActField>();
+  private Map<ActField, VisualActField> visualActFields = new HashMap<ActField, VisualActField>();
 
   public ActViewer(ActList actList, String name, ImageIcon icon) {
-    super(actList.getName(), name, icon);
+    super(actList.getName(), name, icon, actList);
+    this.actList = actList;
     prepareUI(actList);
     connectUIComponents(actList);
     initActList(actList);
+    refresh();
   }
 
   protected class VisualActField implements ActionListener {
@@ -51,6 +59,8 @@ public class ActViewer extends Viewer
     private VisualActField nextField = null;
     private JTextComponent textComponent;
     private JComponent component;
+
+    private ActEntry entry = null;
 
     public VisualActField(ActField field) {
       if (!field.isMemo()) {
@@ -71,6 +81,11 @@ public class ActViewer extends Viewer
       this.nextField = field;
     }
 
+    public void setEntry(ActEntry entry) {
+      this.entry = entry;
+      refresh();
+    }
+
     public JComponent getComponent() {
       return component;
     }
@@ -80,11 +95,17 @@ public class ActViewer extends Viewer
     }
 
     public void actionPerformed(ActionEvent e) {
+      entry.setValue(textComponent.getText());
+
       if (nextField != null) {
 	nextField.focus();
       } else {
 	validateAct();
       }
+    }
+
+    public void refresh() {
+      textComponent.setText(entry.getValue());
     }
   }
 
@@ -145,7 +166,7 @@ public class ActViewer extends Viewer
 	return new PanelCreationResult(1, createPanel((ActField)els[idx]));
       }
 
-      JPanel bigMess = new JPanel(new FlowLayout(FlowLayout.LEADING, 5, 5));
+      JPanel bigMess = new JPanel(new FlowLayout(FlowLayout.LEADING, 10, 10));
 
       int i;
       int nmbChars = 0;
@@ -175,7 +196,8 @@ public class ActViewer extends Viewer
       l.setVerticalAlignment(JLabel.TOP);
     }
     VisualActField f = new VisualActField(field);
-    visualActFields.add(f);
+    visualActFields.put(field, f);
+    visualActFieldsOrdered.add(f);
     JPanel panel = new JPanel(new BorderLayout(5, 5));
 
     panel.add(l, BorderLayout.WEST);
@@ -184,7 +206,7 @@ public class ActViewer extends Viewer
     return panel;
   }
 
-
+  private JLabel positionLabel = new JLabel("x / y");
   private JButton applyButton = new JButton("Appliquer");
   private JButton deleteButton = new JButton("Effacer");
   private JButton beginningButton = new JButton("<<");
@@ -211,27 +233,50 @@ public class ActViewer extends Viewer
     buttonPanel.add(smallButtonsPanel, BorderLayout.CENTER);
 
     globalPanel.add(buttonPanel, BorderLayout.EAST);
+    globalPanel.add(positionLabel, BorderLayout.WEST);
 
     return globalPanel;
   }
 
+  private void updatePositionLabel() {
+    if (!newAct) {
+      positionLabel.setText(Integer.toString(actListIterator.currentIndex())
+			    + " / " + Integer.toString(actList.getRowCount()));
+    } else {
+      positionLabel.setText("[nouveau] / " + Integer.toString(actList.getRowCount()));
+    }
+  }
+
   private void connectUIComponents(ActList actList) {
-    for (int i = 0 ; i < visualActFields.size() ; i++) {
-      VisualActField f = visualActFields.get(i);
-      VisualActField next = (((i+1) < visualActFields.size()) ? visualActFields.get(i+1) : null);
+    for (int i = 0 ; i < visualActFieldsOrdered.size() ; i++) {
+      VisualActField f = visualActFieldsOrdered.get(i);
+      VisualActField next = (((i+1) < visualActFieldsOrdered.size()) ?
+			     visualActFieldsOrdered.get(i+1) : null);
       f.setNextField(next);
     }
   }
 
   private void initActList(ActList actList) {
-
+    actListIterator = actList.iterator();
+    if (actListIterator.hasNext()) {
+      currentAct = actListIterator.seek(actList.getRowCount()-1);
+      newAct = false;
+    } else {
+      currentAct = actList.createAct();
+      newAct = true;
+    }
   }
 
   public void validateAct() {
-
+    System.err.println("ActViewer.validateAct(): TODO");
   }
 
   public void refresh() {
-    System.err.println("TODO");
+    updatePositionLabel();
+
+    for (ActEntry e : currentAct.getEntries()) {
+      VisualActField f = visualActFields.get(e.getField());
+      f.setEntry(e);
+    }
   }
 }

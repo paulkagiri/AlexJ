@@ -57,11 +57,14 @@ public class ActList implements Iterable<Act>
     return rowCount;
   }
 
-  private class ActListIterator implements ListIterator<Act> {
-    private int currentRow = 0;
+  public class ActListIterator implements ListIterator<Act> {
+    private int currentRow;
     private Act lastActReturned = null;
 
-    public ActListIterator() { }
+    protected ActListIterator() {
+      currentRow = 0;
+      lastActReturned = null;
+    }
 
     public void add(Act a) {
       insert(a, currentRow + 1);
@@ -108,6 +111,10 @@ public class ActList implements Iterable<Act>
 
     public int previousIndex() {
       return currentRow - 1;
+    }
+
+    public int currentIndex() {
+      return currentRow;
     }
 
     public void remove() {
@@ -162,7 +169,7 @@ public class ActList implements Iterable<Act>
     }
   }
 
-  public ListIterator<Act> iterator() {
+  public ActListIterator iterator() {
     return new ActListIterator();
   }
 

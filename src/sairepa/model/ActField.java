@@ -64,4 +64,16 @@ public class ActField implements FieldLayoutElement
     list.add(this);
     return list.iterator();
   }
+
+  public int hashCode() {
+    return getName().hashCode();
+  }
+
+  public boolean equals(Object o) {
+    if (o == null || !(o instanceof ActField)) {
+      return false;
+    }
+
+    return getName().equals(((ActField)o).getName());
+  }
 }

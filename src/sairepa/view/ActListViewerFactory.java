@@ -27,7 +27,7 @@ public class ActListViewerFactory implements ViewerFactory
     public final static long serialVersionUID = 1;
 
     public ActListViewer(ActList actList) {
-      super(actList.getName(), NAME, ICON);
+      super(actList.getName(), NAME, ICON, actList);
     }
 
     public void refresh() {
