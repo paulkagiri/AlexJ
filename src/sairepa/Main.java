@@ -25,8 +25,8 @@ public class Main {
   private View view;
   private Controller controller;
 
-  private Main() {
-
+  private Main() throws Exception {
+    UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
   }
 
   public Project promptForProject() {
