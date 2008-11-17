@@ -26,7 +26,9 @@ public class Main {
   private Controller controller;
 
   private Main() throws Exception {
-    UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    // we force metal theme to avoid problems with the closeable tabs
+    //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
   }
 
   public Project promptForProject() {

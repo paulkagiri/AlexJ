@@ -77,6 +77,7 @@ public class MainWindow extends JFrame {
   }
 
   public void addViewer(Viewer v) {
-    tabs.addTab(v.getName(), v.getIcon(), v);
+    //tabs.addTab(v.getName(), v.getIcon(), v);
+    tabs.addTab(v.getName(), v);
   }
 }
