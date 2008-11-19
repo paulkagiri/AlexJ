@@ -28,8 +28,9 @@ public class Act
 
     this.db = db;
     this.actList = actList;
-    entries = new HashMap<ActField, ActEntry>();
+    this.fields = fields;
 
+    entries = new HashMap<ActField, ActEntry>();
     for (ActField field : fields) {
       entries.put(field, field.createEntry(this));
     }
@@ -79,6 +80,8 @@ public class Act
    * reload according to the row. may have some side effects
    */
   public void reload() {
+    Util.check(fields != null);
+
     synchronized(db) {
       try {
         entries = new HashMap<ActField, ActEntry>();
@@ -169,5 +172,9 @@ public class Act
 	throw new RuntimeException("SQLException", e);
       }
     }
+  }
+
+  public boolean validate() {
+    return fields.validate(this);
   }
 }

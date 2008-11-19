@@ -15,19 +15,31 @@ public class ViewerController implements Viewer.ViewerObserver
     this.view = view;
   }
 
-  public void creatingAct(Viewer v, Act a) {
+  public boolean creatingAct(Viewer v, Act a) {
+    if (!a.validate()) {
+      return false;
+    }
     v.getActList().insert(a);
     refreshAllViewers();
+    return true;
   }
 
-  public void changingAct(Viewer v, Act a) {
+  public boolean changingAct(Viewer v, Act a) {
+    if (!a.validate()) {
+      return false;
+    }
     a.update();
     refreshAllViewers();
+    return true;
   }
 
-  public void deletingAct(Viewer v, Act a) {
+  public boolean deletingAct(Viewer v, Act a) {
+    if (!a.validate()) {
+      return false;
+    }
     v.getActList().delete(a);
     refreshAllViewers();
+    return true;
   }
 
   private void refreshAllViewers() {

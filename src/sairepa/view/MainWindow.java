@@ -53,7 +53,7 @@ public class MainWindow extends JFrame {
 			      BorderLayout.WEST);
 
     tabOpenerScrollPane.getVerticalScrollBar().setUnitIncrement(15);
-    tabOpenerScrollPane.setPreferredSize(new java.awt.Dimension(120, 120));
+    tabOpenerScrollPane.setPreferredSize(new java.awt.Dimension(140, 140));
 
     setSize(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
   }

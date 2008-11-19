@@ -29,21 +29,14 @@ public class ActField implements FieldLayoutElement
     return fieldPrototype.getLength();
   }
 
-  /**
-   * Called by ActEntry when modified
-   * sub-classes can change the behavior of this method (but must call it !).
-   */
-  protected void notifyUpdate(ActEntry e) {
+  private int getMaxLength() {
     int maxLength = 255;
 
     if (!(fieldPrototype instanceof MemoField)) {
       maxLength = fieldPrototype.getLength();
     }
 
-    // truncate if too long
-    if (e.getValue().length() > maxLength) {
-      e.setValue(e.getValue().substring(0, maxLength), false);
-    }
+    return maxLength;
   }
 
   public Field createDBFField() {
@@ -81,10 +74,26 @@ public class ActField implements FieldLayoutElement
     return validate(a.getEntry(this));
   }
 
+
+  /**
+   * Called by ActEntry when modified
+   * sub-classes can change the behavior of this method (but must call it !).
+   */
+  protected void notifyUpdate(ActEntry e) {
+  }
+
   /**
    * Can be overridden
    */
-  public boolean validate(ActEntry field) {
+  public boolean validate(ActEntry entry) {
+    if (entry.getValue() == null) {
+      return false;
+    }
+
+    if (entry.getValue().length() > getMaxLength()) {
+      return false;
+    }
+
     return true;
   }
 }

@@ -1,16 +1,19 @@
 package sairepa.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-
+import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -20,6 +23,8 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.text.JTextComponent;
 
 import sairepa.model.Act;
@@ -53,20 +58,26 @@ public class ActViewer extends Viewer implements ActionListener
     refresh();
   }
 
-  protected class VisualActField implements ActionListener {
+  protected class VisualActField implements ActionListener, InputMethodListener, CaretListener {
     private final long serialVersionUID = 1;
 
     private VisualActField nextField = null;
     private JTextComponent textComponent;
     private JComponent component;
 
+    private JLabel associatedLabel;
+
     private ActField field = null;
     private ActEntry entry = null;
 
-    public VisualActField(ActField field) {
+    private Color initialColor;
+    private Color initialLabelColor;
+
+    public VisualActField(ActField field, JLabel associatedLabel) {
       Util.check(field != null);
 
       this.field = field;
+      this.associatedLabel = associatedLabel;
 
       if (!field.isMemo()) {
 	JTextField f = new JTextField(maximizeLength(field.getLength()));
@@ -81,6 +92,12 @@ public class ActViewer extends Viewer implements ActionListener
 	component = new JScrollPane(textComponent);
 	((JScrollPane)component).getVerticalScrollBar().setUnitIncrement(10);
       }
+
+      textComponent.addInputMethodListener(this);
+      textComponent.addCaretListener(this);
+
+      initialColor = textComponent.getForeground();
+      initialLabelColor = associatedLabel.getForeground();
     }
 
     public ActField getField() {
@@ -104,18 +121,43 @@ public class ActViewer extends Viewer implements ActionListener
       textComponent.requestFocus();
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void updateEntry() {
       entry.setValue(textComponent.getText());
+
+      if (entry.validate()) {
+	textComponent.setForeground(initialColor);
+	associatedLabel.setForeground(initialLabelColor);
+      } else {
+	textComponent.setForeground(new Color(255, 0, 0));
+	associatedLabel.setForeground(new Color(255, 0, 0));
+      }
+      updateButtonStates();
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      updateEntry();
+      refresh();
 
       if (nextField != null) {
 	nextField.focus();
       } else {
-	applyChanges();
+	continueTyping();
       }
     }
 
     public void refresh() {
       textComponent.setText(entry.getValue());
+    }
+
+    public void caretPositionChanged(InputMethodEvent event) {
+    }
+
+    public void inputMethodTextChanged(InputMethodEvent event) {
+      updateEntry();
+    }
+
+    public void	caretUpdate(CaretEvent e) {
+      updateEntry();
     }
   }
 
@@ -207,7 +249,7 @@ public class ActViewer extends Viewer implements ActionListener
     if (field.isMemo()) {
       l.setVerticalAlignment(JLabel.TOP);
     }
-    VisualActField f = new VisualActField(field);
+    VisualActField f = new VisualActField(field, l);
     visualActFields.put(field, f);
     visualActFieldsOrdered.add(f);
     JPanel panel = new JPanel(new BorderLayout(5, 5));
@@ -226,6 +268,7 @@ public class ActViewer extends Viewer implements ActionListener
   private JButton previousButton = new JButton("<");
   private JButton nextButton = new JButton(">");
   private JButton endButton = new JButton(">>");
+  private List<JButton> buttons = new Vector<JButton>();
 
   private JPanel createButtonPanel() {
     JPanel globalPanel = new JPanel(new BorderLayout());
@@ -259,19 +302,39 @@ public class ActViewer extends Viewer implements ActionListener
     return globalPanel;
   }
 
+  public void updateButtonStates() {
+    boolean e = currentAct.validate();
+    applyButton.setEnabled(e);
+    newButton.setEnabled(e);
+    beginningButton.setEnabled(e);
+    previousButton.setEnabled(e);
+    nextButton.setEnabled(e);
+    endButton.setEnabled(e);
+  }
+
+  private boolean hasElements() {
+    return (actList.getRowCount() > 0);
+  }
+
   /**
    * always save the current act before doing anything. Stops
    * immediatly if can't save
    */
   public void actionPerformed(ActionEvent e) {
-    if (!saveAct()) {
-      return;
+    if (e.getSource() != deleteButton) {
+      if (!saveAct()) {
+	return;
+      }
     }
 
     if (e.getSource() == beginningButton) {
-      currentAct = actListIterator.seek(0);
-      newAct = false;
-      refresh();
+      if (!hasElements()) {
+	startNewAct();
+      } else {
+	currentAct = actListIterator.seek(0);
+	newAct = false;
+	refresh();
+      }
     } else if (e.getSource() == previousButton) {
       if (actListIterator.hasPrevious()) {
 	currentAct = actListIterator.previous();
@@ -285,11 +348,9 @@ public class ActViewer extends Viewer implements ActionListener
 	refresh();
       }
     } else if (e.getSource() == endButton) {
-      currentAct = actListIterator.seek(actList.getRowCount()-1);
-      newAct = false;
-      refresh();
+      goToLastAct();
     } else if (e.getSource() == applyButton) {
-      applyChanges();
+      continueTyping();
     } else if (e.getSource() == deleteButton) {
       deleteAct();
     } else if (e.getSource() == newButton) {
@@ -297,19 +358,36 @@ public class ActViewer extends Viewer implements ActionListener
     }
   }
 
-  private void saveAct() {
+  private boolean saveAct() {
+    // just to make sure
+    for (VisualActField vFields : visualActFieldsOrdered) {
+      vFields.updateEntry();
+      vFields.refresh();
+    }
+
     if (newAct) {
       for (ViewerObserver obs : getObservers()) {
-	obs.creatingAct(this, currentAct);
+	if (!obs.creatingAct(this, currentAct))
+	  return false;
       }
+
+      currentAct = actListIterator.seek(currentAct.getRow());
     } else {
       for (ViewerObserver obs : getObservers()) {
-	obs.changingAct(this, currentAct);
+	if (!obs.changingAct(this, currentAct))
+	  return false;
       }
     }
+
+    return true;
   }
 
-  private void applyChanges() {
+  private void continueTyping() {
+    if (!currentAct.validate()) {
+      return;
+    }
+
+    // has already been saved
     if (newAct) {
       startNewAct();
     } else {
@@ -329,27 +407,42 @@ public class ActViewer extends Viewer implements ActionListener
     refresh();
   }
 
+  private void moveBack() {
+    // we are on the last element, so we need to go back
+    if (actListIterator.hasPrevious()) {
+      currentAct = actListIterator.previous();
+      newAct = false;
+      refresh();
+    } else {
+      // and if we can't ...
+      startNewAct();
+    }
+  }
+
+  private void goToLastAct() {
+    if (!hasElements()) {
+      startNewAct();
+    } else {
+      currentAct = actListIterator.seek(actList.getRowCount()-1);
+      newAct = false;
+      refresh();
+    }
+  }
+
   private void deleteAct() {
     if (!newAct) {
       Act actToDelete = currentAct;
 
       if (!actListIterator.hasNext()) {
 	// we are on the last element, so we need to go back
-	if (actListIterator.hasPrevious()) {
-	  currentAct = actListIterator.previous();
-	  newAct = false;
-	  refresh();
-	} else {
-	  // and if we can't ...
-	  startNewAct();
-	}
+	moveBack();
       }
 
       for (ViewerObserver obs : getObservers()) {
 	obs.deletingAct(this, actToDelete);
       }
     } else {
-      startNewAct();
+      goToLastAct();
     }
   }
 
@@ -401,5 +494,7 @@ public class ActViewer extends Viewer implements ActionListener
       VisualActField f = visualActFields.get(e.getField());
       f.setEntry(e);
     }
+
+    updateButtonStates();
   }
 }
