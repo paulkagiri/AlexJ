@@ -16,6 +16,9 @@ import org.xBaseJ.micro.xBaseJException;
 import org.xBaseJ.micro.fields.Field;
 import org.xBaseJ.micro.fields.MemoField;
 
+/**
+ * Do the work about importing/exporting DBF files into Hsqldb
+ */
 public abstract class ActListFactory
 {
   private FieldLayout fields;
@@ -58,7 +61,7 @@ public abstract class ActListFactory
 
 	System.out.println("Loading '" + dbf.getPath() + "' ...");
 	purgeFieldsAndEntries();
-	reloadDbf();
+	rereadDbf();
 	updateDbfSyncTimestamp();
 
       }
@@ -209,7 +212,7 @@ public abstract class ActListFactory
     st.execute();
   }
 
-  private void reloadDbf() throws SQLException, IOException {
+  private void rereadDbf() throws SQLException, IOException {
     Util.check(dbf.exists());
 
     updateFieldTable();
@@ -217,7 +220,7 @@ public abstract class ActListFactory
     DBF dbfFile;
 
     try {
-      dbfFile = new DBF(dbf.getPath(), DBF.READ_ONLY);
+      dbfFile = new DBF(dbf.getPath(), DBF.READ_ONLY, "CP850");
     } catch (xBaseJException e) {
 	throw new IOException("xBaseJException while opening the DBF file: " + e.toString());
     }
@@ -229,10 +232,13 @@ public abstract class ActListFactory
 	dbfFile.read();
 	for (int i = 1 ; i <= dbfFile.getFieldCount() ; i++) {
 	  Field field = dbfFile.getField(i);
-	  Util.check(field.get() != null);
+
+	  String value;
+	  Util.check((value = field.get()) != null);
+
 	  int fieldId = getFieldId(field.getName());
 	  Util.check(fieldId != -1);
-	  insertEntry(fieldId, row, field.get().trim());
+	  insertEntry(fieldId, row, value.trim());
 	}
 	row++;
       }
@@ -262,7 +268,7 @@ public abstract class ActListFactory
 	dbfFields.put(field.getName(), field.createDBFField());
       }
 
-      DBF dbfFile = new DBF(dbf.getPath(), (int)DBF.DBASEIII_WITH_MEMO, true);
+      DBF dbfFile = new DBF(dbf.getPath(), (int)DBF.DBASEIII_WITH_MEMO, true, "CP850");
 
       for (Field field : dbfFields.values()) {
 	dbfFile.addField(field);

@@ -26,7 +26,7 @@ public class ActField implements FieldLayoutElement
   }
 
   public int getLength() {
-    return fieldPrototype.Length;
+    return fieldPrototype.getLength();
   }
 
   /**
@@ -37,7 +37,7 @@ public class ActField implements FieldLayoutElement
     int maxLength = 255;
 
     if (!(fieldPrototype instanceof MemoField)) {
-      maxLength = fieldPrototype.Length;
+      maxLength = fieldPrototype.getLength();
     }
 
     // truncate if too long
