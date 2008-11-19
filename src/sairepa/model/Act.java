@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 public class Act
@@ -13,18 +16,22 @@ public class Act
   private Connection db;
   private ActList actList;
   private FieldLayout fields;
-  private List<ActEntry> entries;
+  private Map<ActField, ActEntry> entries;
 
   /**
    * Create a brand new and empty act
    */
-  public Act(Connection db, ActList actList, FieldLayout fields) {
+  protected Act(Connection db, ActList actList, FieldLayout fields) {
+    Util.check(db != null);
+    Util.check(actList != null);
+    Util.check(fields != null);
+
     this.db = db;
     this.actList = actList;
-    entries = new Vector<ActEntry>();
+    entries = new HashMap<ActField, ActEntry>();
 
     for (ActField field : fields) {
-      entries.add(field.createEntry(this));
+      entries.put(field, field.createEntry(this));
     }
   }
 
@@ -32,6 +39,11 @@ public class Act
    * Already existing act loaded from the db
    */
   public Act(Connection db, ActList actList, FieldLayout fields, int row) throws SQLException {
+    Util.check(db != null);
+    Util.check(actList != null);
+    Util.check(fields != null);
+    Util.check(row >= 0);
+
     this.db = db;
     this.fields = fields;
     this.row = row;
@@ -39,8 +51,12 @@ public class Act
     reload();
   }
 
-  public List<ActEntry> getEntries() {
-    return entries;
+  public Collection<ActEntry> getEntries() {
+    return entries.values();
+  }
+
+  public ActEntry getEntry(ActField field) {
+    return entries.get(field);
   }
 
   public void setRow(int row) {
@@ -65,7 +81,7 @@ public class Act
   public void reload() {
     synchronized(db) {
       try {
-        entries = new Vector<ActEntry>();
+        entries = new HashMap<ActField, ActEntry>();
 
 	PreparedStatement fieldGetter = db.prepareStatement(
 	    "SELECT fields.id FROM fields WHERE fields.name = ? AND fields.file = ? LIMIT 1");
@@ -87,7 +103,7 @@ public class Act
 	  Util.check(set.next());
 
 	  String value = set.getString(1);
-	  entries.add(new ActEntry(this, field, value));
+	  entries.put(field, new ActEntry(this, field, value));
 	}
       } catch (SQLException e) {
 	throw new RuntimeException("SQLException", e);
@@ -107,7 +123,7 @@ public class Act
 	PreparedStatement insert = db.prepareStatement(
 	    "INSERT INTO entries (field, row, value) VALUES (?, ?, ?)");
 
-	for (ActEntry entry : entries) {
+	for (ActEntry entry : entries.values()) {
 	  fieldIdGetter.setString(1, entry.getField().getName());
 	  fieldIdGetter.setInt(2, actList.getFileId());
 	  ResultSet set = fieldIdGetter.executeQuery();
@@ -126,10 +142,11 @@ public class Act
     }
   }
 
-  public void delete() {
+  protected void delete() {
     synchronized(db) {
       try {
 	Util.check(row >= 0);
+	Util.check(fields != null);
 
 	PreparedStatement fieldIdGetter = db.prepareStatement(
 	    "SELECT id FROM fields WHERE name = ? AND file = ? LIMIT 1");

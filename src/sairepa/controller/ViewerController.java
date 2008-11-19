@@ -15,25 +15,26 @@ public class ViewerController implements Viewer.ViewerObserver
     this.view = view;
   }
 
-  /**
-   * should add it to the model and start a new one in the view
-   */
-  public void newAct(Viewer v, Act a) {
-    System.out.println("newAct() : TODO");
+  public void creatingAct(Viewer v, Act a) {
+    v.getActList().insert(a);
+    refreshAllViewers();
   }
 
-  /**
-   * must update the model if ack
-   * and next call refresh()
-   */
-  public void actChanged(Viewer v, Act a) {
-    System.out.println("actChanged() : TODO");
+  public void changingAct(Viewer v, Act a) {
+    a.update();
+    refreshAllViewers();
   }
 
-  public void actDeleted(Viewer v, Act a) {
-    System.out.println("actDeleted() : TODO");
+  public void deletingAct(Viewer v, Act a) {
+    v.getActList().delete(a);
+    refreshAllViewers();
   }
 
+  private void refreshAllViewers() {
+    for (Viewer v : view.getMainWindow().getViewers()) {
+      v.refresh();
+    }
+  }
 
   public void viewerClosing(Viewer v) {
     view.getMainWindow().removeViewer(v);

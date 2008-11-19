@@ -69,8 +69,16 @@ public class FieldLayout implements Iterable<ActField>, FieldLayoutElement
     }
   }
 
-
   public Iterator<ActField> iterator() {
     return new ActFieldIterator(elements);
+  }
+
+  public boolean validate(Act a) {
+    for (FieldLayoutElement el : elements) {
+      if (!el.validate(a)) {
+	return false;
+      }
+    }
+    return true;
   }
 }

@@ -1,6 +1,8 @@
 package sairepa.view;
 
 import java.awt.BorderLayout;
+import java.util.List;
+import java.util.Vector;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JMenu;
@@ -50,6 +52,7 @@ public class MainWindow extends JFrame {
                               new JScrollPane(tabOpener = createTabSelecter(model)),
 			      BorderLayout.WEST);
 
+    tabOpenerScrollPane.getVerticalScrollBar().setUnitIncrement(15);
     tabOpenerScrollPane.setPreferredSize(new java.awt.Dimension(120, 120));
 
     setSize(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
@@ -81,9 +84,12 @@ public class MainWindow extends JFrame {
     return menuFileQuit;
   }
 
+  private Vector<Viewer> viewers = new Vector<Viewer>();
+
   public void addViewer(Viewer v) {
     //tabs.addTab(v.getName(), v.getIcon(), v);
     tabs.addTab(v.getName(), v);
+    viewers.add(v);
   }
 
   public void selectViewer(Viewer v) {
@@ -92,5 +98,10 @@ public class MainWindow extends JFrame {
 
   public void removeViewer(Viewer v) {
     tabs.remove(v);
+    viewers.remove(v);
+  }
+
+  public List<Viewer> getViewers() {
+    return viewers;
   }
 }

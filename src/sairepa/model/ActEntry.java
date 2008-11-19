@@ -44,4 +44,8 @@ public class ActEntry
   public void setValue(String value) {
     setValue(value, true);
   }
+
+  public boolean validate() {
+    return field.validate(act);
+  }
 }

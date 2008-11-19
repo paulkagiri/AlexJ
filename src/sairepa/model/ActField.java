@@ -76,4 +76,15 @@ public class ActField implements FieldLayoutElement
 
     return getName().equals(((ActField)o).getName());
   }
+
+  public boolean validate(Act a) {
+    return validate(a.getEntry(this));
+  }
+
+  /**
+   * Can be overridden
+   */
+  public boolean validate(ActEntry field) {
+    return true;
+  }
 }

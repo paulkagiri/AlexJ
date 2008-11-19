@@ -60,9 +60,14 @@ public class ActViewer extends Viewer implements ActionListener
     private JTextComponent textComponent;
     private JComponent component;
 
+    private ActField field = null;
     private ActEntry entry = null;
 
     public VisualActField(ActField field) {
+      Util.check(field != null);
+
+      this.field = field;
+
       if (!field.isMemo()) {
 	JTextField f = new JTextField(maximizeLength(field.getLength()));
 	f.addActionListener(this);
@@ -74,7 +79,12 @@ public class ActViewer extends Viewer implements ActionListener
 	area.setWrapStyleWord(true);
 	textComponent = area;
 	component = new JScrollPane(textComponent);
+	((JScrollPane)component).getVerticalScrollBar().setUnitIncrement(10);
       }
+    }
+
+    public ActField getField() {
+      return field;
     }
 
     public void setNextField(VisualActField field) {
@@ -100,7 +110,7 @@ public class ActViewer extends Viewer implements ActionListener
       if (nextField != null) {
 	nextField.focus();
       } else {
-	validateAct();
+	applyChanges();
       }
     }
 
@@ -112,10 +122,12 @@ public class ActViewer extends Viewer implements ActionListener
 
   private void prepareUI(ActList actList) {
     this.setLayout(new BorderLayout(5, 5));
-    this.add(new JScrollPane(createPanel(actList.getFields()),
-			     JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-			     JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED),
-	     BorderLayout.CENTER);
+    JScrollPane scrollPane =
+      new JScrollPane(createPanel(actList.getFields()),
+		      JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+		      JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.getVerticalScrollBar().setUnitIncrement(15);
+    this.add(scrollPane, BorderLayout.CENTER);
     this.add(createButtonPanel(), BorderLayout.SOUTH);
   }
 
@@ -209,6 +221,7 @@ public class ActViewer extends Viewer implements ActionListener
   private JLabel positionLabel = new JLabel("x / y");
   private JButton applyButton = new JButton("Appliquer");
   private JButton deleteButton = new JButton("Effacer");
+  private JButton newButton = new JButton("Nouveau");
   private JButton beginningButton = new JButton("<<");
   private JButton previousButton = new JButton("<");
   private JButton nextButton = new JButton(">");
@@ -224,6 +237,8 @@ public class ActViewer extends Viewer implements ActionListener
     applyButton.addActionListener(this);
     bigButtonsPanel.add(deleteButton);
     deleteButton.addActionListener(this);
+    bigButtonsPanel.add(newButton);
+    newButton.addActionListener(this);
 
     JPanel smallButtonsPanel = new JPanel(new GridLayout(1, 4));
     smallButtonsPanel.add(beginningButton);
@@ -244,7 +259,15 @@ public class ActViewer extends Viewer implements ActionListener
     return globalPanel;
   }
 
+  /**
+   * always save the current act before doing anything. Stops
+   * immediatly if can't save
+   */
   public void actionPerformed(ActionEvent e) {
+    if (!saveAct()) {
+      return;
+    }
+
     if (e.getSource() == beginningButton) {
       currentAct = actListIterator.seek(0);
       newAct = false;
@@ -265,9 +288,68 @@ public class ActViewer extends Viewer implements ActionListener
       currentAct = actListIterator.seek(actList.getRowCount()-1);
       newAct = false;
       refresh();
+    } else if (e.getSource() == applyButton) {
+      applyChanges();
+    } else if (e.getSource() == deleteButton) {
+      deleteAct();
+    } else if (e.getSource() == newButton) {
+      startNewAct();
+    }
+  }
+
+  private void saveAct() {
+    if (newAct) {
+      for (ViewerObserver obs : getObservers()) {
+	obs.creatingAct(this, currentAct);
+      }
     } else {
-      System.err.println("Button non supporte => TODO");
-      Util.check(false);
+      for (ViewerObserver obs : getObservers()) {
+	obs.changingAct(this, currentAct);
+      }
+    }
+  }
+
+  private void applyChanges() {
+    if (newAct) {
+      startNewAct();
+    } else {
+      if (actListIterator.hasNext()) {
+	currentAct = actListIterator.next();
+      } else {
+	currentAct = actList.createAct();
+	newAct = true;
+      }
+      refresh();
+    }
+  }
+
+  private void startNewAct() {
+    currentAct = actList.createAct();
+    newAct = true;
+    refresh();
+  }
+
+  private void deleteAct() {
+    if (!newAct) {
+      Act actToDelete = currentAct;
+
+      if (!actListIterator.hasNext()) {
+	// we are on the last element, so we need to go back
+	if (actListIterator.hasPrevious()) {
+	  currentAct = actListIterator.previous();
+	  newAct = false;
+	  refresh();
+	} else {
+	  // and if we can't ...
+	  startNewAct();
+	}
+      }
+
+      for (ViewerObserver obs : getObservers()) {
+	obs.deletingAct(this, actToDelete);
+      }
+    } else {
+      startNewAct();
     }
   }
 
@@ -276,7 +358,8 @@ public class ActViewer extends Viewer implements ActionListener
       positionLabel.setText(Integer.toString(actListIterator.currentIndex()+1)
 			    + " / " + Integer.toString(actList.getRowCount()));
     } else {
-      positionLabel.setText("[nouveau] / " + Integer.toString(actList.getRowCount()));
+      positionLabel.setText("" + Integer.toString(actList.getRowCount()+1)
+			    + " (nouveau) / " + Integer.toString(actList.getRowCount()));
     }
   }
 
@@ -285,6 +368,10 @@ public class ActViewer extends Viewer implements ActionListener
       VisualActField f = visualActFieldsOrdered.get(i);
       VisualActField next = (((i+1) < visualActFieldsOrdered.size()) ?
 			     visualActFieldsOrdered.get(i+1) : null);
+      // we don't connect the memo field
+      if (next != null && next.getField().isMemo()) {
+	next = null;
+      }
       f.setNextField(next);
     }
   }
@@ -300,11 +387,14 @@ public class ActViewer extends Viewer implements ActionListener
     }
   }
 
-  public void validateAct() {
-    System.err.println("ActViewer.validateAct(): TODO");
+  private void reloadAct() {
+    if (!newAct) {
+      currentAct.reload();
+    }
   }
 
   public void refresh() {
+    reloadAct();
     updatePositionLabel();
 
     for (ActEntry e : currentAct.getEntries()) {
