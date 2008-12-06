@@ -63,24 +63,40 @@ public class ActListViewer extends Viewer
     }
 
     public int getColumnCount() {
-      return columns.size();
+      return columns.size() + 1;
     }
 
     public String getColumnName(int i) {
-      return columns.get(i).getName();
+      if (i == 0) {
+	return "NUM";
+      }
+
+      return columns.get(i-1).getName();
     }
 
     public ActField getField(int i) {
-      return columns.get(i);
+      if (i == 0) {
+	return null;
+      }
+
+      return columns.get(i-1);
     }
 
     public int findColumn(String name) {
-      return columns.indexOf(name);
+      if (name.equals("NUM")) {
+	return 0;
+      }
+
+      return columns.indexOf(name)+1;
     }
 
     public Object getValueAt(int row, int column) {
+      if (column == 0) {
+	return Integer.toString(row+1);
+      }
+
       Act act = actList.getAct(row);
-      ActEntry entry = act.getEntry(columns.get(column));
+      ActEntry entry = act.getEntry(columns.get(column-1));
       return entry.getValue();
     }
 
@@ -91,8 +107,9 @@ public class ActListViewer extends Viewer
 
     while (e.hasMoreElements()) {
       TableColumn c = e.nextElement();
-      int fieldWidth = model.getField(c.getModelIndex()).getLength();
-      int fieldNameWidth = model.getField(c.getModelIndex()).getName().length();
+      int index = c.getModelIndex();
+      int fieldWidth = ((index > 0) ? model.getField(c.getModelIndex()).getLength() : 4);
+      int fieldNameWidth = ((index > 0) ? model.getField(c.getModelIndex()).getName().length() : 4);
       int width = ((fieldWidth > fieldNameWidth) ? fieldWidth : fieldNameWidth) * 10;
       if (width > 100) {
 	width = 100;
