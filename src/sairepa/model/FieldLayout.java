@@ -81,4 +81,12 @@ public class FieldLayout implements Iterable<ActField>, FieldLayoutElement
     }
     return true;
   }
+
+  public int getNmbChildElements() {
+    int nmb = 0;
+    for (FieldLayoutElement el : elements) {
+      nmb+= el.getNmbChildElements();
+    }
+    return nmb;
+  }
 }

@@ -486,6 +486,7 @@ public class ActViewer extends Viewer implements ActionListener
     }
   }
 
+  @Override
   public void refresh() {
     reloadAct();
     updatePositionLabel();

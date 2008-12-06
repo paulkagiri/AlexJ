@@ -20,21 +20,6 @@ public class ActListViewerFactory implements ViewerFactory
     return ICON;
   }
 
-  /**
-   * is a JPanel displaying a table with all the act in the list
-   */
-  protected class ActListViewer extends Viewer {
-    public final static long serialVersionUID = 1;
-
-    public ActListViewer(ActList actList) {
-      super(actList.getName(), NAME, ICON, actList);
-    }
-
-    public void refresh() {
-      System.err.println("TODO");
-    }
-  }
-
   public Viewer createViewer(ActList list) {
     return new ActListViewer(list);
   }

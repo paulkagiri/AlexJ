@@ -27,5 +27,6 @@ public class TabController implements TabSelecter.TabSelecterObserver
     v.addObserver(new ViewerController(model, view));
     view.getMainWindow().addViewer(v);
     view.getMainWindow().selectViewer(v);
+    v.init();
   }
 }

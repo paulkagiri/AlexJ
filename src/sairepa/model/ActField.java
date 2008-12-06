@@ -26,7 +26,7 @@ public class ActField implements FieldLayoutElement
   }
 
   public int getLength() {
-    return fieldPrototype.getLength();
+    return getMaxLength();
   }
 
   private int getMaxLength() {
@@ -95,5 +95,9 @@ public class ActField implements FieldLayoutElement
     }
 
     return true;
+  }
+
+  public int getNmbChildElements() {
+    return 1;
   }
 }

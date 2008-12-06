@@ -25,6 +25,10 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
     observers = new Vector<ViewerObserver>();
   }
 
+  public void init() {
+
+  }
+
   public static interface ViewerObserver {
     /**
      * should add it to the model
