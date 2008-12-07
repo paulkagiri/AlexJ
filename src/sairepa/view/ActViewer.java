@@ -499,4 +499,8 @@ public class ActViewer extends Viewer implements ActionListener
 
     updateButtonStates();
   }
+
+  public boolean canClose() {
+    return currentAct.validate();
+  }
 }

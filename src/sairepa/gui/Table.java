@@ -22,6 +22,8 @@ import javax.swing.ImageIcon;
 import java.util.List;
 import java.util.Vector;
 
+import sairepa.model.ActEntry;
+
 /**
  * Inherits from JTable
  */
@@ -153,7 +155,6 @@ public class Table extends JTable implements MouseListener {
     private final static long serialVersionUID = 20060821;
 
     private boolean statusInProgressBars = true;
-    private int columnWithKeys = -1;
 
     private JLabel labelRenderer;
     private JTextArea textAreaRenderer;
@@ -168,10 +169,6 @@ public class Table extends JTable implements MouseListener {
 
     public void showStatusInProgressBars(boolean v) {
       statusInProgressBars = v;
-    }
-
-    public void specifyColumnWithKeys(int c) {
-      columnWithKeys = c;
     }
 
 
@@ -225,11 +222,10 @@ public class Table extends JTable implements MouseListener {
 
       setBackground(cell, row, isSelected);
 
-      cell.setForeground(Color.BLACK);
-
-
-      if (column == columnWithKeys && value instanceof String) {
-	String key = (String)value;
+      if (value instanceof ActEntry && !((ActEntry)value).validate()) {
+	cell.setForeground(Color.RED);
+      } else {
+	cell.setForeground(Color.BLACK);
       }
 
       return cell;

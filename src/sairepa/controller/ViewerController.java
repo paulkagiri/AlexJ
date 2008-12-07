@@ -20,7 +20,7 @@ public class ViewerController implements Viewer.ViewerObserver
       return false;
     }
     v.getActList().insert(a);
-    refreshAllViewers();
+    refreshAllViewers(v);
     return true;
   }
 
@@ -29,7 +29,7 @@ public class ViewerController implements Viewer.ViewerObserver
       return false;
     }
     a.update();
-    refreshAllViewers();
+    refreshAllViewers(v);
     return true;
   }
 
@@ -38,18 +38,22 @@ public class ViewerController implements Viewer.ViewerObserver
       return false;
     }
     v.getActList().delete(a);
-    refreshAllViewers();
+    refreshAllViewers(v);
     return true;
   }
 
-  private void refreshAllViewers() {
+  private void refreshAllViewers(Viewer exception) {
     for (Viewer v : view.getMainWindow().getViewers()) {
-      v.getActList().refresh();
-      v.refresh();
+      if (v != exception) {
+	v.getActList().refresh();
+	v.refresh();
+      }
     }
   }
 
   public void viewerClosing(Viewer v) {
-    view.getMainWindow().removeViewer(v);
+    if (v.canClose()) {
+      view.getMainWindow().removeViewer(v);
+    }
   }
 }

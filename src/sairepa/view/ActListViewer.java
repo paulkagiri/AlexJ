@@ -99,9 +99,27 @@ public class ActListViewer extends Viewer implements Table.ReorderingListener
       }
 
       ActEntry entry = act.getEntry(columns.get(column-1));
-      return entry.getValue();
+      return entry;
     }
 
+    public boolean isCellEditable(int row, int column) {
+      return (column > 0);
+    }
+
+    public void setValueAt(Object value, int row, int column) {
+      System.out.println("Setting value");
+
+      String val = value.toString();
+      Act act = actList.getAct(row);
+      ActEntry entry = act.getEntry(getField(column));
+      entry.setValue(val);
+
+      fireTableRowsUpdated(row, row);
+
+      for (ViewerObserver obs : getObservers()) {
+	obs.changingAct(ActListViewer.this, act);
+      }
+    }
   }
 
   private void resizeColumnsToDefault() {
@@ -133,5 +151,18 @@ public class ActListViewer extends Viewer implements Table.ReorderingListener
       actList = actList.getSortedActList(colName, desc);
     }
     refresh();
+  }
+
+  public boolean canClose() {
+    boolean ok = true;
+
+    for (Act a : actList) {
+      if (!a.validate()) {
+	ok = false;
+	break;
+      }
+    }
+
+    return ok;
   }
 }

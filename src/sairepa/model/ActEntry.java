@@ -48,4 +48,8 @@ public class ActEntry
   public boolean validate() {
     return field.validate(act);
   }
+
+  public String toString() {
+    return getValue();
+  }
 }
