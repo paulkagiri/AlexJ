@@ -4,6 +4,7 @@ import javax.swing.ImageIcon;
 
 import sairepa.gui.IconBox;
 import sairepa.model.ActList;
+import sairepa.model.ActListFactory;
 
 public class ActListViewerFactory implements ViewerFactory
 {
@@ -18,6 +19,10 @@ public class ActListViewerFactory implements ViewerFactory
 
   public ImageIcon getIcon() {
     return ICON;
+  }
+
+  public ActList extractActList(ActListFactory factory) {
+    return factory.getActList();
   }
 
   public Viewer createViewer(ActList list) {

@@ -17,25 +17,26 @@ import sairepa.model.Act;
 import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.ActList;
+import sairepa.model.ActListFactory;
 
-public class ActListViewer extends Viewer
+public class ActListViewer extends Viewer implements Table.ReorderingListener
 {
   public final static long serialVersionUID = 1;
 
   private ActList actList;
   private ActListTableModel model;
-  private JTable table;
+  private Table table;
 
   public ActListViewer(ActList actList) {
-    super(actList.getName(),
+    super(actList,
 	  ActListViewerFactory.NAME,
-	  ActListViewerFactory.ICON,
-	  actList);
+	  ActListViewerFactory.ICON);
     this.actList = actList;
     this.setLayout(new BorderLayout());
     model = new ActListTableModel();
     table = new Table(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+    table.addReorderingListener(this);
     this.add(new JScrollPane(table), BorderLayout.CENTER);
   }
 
@@ -91,11 +92,12 @@ public class ActListViewer extends Viewer
     }
 
     public Object getValueAt(int row, int column) {
+      Act act = actList.getAct(row);
+
       if (column == 0) {
-	return Integer.toString(row+1);
+	return Integer.toString(act.getRow() + 1);
       }
 
-      Act act = actList.getAct(row);
       ActEntry entry = act.getEntry(columns.get(column-1));
       return entry.getValue();
     }
@@ -110,9 +112,9 @@ public class ActListViewer extends Viewer
       int index = c.getModelIndex();
       int fieldWidth = ((index > 0) ? model.getField(c.getModelIndex()).getLength() : 4);
       int fieldNameWidth = ((index > 0) ? model.getField(c.getModelIndex()).getName().length() : 4);
-      int width = ((fieldWidth > fieldNameWidth) ? fieldWidth : fieldNameWidth) * 10;
-      if (width > 100) {
-	width = 100;
+      int width = ((fieldWidth > fieldNameWidth) ? fieldWidth : fieldNameWidth) * 15;
+      if (width > 150) {
+	width = 150;
       }
       c.setPreferredWidth(width);
     }
@@ -121,5 +123,15 @@ public class ActListViewer extends Viewer
   @Override
   public void refresh() {
     model.fireTableDataChanged();
+  }
+
+  public void reorder(int columnIndex, boolean desc) {
+    if (columnIndex == 0) {
+      actList = actList.getSortedActList(null, desc);
+    } else {
+      String colName = model.getColumnName(columnIndex);
+      actList = actList.getSortedActList(colName, desc);
+    }
+    refresh();
   }
 }

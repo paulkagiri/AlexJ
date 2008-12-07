@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 
 import sairepa.model.Act;
 import sairepa.model.ActList;
+import sairepa.model.ActListFactory;
 import sairepa.gui.CloseableTabbedPane;
 
 public abstract class Viewer extends JPanel implements CloseableTabbedPane.CloseableTab
@@ -17,8 +18,8 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
   private List<ViewerObserver> observers;
   private ActList actList;
 
-  public Viewer(String factoryName, String viewerName, ImageIcon icon, ActList actList) {
-    this.factoryName = factoryName;
+  public Viewer(ActList actList, String viewerName, ImageIcon icon) {
+    this.factoryName = actList.getName();
     this.viewerName = viewerName;
     this.icon = icon;
     this.actList = actList;

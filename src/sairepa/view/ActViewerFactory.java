@@ -7,6 +7,7 @@ import javax.swing.JTextField;
 
 import sairepa.gui.IconBox;
 import sairepa.model.ActList;
+import sairepa.model.ActListFactory;
 
 public class ActViewerFactory implements ViewerFactory
 {
@@ -23,7 +24,11 @@ public class ActViewerFactory implements ViewerFactory
     return ICON;
   }
 
+  public ActList extractActList(ActListFactory factory) {
+    return factory.getActList();
+  }
+
   public Viewer createViewer(ActList list) {
-    return new ActViewer(list, NAME, ICON);
+    return new ActViewer(list);
   }
 }

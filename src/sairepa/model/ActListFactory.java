@@ -67,7 +67,7 @@ public abstract class ActListFactory
       }
     }
 
-    actList = new ActList(db, fileId, fields, toString());
+    actList = new DbActList(db, fileId, fields, toString());
   }
 
   public void save() throws SQLException, IOException {
@@ -316,7 +316,10 @@ public abstract class ActListFactory
     }
   }
 
-  public ActList getList() {
+  /**
+   * Returns the default act list type, always hitting the DB
+   */
+  public ActList getActList() {
     return actList;
   }
 

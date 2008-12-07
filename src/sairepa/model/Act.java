@@ -17,11 +17,12 @@ public class Act
   private ActList actList;
   private FieldLayout fields;
   private Map<ActField, ActEntry> entries;
+  private int fileId = -1;
 
   /**
    * Create a brand new and empty act
    */
-  protected Act(Connection db, ActList actList, FieldLayout fields) {
+  protected Act(Connection db, ActList actList, int fileId, FieldLayout fields) {
     Util.check(db != null);
     Util.check(actList != null);
     Util.check(fields != null);
@@ -29,6 +30,7 @@ public class Act
     this.db = db;
     this.actList = actList;
     this.fields = fields;
+    this.fileId = fileId;
 
     entries = new HashMap<ActField, ActEntry>();
     for (ActField field : fields) {
@@ -39,7 +41,7 @@ public class Act
   /**
    * Already existing act loaded from the db
    */
-  public Act(Connection db, ActList actList, FieldLayout fields, int row) throws SQLException {
+  public Act(Connection db, ActList actList, int fileId, FieldLayout fields, int row) throws SQLException {
     Util.check(db != null);
     Util.check(actList != null);
     Util.check(fields != null);
@@ -49,6 +51,8 @@ public class Act
     this.fields = fields;
     this.row = row;
     this.actList = actList;
+    this.fileId = fileId;
+
     reload();
   }
 
@@ -93,7 +97,7 @@ public class Act
 
 	for (ActField field : fields) {
 	  fieldGetter.setString(1, field.getName());
-	  fieldGetter.setInt(2, actList.getFileId());
+	  fieldGetter.setInt(2, fileId);
 	  ResultSet set = fieldGetter.executeQuery();
 	  Util.check(set.next());
 	  int fieldId = set.getInt(1);
@@ -128,7 +132,7 @@ public class Act
 
 	for (ActEntry entry : entries.values()) {
 	  fieldIdGetter.setString(1, entry.getField().getName());
-	  fieldIdGetter.setInt(2, actList.getFileId());
+	  fieldIdGetter.setInt(2, fileId);
 	  ResultSet set = fieldIdGetter.executeQuery();
 	  Util.check(set.next());
 	  int fieldId = set.getInt(1);
@@ -158,7 +162,7 @@ public class Act
 
 	for (ActField field : fields) {
 	  fieldIdGetter.setString(1, field.getName());
-	  fieldIdGetter.setInt(2, actList.getFileId());
+	  fieldIdGetter.setInt(2, fileId);
 	  ResultSet set = fieldIdGetter.executeQuery();
 	  Util.check(set.next());
 	  int fieldId = set.getInt(1);

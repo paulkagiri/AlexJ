@@ -13,192 +13,37 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Vector;
 
-public class ActList implements Iterable<Act>
+public interface ActList extends Iterable<Act>
 {
-  private Connection db;
-  private int fileId;
-  private FieldLayout fields;
-  private int rowCount;
-  private String name;
+  public String getName();
+  public FieldLayout getFields();
+  public int getRowCount();
 
-  public ActList(Connection db, int fileId, FieldLayout fields, String name)
-      throws SQLException, IOException {
-    this.db = db;
-    this.fileId = fileId;
-    this.fields = fields;
-    this.rowCount = computeRowCount();
-    this.name = name;
+  public static interface ActListIterator extends ListIterator<Act> {
+    public void add(Act a);
+    public boolean hasNext();
+    public boolean hasPrevious();
+    public Act next();
+    public int nextIndex();
+    public Act previous();
+    public Act seek(int position);
+    public int previousIndex();
+    public int currentIndex();
+    public void remove();
+    public void set(Act a);
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public FieldLayout getFields() {
-    return fields;
-  }
-
-  public int computeRowCount() throws SQLException {
-    synchronized(db) {
-      PreparedStatement st = db.prepareStatement(
-          "SELECT entries.row " +
-          "FROM ENTRIES INNER JOIN FIELDS ON entries.field = fields.id " +
-	  "WHERE fields.file = ? ORDER BY entries.row DESC LIMIT 1");
-      st.setInt(1, fileId);
-
-      ResultSet set = st.executeQuery();
-      rowCount = ((set.next()) ? set.getInt(1) + 1 : 0);
-      set.close();
-      return rowCount;
-    }
-  }
-
-  public int getRowCount() {
-    return rowCount;
-  }
-
-  public class ActListIterator implements ListIterator<Act> {
-    private int currentRow;
-    private Act lastActReturned = null;
-
-    protected ActListIterator() {
-      currentRow = 0;
-      lastActReturned = null;
-    }
-
-    public void add(Act a) {
-      insert(a, currentRow + 1);
-    }
-
-    public boolean hasNext() {
-      return (currentRow < rowCount - 1);
-    }
-
-    public boolean hasPrevious() {
-      return (currentRow > 0);
-    }
-
-    public Act next() {
-      synchronized(db) {
-	if (!hasNext()) {
-	  Util.check(false);
-	}
-	currentRow++;
-	return (lastActReturned = getAct(currentRow));
-      }
-    }
-
-    public int nextIndex() {
-      return currentRow + 1;
-    }
-
-    public Act previous() {
-      synchronized(db) {
-	if (!hasPrevious()) {
-	  Util.check(false);
-	}
-	currentRow--;
-	return (lastActReturned = getAct(currentRow));
-      }
-    }
-
-    public Act seek(int position) {
-      synchronized(db) {
-	currentRow = position;
-	return (lastActReturned = getAct(position));
-      }
-    }
-
-    public int previousIndex() {
-      return currentRow - 1;
-    }
-
-    public int currentIndex() {
-      return currentRow;
-    }
-
-    public void remove() {
-      delete(lastActReturned);
-    }
-
-    public void	set(Act a) {
-      synchronized(db) {
-	a.setRow(currentRow, false);
-	a.update();
-      }
-    }
-  }
-
-  public Act getAct(int row) {
-    synchronized(db) {
-      try {
-	Act act = new Act(db, this, fields, row);
-	return act;
-      } catch(SQLException e) {
-	throw new RuntimeException("SQLException", e);
-      }
-    }
-  }
-
-  public void insert(Act act) {
-    insert(act, rowCount);
-  }
-
-  public void insert(Act act, int row) {
-    synchronized(db) {
-      try {
-	act.setRow(row, false);
-	shiftAfter(row, 1);
-	act.update();
-	rowCount++;
-      } catch (SQLException e) {
-	throw new RuntimeException("SQLException", e);
-      }
-    }
-  }
-
-  public void delete(Act act) {
-    synchronized(db) {
-      try {
-	act.delete();
-	shiftAfter(act.getRow(), -1);
-	rowCount--;
-      } catch (SQLException e) {
-	throw new RuntimeException("SQLException", e);
-      }
-    }
-  }
-
-  public ActListIterator iterator() {
-    return new ActListIterator();
-  }
-
-  private void shiftAfter(int position, int shift) throws SQLException {
-    PreparedStatement selectFields = db.prepareStatement(
-        "SELECT fields.id FROM fields WHERE fields.file = ?");
-    selectFields.setInt(1, fileId);
-    ResultSet set = selectFields.executeQuery();
-
-    PreparedStatement update = db.prepareStatement(
-        "UPDATE entries SET row = row + ? " +
-	"WHERE row >= ? AND field = ?");
-
-    while(set.next()) {
-      update.setInt(1, shift);
-      update.setInt(2, position);
-      update.setInt(3, set.getInt(1));
-      update.execute();
-    }
-  }
-
+  public Act getAct(int row);
   /**
-   * this act is not stored until added to the list
+   * @param sortedBy field name ; can be null
+   * @return beware: can return this !
    */
-  public Act createAct() {
-    return new Act(db, this, fields);
-  }
+  public ActList getSortedActList(String sortedBy, boolean desc);
 
-  protected int getFileId() {
-    return fileId;
-  }
+  public void insert(Act act);
+  public void insert(Act act, int row);
+  public void delete(Act act);
+  public ActListIterator iterator();
+  public Act createAct();
+  public void refresh();
 }

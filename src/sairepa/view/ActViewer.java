@@ -31,6 +31,7 @@ import sairepa.model.Act;
 import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.ActList;
+import sairepa.model.ActListFactory;
 import sairepa.model.FieldLayout;
 import sairepa.model.FieldLayoutElement;
 import sairepa.model.Util;
@@ -49,8 +50,8 @@ public class ActViewer extends Viewer implements ActionListener
   private List<VisualActField> visualActFieldsOrdered = new ArrayList<VisualActField>();
   private Map<ActField, VisualActField> visualActFields = new HashMap<ActField, VisualActField>();
 
-  public ActViewer(ActList actList, String name, ImageIcon icon) {
-    super(actList.getName(), name, icon, actList);
+  public ActViewer(ActList actList) {
+    super(actList, ActViewerFactory.NAME, ActViewerFactory.ICON);
     this.actList = actList;
     prepareUI(actList);
     connectUIComponents(actList);

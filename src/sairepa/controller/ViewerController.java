@@ -44,6 +44,7 @@ public class ViewerController implements Viewer.ViewerObserver
 
   private void refreshAllViewers() {
     for (Viewer v : view.getMainWindow().getViewers()) {
+      v.getActList().refresh();
       v.refresh();
     }
   }
