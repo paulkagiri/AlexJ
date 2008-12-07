@@ -22,7 +22,7 @@ public class ActListViewerFactory implements ViewerFactory
   }
 
   public ActList extractActList(ActListFactory factory) {
-    return factory.getActList();
+    return factory.getInMemoryActList();
   }
 
   public Viewer createViewer(ActList list) {

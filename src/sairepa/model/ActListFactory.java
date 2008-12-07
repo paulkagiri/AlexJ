@@ -323,5 +323,14 @@ public abstract class ActListFactory
     return actList;
   }
 
+  public ActList getInMemoryActList() {
+    try {
+      return new InMemoryActList(actList);
+    } catch (OutOfMemoryError e) {
+      System.err.println("OutOfMemoryError ; Falling back on direct DB access");
+      return actList;
+    }
+  }
+
   public abstract String toString();
 }
