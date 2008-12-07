@@ -23,7 +23,7 @@ public class SepulchreListFactory extends ActListFactory
 	  new ActField(new NumField("JOUR", 2, 0)),
 	  new ActField(new NumField("MOIS", 2, 0)),
 	  new ActField(new NumField("ANNEE", 4, 0)),
-	  new FieldLayout("Renseignements concernant le defunt",
+	  new FieldLayout("Renseignements concernant le d\351funt",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("NOM1", 20)),
 			    new ActField(new CharField("PRN1", 23)),
@@ -31,7 +31,7 @@ public class SepulchreListFactory extends ActListFactory
 			    new ActField(new CharField("AGE1", 13)),
 			    new ActField(new CharField("NOT1", 40)),
 			  }),
-	  new FieldLayout("Pere du defunt",
+	  new FieldLayout("P\350re du d\351funt",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("NOM2", 20)),
 			    new ActField(new CharField("NOM2CV", 20)),
@@ -39,7 +39,7 @@ public class SepulchreListFactory extends ActListFactory
 			    new ActField(new CharField("PRN2CV", 8)),
 			    new ActField(new CharField("NOT2", 40)),
 			  }),
-	  new FieldLayout("Mere du defunt",
+	  new FieldLayout("M\350re du d\351funt",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("NOM3", 20)),
 			    new ActField(new CharField("NOM3CV", 20)),
@@ -47,7 +47,7 @@ public class SepulchreListFactory extends ActListFactory
 			    new ActField(new CharField("PRN3CV", 8)),
 			    new ActField(new CharField("NOT3", 40)),
 			  }),
-	  new FieldLayout("Conjoint du defunt",
+	  new FieldLayout("Conjoint du d\351funt",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("NOMC", 20)),
 			    new ActField(new CharField("PRNC", 23)),

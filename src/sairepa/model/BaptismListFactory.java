@@ -23,7 +23,7 @@ public class BaptismListFactory extends ActListFactory
 	  new ActField(new NumField("JOUR", 2, 0)),
 	  new ActField(new NumField("MOIS", 2, 0)),
 	  new ActField(new NumField("ANNEE", 4, 0)),
-	  new FieldLayout("Renseignements concernant le baptise",
+	  new FieldLayout("Renseignements concernant le baptis\351",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("NOM1", 20)),
 			    new ActField(new CharField("PRN1", 23)),
@@ -31,7 +31,7 @@ public class BaptismListFactory extends ActListFactory
 			    new ActField(new CharField("NEE", 7)),
 			    new ActField(new CharField("NOT1", 40)),
 	    }),
-	  new FieldLayout("Informations concernant le pere du baptise",
+	  new FieldLayout("Informations concernant le p\350re du baptis\351",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("NOM2", 20)),
 			    new ActField(new CharField("NOM2CV", 20)),
@@ -39,7 +39,7 @@ public class BaptismListFactory extends ActListFactory
 			    new ActField(new CharField("PRN2CV", 8)),
 			    new ActField(new CharField("NOT2", 40)),
 			  }),
-	  new FieldLayout("Informations concernant la mere du baptise",
+	  new FieldLayout("Informations concernant la m\350re du baptis\351",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("NOM3", 20)),
 			    new ActField(new CharField("NOM3CV", 20)),

@@ -74,8 +74,9 @@ public abstract class ActListFactory
     synchronized(db) {
       if (mustRewriteDbf()) {
 	System.out.println("Writing '" + dbf.getPath() + "' ...");
-	rewriteDbf();
-	updateDbfSyncTimestamp();
+	if(rewriteDbf()) {
+	  updateDbfSyncTimestamp();
+	}
       } else {
 	System.out.println("DBF file '" + dbf.getPath() + "' already up-to-date");
       }
@@ -260,8 +261,15 @@ public abstract class ActListFactory
     st.execute();
   }
 
-  private void rewriteDbf() throws SQLException, IOException {
+  private boolean rewriteDbf() throws SQLException, IOException {
     try {
+      actList.refresh();
+      if (actList.getRowCount() <= 0) {
+	System.out.println("NOTICE: '" + dbf.getPath() + "' is empty ; not rewritten");
+	dbf.delete();
+	return false;
+      }
+
       Map<String, Field> dbfFields = new HashMap<String, Field>();
 
       for (ActField field : fields) {
@@ -314,6 +322,8 @@ public abstract class ActListFactory
     } catch (xBaseJException e) {
 	throw new IOException("xBaseJException while reading the dbf file: " + e.toString());
     }
+
+    return true;
   }
 
   /**

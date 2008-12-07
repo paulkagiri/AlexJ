@@ -24,7 +24,7 @@ public class WeddingListFactory extends ActListFactory
 	  new ActField(new NumField("JOUR", 2, 0)),
 	  new ActField(new NumField("MOIS", 2, 0)),
 	  new ActField(new NumField("ANNEE", 4, 0)),
-	  new FieldLayout("Renseignement concernant l'epoux",
+	  new FieldLayout("Renseignement concernant l'\351poux",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("NOM2", 20)),
 			    new ActField(new CharField("NOM2CV", 20)),
@@ -34,19 +34,19 @@ public class WeddingListFactory extends ActListFactory
 			    new ActField(new CharField("LOC2ID", 38)),
 			    new ActField(new CharField("CVF2", 1)),
 			    new ActField(new CharField("NOT2", 40)),
-			    new FieldLayout("Pere de l'epoux",
+			    new FieldLayout("P\350re de l'\351poux",
 					    new FieldLayoutElement[] {
 					      new ActField(new CharField("NOM4", 20)),
 					      new ActField(new CharField("PRN4", 23)),
 					      new ActField(new CharField("NOT4", 40)),
 					    }),
-			    new FieldLayout("Mere de l'epoux",
+			    new FieldLayout("M\350re de l'\351poux",
 					    new FieldLayoutElement[] {
 					      new ActField(new CharField("NOM5", 20)),
 					      new ActField(new CharField("PRN5", 23)),
 					    })
 			  }),
-	  new FieldLayout("Renseignement concernant l'epouse",
+	  new FieldLayout("Renseignement concernant l'\351pouse",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("NOM3", 20)),
 			    new ActField(new CharField("NOM3CV", 20)),
@@ -56,13 +56,13 @@ public class WeddingListFactory extends ActListFactory
 			    new ActField(new CharField("LOC3ID", 38)),
 			    new ActField(new CharField("CVF3", 1)),
 			    new ActField(new CharField("NOT3", 40)),
-			    new FieldLayout("Pere de l'epouse",
+			    new FieldLayout("P\350re de l'\351pouse",
 					    new FieldLayoutElement[] {
 					      new ActField(new CharField("NOM6", 20)),
 					      new ActField(new CharField("PRN6", 23)),
 					      new ActField(new CharField("NOT6", 40)),
 					    }),
-			    new FieldLayout("Mere de l'epouse",
+			    new FieldLayout("M\350re de l'\351pouse",
 					    new FieldLayoutElement[] {
 					      new ActField(new CharField("NOM7", 20)),
 					      new ActField(new CharField("PRN7", 23)),
