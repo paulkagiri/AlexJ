@@ -67,6 +67,7 @@ public class InMemoryActList implements ActList
   }
 
   public void refresh() {
+    dbActList.refresh();
 
     // reload the content of the act list in memory
     int current = 0;

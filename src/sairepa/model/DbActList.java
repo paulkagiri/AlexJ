@@ -57,10 +57,20 @@ public class DbActList implements ActList
     return rowCount;
   }
 
+  // often, a same row is asked many times in a row
+  private int lastRowReturned = -1;
+  private Act lastActReturned = null;
+
   public Act getAct(int row) {
     synchronized(db) {
+      if (row == lastRowReturned && lastActReturned != null) {
+	return lastActReturned;
+      }
+
       try {
 	Act act = new Act(db, this, fileId, fields, row);
+	this.lastActReturned = act;
+	this.lastRowReturned = row;
 	return act;
       } catch(SQLException e) {
 	throw new RuntimeException("SQLException", e);
@@ -131,7 +141,15 @@ public class DbActList implements ActList
   }
 
   public void refresh() {
-
+    synchronized(db) {
+      lastRowReturned = -1;
+      lastActReturned = null;
+      try {
+	computeRowCount();
+      } catch (SQLException e) {
+	throw new RuntimeException("SQLException", e);
+      }
+    }
   }
 
   protected class SortedActList implements ActList {
@@ -172,8 +190,15 @@ public class DbActList implements ActList
       return DbActList.this.getRowCount();
     }
 
+    private int lastPositionReturned = -1;
+    private Act lastActReturned = null;
+
     public Act getAct(int position) {
       synchronized(db) {
+	if (position == lastPositionReturned && lastActReturned != null) {
+	  return lastActReturned;
+	}
+
 	int row = -1;
 
 	if (sortingFieldId >= 0) {
@@ -196,7 +221,11 @@ public class DbActList implements ActList
 	}
 
 	Util.check(row >= 0);
-	return DbActList.this.getAct(row);
+
+	Act a = DbActList.this.getAct(row);
+	lastPositionReturned = position;
+	lastActReturned = a;
+	return a;
       }
     }
 
@@ -228,7 +257,11 @@ public class DbActList implements ActList
     }
 
     public void refresh() {
-      DbActList.this.refresh();
+      synchronized(db) {
+	lastActReturned = null;
+	lastPositionReturned = -1;
+	DbActList.this.refresh();
+      }
     }
   }
 
