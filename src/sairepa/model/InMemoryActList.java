@@ -73,11 +73,6 @@ public class InMemoryActList implements ActList
     acts = new Vector<Act>();
     for (Act act : dbActList) {
       acts.add(act);
-      if (current != act.getRow()) {
-	System.err.println("WARNING: Glitch in the DB : "
-			   + "Act row: " + Integer.toString(act.getRow()) + " ; "
-			   + "Expected row: " + Integer.toString(current));
-      }
       current++;
     }
 
