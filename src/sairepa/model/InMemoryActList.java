@@ -22,7 +22,7 @@ public class InMemoryActList implements ActList
   }
 
   public int getRowCount() {
-    return dbActList.getRowCount();
+    return acts.size();
   }
 
   public Act getAct(int row) {
@@ -67,10 +67,26 @@ public class InMemoryActList implements ActList
   }
 
   public void refresh() {
+
     // reload the content of the act list in memory
+    int current = 0;
     acts = new Vector<Act>();
-    for (Act a : dbActList) {
-      acts.add(a);
+    for (Act act : dbActList) {
+      acts.add(act);
+      if (current != act.getRow()) {
+	System.err.println("WARNING: Glitch in the DB : "
+			   + "Act row: " + Integer.toString(act.getRow()) + " ; "
+			   + "Expected row: " + Integer.toString(current));
+      }
+      current++;
     }
+
+    if (acts.size() != dbActList.getRowCount()) {
+      System.err.println("WARNING: Row count invalid ! ("
+			 + Integer.toString(acts.size()) + " / "
+			 + Integer.toString(dbActList.getRowCount()) + ")");
+    }
+
+    Util.check(acts.size() == dbActList.getRowCount());
   }
 }

@@ -107,8 +107,6 @@ public class ActListViewer extends Viewer implements Table.ReorderingListener
     }
 
     public void setValueAt(Object value, int row, int column) {
-      System.out.println("Setting value");
-
       String val = value.toString();
       Act act = actList.getAct(row);
       ActEntry entry = act.getEntry(getField(column));

@@ -10,7 +10,7 @@ public class GenericActListIterator implements ActList.ActListIterator
   protected GenericActListIterator(Object lock, ActList actList) {
     this.actList = actList;
     this.lock = lock;
-    currentRow = 0;
+    currentRow = -1;
     lastActReturned = null;
   }
 
