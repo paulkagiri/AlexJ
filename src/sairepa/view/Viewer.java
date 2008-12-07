@@ -36,6 +36,8 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
      */
     public boolean creatingAct(Viewer v, Act a);
 
+    public boolean insertingAct(Viewer v, Act a, int row);
+
     /**
      * must update the model
      * and next call refresh() on all viewers

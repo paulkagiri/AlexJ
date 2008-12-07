@@ -46,6 +46,7 @@ public class ActViewer extends Viewer implements ActionListener
   private ActList.ActListIterator actListIterator;
   private Act currentAct;
   private boolean newAct;
+  private int newActRow = -1;
 
   private List<VisualActField> visualActFieldsOrdered = new ArrayList<VisualActField>();
   private Map<ActField, VisualActField> visualActFields = new HashMap<ActField, VisualActField>();
@@ -368,7 +369,7 @@ public class ActViewer extends Viewer implements ActionListener
 
     if (newAct) {
       for (ViewerObserver obs : getObservers()) {
-	if (!obs.creatingAct(this, currentAct))
+	if (!obs.insertingAct(this, currentAct, newActRow))
 	  return false;
       }
 
@@ -395,6 +396,7 @@ public class ActViewer extends Viewer implements ActionListener
       if (actListIterator.hasNext()) {
 	currentAct = actListIterator.next();
       } else {
+	newActRow = currentAct.getRow() +1;
 	currentAct = actList.createAct();
 	newAct = true;
       }
@@ -403,6 +405,7 @@ public class ActViewer extends Viewer implements ActionListener
   }
 
   private void startNewAct() {
+    newActRow = currentAct.getRow() + 1;
     currentAct = actList.createAct();
     newAct = true;
     refresh();
@@ -452,8 +455,8 @@ public class ActViewer extends Viewer implements ActionListener
       positionLabel.setText(Integer.toString(actListIterator.currentIndex()+1)
 			    + " / " + Integer.toString(actList.getRowCount()));
     } else {
-      positionLabel.setText("" + Integer.toString(actList.getRowCount()+1)
-			    + " (nouveau) / " + Integer.toString(actList.getRowCount()));
+      positionLabel.setText("" + Integer.toString(newActRow+1)
+			    + " (nouveau) / " + Integer.toString(actList.getRowCount()+1));
     }
   }
 
@@ -476,6 +479,7 @@ public class ActViewer extends Viewer implements ActionListener
       currentAct = actListIterator.seek(actList.getRowCount()-1);
       newAct = false;
     } else {
+      newActRow = currentAct.getRow() + 1;
       currentAct = actList.createAct();
       newAct = true;
     }

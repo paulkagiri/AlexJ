@@ -24,6 +24,15 @@ public class ViewerController implements Viewer.ViewerObserver
     return true;
   }
 
+  public boolean insertingAct(Viewer v, Act a, int row) {
+    if (!a.validate()) {
+      return false;
+    }
+    v.getActList().insert(a, row);
+    refreshAllViewers(v);
+    return true;
+  }
+
   public boolean changingAct(Viewer v, Act a) {
     if (!a.validate()) {
       return false;
