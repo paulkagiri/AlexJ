@@ -6,6 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
 import java.util.ArrayList;
@@ -60,7 +62,7 @@ public class ActViewer extends Viewer implements ActionListener
     refresh();
   }
 
-  protected class VisualActField implements ActionListener, InputMethodListener, CaretListener {
+  protected class VisualActField implements ActionListener, InputMethodListener, CaretListener, FocusListener {
     private final long serialVersionUID = 1;
 
     private VisualActField nextField = null;
@@ -75,7 +77,11 @@ public class ActViewer extends Viewer implements ActionListener
     private Color initialColor;
     private Color initialLabelColor;
 
-    public VisualActField(ActField field, JLabel associatedLabel) {
+    private JPanel parentPanel;
+
+    public VisualActField(ActField field, JLabel associatedLabel, JPanel parent) {
+      this.parentPanel = parent;
+
       Util.check(field != null);
 
       this.field = field;
@@ -97,6 +103,7 @@ public class ActViewer extends Viewer implements ActionListener
 
       textComponent.addInputMethodListener(this);
       textComponent.addCaretListener(this);
+      textComponent.addFocusListener(this);
 
       initialColor = textComponent.getForeground();
       initialLabelColor = associatedLabel.getForeground();
@@ -151,8 +158,7 @@ public class ActViewer extends Viewer implements ActionListener
       textComponent.setText(entry.getValue());
     }
 
-    public void caretPositionChanged(InputMethodEvent event) {
-    }
+    public void caretPositionChanged(InputMethodEvent event) { }
 
     public void inputMethodTextChanged(InputMethodEvent event) {
       updateEntry();
@@ -161,6 +167,13 @@ public class ActViewer extends Viewer implements ActionListener
     public void	caretUpdate(CaretEvent e) {
       updateEntry();
     }
+
+    public void	focusGained(FocusEvent e) {
+      java.awt.Rectangle rect = textComponent.getBounds(null);
+      parentPanel.scrollRectToVisible(rect);
+    }
+
+    public void focusLost(FocusEvent e) { }
   }
 
 
@@ -251,10 +264,10 @@ public class ActViewer extends Viewer implements ActionListener
     if (field.isMemo()) {
       l.setVerticalAlignment(JLabel.TOP);
     }
-    VisualActField f = new VisualActField(field, l);
+    JPanel panel = new JPanel(new BorderLayout(5, 5));
+    VisualActField f = new VisualActField(field, l, panel);
     visualActFields.put(field, f);
     visualActFieldsOrdered.add(f);
-    JPanel panel = new JPanel(new BorderLayout(5, 5));
 
     panel.add(l, BorderLayout.WEST);
     panel.add(f.getComponent(), BorderLayout.CENTER);
@@ -317,6 +330,8 @@ public class ActViewer extends Viewer implements ActionListener
     currentActField.setEditable(e);
     nextButton.setEnabled(actListIterator.hasNext() ? e : false);
     endButton.setEnabled(e);
+
+    deleteButton.setText(newAct ? "Annuler saisie" : "Effacer");
   }
 
   private boolean hasElements() {
