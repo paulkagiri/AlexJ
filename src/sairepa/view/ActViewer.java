@@ -268,6 +268,7 @@ public class ActViewer extends Viewer implements ActionListener
   private JButton newButton = new JButton("Nouveau");
   private JButton beginningButton = new JButton("<<");
   private JButton previousButton = new JButton("<");
+  private JTextField currentActField = new JTextField();
   private JButton nextButton = new JButton(">");
   private JButton endButton = new JButton(">>");
   private List<JButton> buttons = new Vector<JButton>();
@@ -290,18 +291,21 @@ public class ActViewer extends Viewer implements ActionListener
     beginningButton.addActionListener(this);
     smallButtonsPanel.add(previousButton);
     previousButton.addActionListener(this);
+    smallButtonsPanel.add(currentActField);
+    currentActField.addActionListener(this);
     smallButtonsPanel.add(nextButton);
     nextButton.addActionListener(this);
     smallButtonsPanel.add(endButton);
     endButton.addActionListener(this);
 
-    buttonPanel.add(bigButtonsPanel, BorderLayout.WEST);
-    buttonPanel.add(smallButtonsPanel, BorderLayout.CENTER);
+    buttonPanel.add(bigButtonsPanel, BorderLayout.NORTH);
+    buttonPanel.add(smallButtonsPanel, BorderLayout.SOUTH);
 
-    globalPanel.add(buttonPanel, BorderLayout.EAST);
-    globalPanel.add(positionLabel, BorderLayout.WEST);
+    JPanel omegaPanel = new JPanel(new BorderLayout());
+    omegaPanel.add(positionLabel, BorderLayout.CENTER);
+    omegaPanel.add(buttonPanel, BorderLayout.EAST);
 
-    return globalPanel;
+    return omegaPanel;
   }
 
   public void updateButtonStates() {
@@ -309,8 +313,9 @@ public class ActViewer extends Viewer implements ActionListener
     applyButton.setEnabled(e);
     newButton.setEnabled(e);
     beginningButton.setEnabled(e);
-    previousButton.setEnabled(e);
-    nextButton.setEnabled(e);
+    previousButton.setEnabled(actListIterator.hasPrevious() ? e : false);
+    currentActField.setEditable(e);
+    nextButton.setEnabled(actListIterator.hasNext() ? e : false);
     endButton.setEnabled(e);
   }
 
@@ -343,6 +348,13 @@ public class ActViewer extends Viewer implements ActionListener
 	newAct = false;
 	refresh();
       }
+    } else if (e.getSource() == currentActField) {
+	int i = Integer.valueOf(currentActField.getText()) - 1;
+	if (i >= 0 && i < actList.getRowCount()) {
+	    currentAct = actListIterator.seek(i);
+	    newAct = false;
+	}
+	refresh();
     } else if (e.getSource() == nextButton) {
       if (actListIterator.hasNext()) {
 	currentAct = actListIterator.next();
@@ -405,10 +417,14 @@ public class ActViewer extends Viewer implements ActionListener
   }
 
   private void startNewAct() {
-    newActRow = currentAct.getRow() + 1;
-    currentAct = actList.createAct();
-    newAct = true;
-    refresh();
+      if (currentAct != null) {
+	  newActRow = currentAct.getRow() + 1;
+      } else {
+	  newActRow = 0;
+      }
+      currentAct = actList.createAct();
+      newAct = true;
+      refresh();
   }
 
   private void moveBack() {
@@ -442,6 +458,8 @@ public class ActViewer extends Viewer implements ActionListener
 	moveBack();
       }
 
+      reloadAct();
+
       for (ViewerObserver obs : getObservers()) {
 	obs.deletingAct(this, actToDelete);
       }
@@ -454,9 +472,11 @@ public class ActViewer extends Viewer implements ActionListener
     if (!newAct) {
       positionLabel.setText(Integer.toString(actListIterator.currentIndex()+1)
 			    + " / " + Integer.toString(actList.getRowCount()));
+      currentActField.setText(Integer.toString(actListIterator.currentIndex()+1));
     } else {
       positionLabel.setText("" + Integer.toString(newActRow+1)
 			    + " (nouveau) / " + Integer.toString(actList.getRowCount()+1));
+      currentActField.setText(Integer.toString(newActRow+1));
     }
   }
 
@@ -479,9 +499,7 @@ public class ActViewer extends Viewer implements ActionListener
       currentAct = actListIterator.seek(actList.getRowCount()-1);
       newAct = false;
     } else {
-      newActRow = currentAct.getRow() + 1;
-      currentAct = actList.createAct();
-      newAct = true;
+      startNewAct();
     }
   }
 

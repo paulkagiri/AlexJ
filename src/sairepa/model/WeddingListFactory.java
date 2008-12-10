@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 
+import sairepa.model.fields.*;
+
 import org.xBaseJ.micro.xBaseJException;
 import org.xBaseJ.micro.fields.CharField;
 import org.xBaseJ.micro.fields.DateField;

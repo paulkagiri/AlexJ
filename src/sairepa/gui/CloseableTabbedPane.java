@@ -140,13 +140,13 @@ public class CloseableTabbedPane extends JTabbedPane implements MouseListener
 
     JFrame frame=new JFrame();
     JTabbedPane tabPane = new CloseableTabbedPane();
-    tabPane.addTab("long long long long str2", new CloseableTestLabel(tabPane, "0   "));
-    tabPane.addTab("long long long long str1", new JLabel("1   "));
-    tabPane.addTab("long long long long str2", new CloseableTestLabel(tabPane, "2   "));
-    tabPane.addTab("long long long long str3", new CloseableTestLabel(tabPane, "3   "));
+    tabPane.addTab("0", new CloseableTestLabel(tabPane, "0   "));
+    tabPane.addTab("1", new JLabel("1   "));
+    tabPane.addTab("2", new CloseableTestLabel(tabPane, "2   "));
+    tabPane.addTab("3", new CloseableTestLabel(tabPane, "3   "));
     frame.setContentPane(tabPane);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(200,200);
+    frame.setSize(400,400);
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
   }

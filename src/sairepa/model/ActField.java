@@ -70,19 +70,29 @@ public class ActField implements FieldLayoutElement
     return getName().equals(((ActField)o).getName());
   }
 
+  /**
+   * Shouldn't be overriden
+   */
   public boolean validate(Act a) {
     return validate(a.getEntry(this));
   }
 
 
   /**
-   * Called by ActEntry when modified
-   * sub-classes can change the behavior of this method (but must call it !).
+   * Allow to change entry value during typing of the act.
+   * Called by ActEntry when modified.
    */
   protected void notifyUpdate(ActEntry e) {
+      if ("".equals(e.getValue())) {
+	  e.setValue("-");
+      }
+      if (e.getValue().length() > getMaxLength()) {
+	  e.setValue(e.getValue().substring(0, getMaxLength()), false);
+      }
   }
 
   /**
+   * If return false, the act shouldn't be saved to the DB.
    * Can be overridden
    */
   public boolean validate(ActEntry entry) {

@@ -29,25 +29,34 @@ public class ErrorMessage
     displayError(null, msg, e);
   }
 
+  public static void displayError(String msg) {
+    displayError(null, msg, null);
+  }
+
   public static void displayError(Component parent, Exception e) {
     displayError(parent, null, e);
   }
 
   public static void displayError(Component parent, String message,
       Exception e) {
-    Component insidePanel;
+    Component insidePanel = null;
 
-    if (message != null) {
+    if (message != null && e != null) {
       insidePanel = createErrorPanel(new String[] {
 	  message, addDetailHeader(extractStackTrace(e))
 	});
-    } else {
+    } else if (message == null && e != null) {
       insidePanel = createErrorPanel(new String[] {
 	  addDetailHeader(extractStackTrace(e))
 	});
+    } else {
+	insidePanel = createErrorPanel(new String[] {
+		message
+	    });
     }
 
-    JDialog dialog = new JOptionPane(insidePanel, JOptionPane.ERROR_MESSAGE).createDialog(parent, "Erreur");
+    JDialog dialog;
+    dialog = new JOptionPane(insidePanel, JOptionPane.ERROR_MESSAGE).createDialog(parent, "Erreur");
     dialog.setSize(SIZE_X, SIZE_Y);
     dialog.setResizable(true);
     dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

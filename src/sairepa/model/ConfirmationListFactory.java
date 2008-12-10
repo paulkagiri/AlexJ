@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 
+import sairepa.model.fields.*;
+
 import org.xBaseJ.micro.xBaseJException;
 import org.xBaseJ.micro.fields.CharField;
 import org.xBaseJ.micro.fields.DateField;
@@ -23,14 +25,14 @@ public class ConfirmationListFactory extends ActListFactory
   static {
     try {
       fields = new FieldLayout(new FieldLayoutElement[] {
-	  new ActField(new NumField("JOUR", 2, 0)),
-	  new ActField(new NumField("MOIS", 2, 0)),
-	  new ActField(new NumField("ANNEE", 4, 0)),
+	  new NumericField("JOUR", 2, 1, 31),
+	  new NumericField("MOIS", 2, 1, 12),
+	  new NumericField("ANNEE", 4),
 	  new FieldLayout("Renseignements concernant le confirm\351",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("NOM1", 20)),
 			    new ActField(new CharField("PRN1", 23)),
-			    new ActField(new CharField("SEX1", 1)),
+			    new SexField("SEX1"),
 			    new ActField(new CharField("NEE", 7)),
 			    new ActField(new CharField("NOT1", 40)),
 	    }),

@@ -43,9 +43,6 @@ public class ViewerController implements Viewer.ViewerObserver
   }
 
   public boolean deletingAct(Viewer v, Act a) {
-    if (!a.validate()) {
-      return false;
-    }
     v.getActList().delete(a);
     refreshAllViewers(v);
     return true;

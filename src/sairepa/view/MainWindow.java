@@ -87,7 +87,7 @@ public class MainWindow extends JFrame {
   private Vector<Viewer> viewers = new Vector<Viewer>();
 
   public void addViewer(Viewer v) {
-    //tabs.addTab(v.getName(), v.getIcon(), v);
+      //tabs.addTab(v.getName(), v.getIcon(), v);
     tabs.addTab(v.getName(), v);
     viewers.add(v);
   }
