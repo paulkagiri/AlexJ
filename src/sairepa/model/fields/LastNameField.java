@@ -8,34 +8,98 @@ import org.xBaseJ.micro.xBaseJException;
 import org.xBaseJ.micro.fields.CharField;
 
 public class LastNameField extends ActField {
-  public LastNameField(String name) throws xBaseJException, IOException {
+  private Sex sex;
+  private ActField origin;
+
+  public LastNameField(String name, Sex sex) throws xBaseJException, IOException {
     super(new CharField(name, 20));
+    this.sex = sex;
   }
 
   /**
    * @param origin if no value is set, listen for notifyUpdate() from origin and takes its value
    */
-  public LastNameField(String name, ActField origin) throws xBaseJException, IOException {
-    this(name);
-    origin.addObserver(this);
+  public LastNameField(String name, Sex sex, ActField origin) throws xBaseJException, IOException {
+    this(name, sex);
+    this.origin = origin;
   }
 
-  protected void notifyUpdate(ActEntry e) {
-    super.notifyUpdate(e);
-    e.setValue(e.getValue().toUpperCase(), false);
+  public Sex getSex() {
+    return sex;
   }
 
-  protected void notifyUpdate(ActField f, ActEntry theirEntry) {
+  protected void notifyUpdate(ActEntry e, String previousValue) {
+    super.notifyUpdate(e, previousValue);
+    if ("".equals(previousValue.trim())) {
+      e.setValue(upperCase(e.getValue(), sex), false);
+    }
+  }
+
+  protected static String upperCase(String str, Sex sex) {
+    char[] chars = str.toCharArray();
+    int max = chars.length;
+
+    if (sex != Sex.MALE && str.toLowerCase().endsWith("in")) {
+      max -= 2;
+    }
+
+    int i;
+
+    for (i = 0 ; i < max ; i++) {
+      if ( (chars[i] >= 'a' && chars[i] <= 'z')
+	   || (chars[i] >= 'A' && chars[i] <= 'Z') ) { // exclude the accents
+	chars[i] = Character.toUpperCase(chars[i]);
+      } else {
+	chars[i] = Character.toLowerCase(chars[i]);
+      }
+    }
+
+    for (; i < chars.length ; i++) {
+      chars[i] = Character.toLowerCase(chars[i]);
+    }
+
+    return new String(chars);
+  }
+
+  protected void notifyUpdate(ActField f, ActEntry theirEntry, String previousValue) {
+
+  }
+
+  public void hasFocus(ActEntry e) {
+    if (origin == null) {
+      return;
+    }
+
+    ActEntry theirEntry = e.getAct().getEntry(origin);
+
     if ("".equals(theirEntry.getValue())) {
       return;
     }
 
     // let's look first for the value of our entry
     ActEntry ourEntry = theirEntry.getAct().getEntry(this);
+
     if ("".equals(ourEntry.getValue().trim())) {
       // then we steal their value :)
-      ourEntry.setValue(theirEntry.getValue());
+
+      String theirValue = theirEntry.getValue();
+
+      if (getSex() == Sex.MALE) {
+	if (!(origin instanceof LastNameField) || ((LastNameField)origin).getSex() != Sex.MALE) {
+	  theirValue = extractMalePart(theirValue);
+	}
+      }
+
+      ourEntry.setValue(theirValue);
     }
+  }
+
+  public static String extractMalePart(String in) {
+    char[] chars = in.toCharArray();
+    int i;
+    for (i = chars.length-1; Character.isLowerCase(chars[i]) && i > 0 ; i--);
+    if (i < 0) return in;
+    return in.substring(0, i+1);
   }
 
   public boolean validate(ActEntry e) {

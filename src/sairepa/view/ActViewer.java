@@ -168,18 +168,19 @@ public class ActViewer extends Viewer implements ActionListener
     }
 
     public void caretPositionChanged(InputMethodEvent event) {
-      updateEntry(false);
+      //updateEntry(false);
     }
 
     public void inputMethodTextChanged(InputMethodEvent event) {
-      updateEntry(false);
+      //updateEntry(false);
     }
 
     public void	caretUpdate(CaretEvent e) {
-      updateEntry(false);
+      //updateEntry(false);
     }
 
     public void	focusGained(FocusEvent e) {
+      field.hasFocus(entry);
       refresh();
       java.awt.Rectangle rect = textComponent.getBounds(null);
       parentPanel.scrollRectToVisible(rect);
@@ -560,7 +561,7 @@ public class ActViewer extends Viewer implements ActionListener
   @Override
   public void close() {
     if (currentAct.validate()) {
-      continueTyping();
+      saveAct();
     }
     super.close();
   }

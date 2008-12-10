@@ -27,12 +27,12 @@ public class ConfirmationListFactory extends ActListFactory
 
     try {
       fields = new FieldLayout(new FieldLayoutElement[] {
-	  new NumericField("JOUR", 2, 1, 31),
-	  new NumericField("MOIS", 2, 1, 12),
-	  new NumericField("ANNEE", 4),
+	  new NumericField("JOUR", 2, 0, 31),
+	  new NumericField("MOIS", 2, 0, 12),
+	  new NumericField("ANNEE", 4, 1500, 2020),
 	  new FieldLayout("Renseignements concernant le confirm\351",
 			  new FieldLayoutElement[] {
-			    tmpLastName1 = new LastNameField("NOM1"),
+			    tmpLastName1 = new LastNameField("NOM1", Sex.UNKNOWN),
 			    new ActField(new CharField("PRN1", 23)),
 			    new SexField("SEX1"),
 			    new ActField(new CharField("NEE", 7)),
@@ -40,7 +40,7 @@ public class ConfirmationListFactory extends ActListFactory
 	    }),
 	  new FieldLayout("Informations concernant le p\350re du confirm\351",
 			  new FieldLayoutElement[] {
-			    new LastNameField("NOM2", tmpLastName1),
+			    new LastNameField("NOM2", Sex.MALE, tmpLastName1),
 			    new ActField(new CharField("NOM2CV", 20)),
 			    new ActField(new CharField("PRN2", 23)),
 			    new ActField(new CharField("PRN2CV", 8)),
@@ -48,7 +48,7 @@ public class ConfirmationListFactory extends ActListFactory
 			  }),
 	  new FieldLayout("Informations concernant la m\350re du confirm\351",
 			  new FieldLayoutElement[] {
-			    new LastNameField("NOM3"),
+			    new LastNameField("NOM3", Sex.FEMALE),
 			    new ActField(new CharField("NOM3CV", 20)),
 			    new ActField(new CharField("PRN3", 23)),
 			    new ActField(new CharField("PRN3CV", 8)),
@@ -56,13 +56,13 @@ public class ConfirmationListFactory extends ActListFactory
 			  }),
 	  new FieldLayout("Informations concernant le parrain",
 			  new FieldLayoutElement[] {
-			    new LastNameField("NOMP"),
+			    new LastNameField("NOMP", Sex.MALE),
 			    new ActField(new CharField("PRNP", 23)),
 			    new ActField(new CharField("NOTP", 40)),
 			  }),
 	  new FieldLayout("Informations concernant la marraine",
 			  new FieldLayoutElement[] {
-			    new LastNameField("NOMM"),
+			    new LastNameField("NOMM", Sex.FEMALE),
 			    new ActField(new CharField("PRNM", 23)),
 			    new ActField(new CharField("NOTM", 40)),
 			  }),

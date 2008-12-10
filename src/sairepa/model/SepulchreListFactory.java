@@ -24,12 +24,12 @@ public class SepulchreListFactory extends ActListFactory
 
     try {
       fields = new FieldLayout(new FieldLayoutElement[] {
-	  new NumericField("JOUR", 2, 1, 31),
-	  new NumericField("MOIS", 2, 1, 12),
-	  new NumericField("ANNEE", 4),
+	  new NumericField("JOUR", 2, 0, 31),
+	  new NumericField("MOIS", 2, 0, 12),
+	  new NumericField("ANNEE", 4, 1500, 2020),
 	  new FieldLayout("Renseignements concernant le d\351funt",
 			  new FieldLayoutElement[] {
-			    tmpLastName1 = new LastNameField("NOM1"),
+			    tmpLastName1 = new LastNameField("NOM1", Sex.UNKNOWN),
 			    new ActField(new CharField("PRN1", 23)),
 			    new SexField("SEX1"),
 			    new ActField(new CharField("AGE1", 13)),
@@ -37,7 +37,7 @@ public class SepulchreListFactory extends ActListFactory
 			  }),
 	  new FieldLayout("P\350re du d\351funt",
 			  new FieldLayoutElement[] {
-			    new LastNameField("NOM2", tmpLastName1),
+			    new LastNameField("NOM2", Sex.MALE, tmpLastName1),
 			    new ActField(new CharField("NOM2CV", 20)),
 			    new ActField(new CharField("PRN2", 23)),
 			    new ActField(new CharField("PRN2CV", 8)),
@@ -45,7 +45,7 @@ public class SepulchreListFactory extends ActListFactory
 			  }),
 	  new FieldLayout("M\350re du d\351funt",
 			  new FieldLayoutElement[] {
-			    new LastNameField("NOM3"),
+			    new LastNameField("NOM3", Sex.FEMALE),
 			    new ActField(new CharField("NOM3CV", 20)),
 			    new ActField(new CharField("PRN3", 23)),
 			    new ActField(new CharField("PRN3CV", 8)),
@@ -53,7 +53,7 @@ public class SepulchreListFactory extends ActListFactory
 			  }),
 	  new FieldLayout("Conjoint du d\351funt",
 			  new FieldLayoutElement[] {
-			    new LastNameField("NOMC"),
+			    new LastNameField("NOMC", Sex.UNKNOWN),
 			    new ActField(new CharField("PRNC", 23)),
 			    new ActField(new CharField("NOTC", 40)),
 			  }),

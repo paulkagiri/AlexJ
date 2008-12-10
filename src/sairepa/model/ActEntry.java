@@ -37,11 +37,12 @@ public class ActEntry extends Observable
   }
 
   public void setValue(String value, boolean notify) {
+    String oldValue = this.value;
     this.value = value.trim();
     setChanged();
 
     if (notify) {
-      field.notifyUpdate(this);
+      field.notifyUpdate(this, oldValue);
       notifyObservers(value);
     }
   }

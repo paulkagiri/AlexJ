@@ -26,12 +26,12 @@ public class WeddingListFactory extends ActListFactory
 
     try {
       fields = new FieldLayout(new FieldLayoutElement[] {
-	  new ActField(new NumField("JOUR", 2, 0)),
-	  new ActField(new NumField("MOIS", 2, 0)),
-	  new ActField(new NumField("ANNEE", 4, 0)),
+	  new NumericField("JOUR", 2, 0, 31),
+	  new NumericField("MOIS", 2, 0, 31),
+	  new NumericField("ANNEE", 4, 1500, 2020),
 	  new FieldLayout("Renseignement concernant l'\351poux",
 			  new FieldLayoutElement[] {
-			    tmpLastName2 = new LastNameField("NOM2"),
+			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE),
 			    new ActField(new CharField("NOM2CV", 20)),
 			    new ActField(new CharField("PRN2", 23)),
 			    new ActField(new CharField("PRN2CV", 8)),
@@ -41,19 +41,19 @@ public class WeddingListFactory extends ActListFactory
 			    new ActField(new CharField("NOT2", 40)),
 			    new FieldLayout("P\350re de l'\351poux",
 					    new FieldLayoutElement[] {
-					      new LastNameField("NOM4", tmpLastName2),
+					      new LastNameField("NOM4", Sex.MALE, tmpLastName2),
 					      new ActField(new CharField("PRN4", 23)),
 					      new ActField(new CharField("NOT4", 40)),
 					    }),
 			    new FieldLayout("M\350re de l'\351poux",
 					    new FieldLayoutElement[] {
-					      new LastNameField("NOM5"),
+					      new LastNameField("NOM5", Sex.FEMALE),
 					      new ActField(new CharField("PRN5", 23)),
 					    })
 			  }),
 	  new FieldLayout("Renseignement concernant l'\351pouse",
 			  new FieldLayoutElement[] {
-			    tmpLastName3 = new LastNameField("NOM3"),
+			    tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
 			    new ActField(new CharField("NOM3CV", 20)),
 			    new ActField(new CharField("PRN3", 23)),
 			    new ActField(new CharField("PRN3CV", 8)),
@@ -63,13 +63,13 @@ public class WeddingListFactory extends ActListFactory
 			    new ActField(new CharField("NOT3", 40)),
 			    new FieldLayout("P\350re de l'\351pouse",
 					    new FieldLayoutElement[] {
-					      new LastNameField("NOM6", tmpLastName3),
+					      new LastNameField("NOM6", Sex.MALE, tmpLastName3),
 					      new ActField(new CharField("PRN6", 23)),
 					      new ActField(new CharField("NOT6", 40)),
 					    }),
 			    new FieldLayout("M\350re de l'\351pouse",
 					    new FieldLayoutElement[] {
-					      new LastNameField("NOM7"),
+					      new LastNameField("NOM7", Sex.FEMALE),
 					      new ActField(new CharField("PRN7", 23)),
 					    }),
 			  }),

@@ -126,7 +126,7 @@ public class ActListViewer extends Viewer implements Table.ReorderingListener
     while (e.hasMoreElements()) {
       TableColumn c = e.nextElement();
       int index = c.getModelIndex();
-      int fieldWidth = ((index > 0) ? model.getField(c.getModelIndex()).getLength() : 4);
+      int fieldWidth = ((index > 0) ? model.getField(c.getModelIndex()).getMaxLength() : 4);
       int fieldNameWidth = ((index > 0) ? model.getField(c.getModelIndex()).getName().length() : 4);
       int width = ((fieldWidth > fieldNameWidth) ? fieldWidth : fieldNameWidth) * 15;
       if (width > 150) {

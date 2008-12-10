@@ -86,26 +86,29 @@ public class ActField implements FieldLayoutElement
     return validate(a.getEntry(this));
   }
 
+  public void hasFocus(ActEntry e) {
+
+  }
 
   /**
    * Called when an entry is modified; can modify the value
    */
-  protected void notifyUpdate(ActEntry e) {
-      if ("".equals(e.getValue())) {
-	  e.setValue("-");
-      }
-      if (e.getValue().length() > getMaxLength()) {
-	  e.setValue(e.getValue().substring(0, getMaxLength()), false);
-      }
-      for (ActField obs : observers) {
-	obs.notifyUpdate(this, e);
-      }
+  protected void notifyUpdate(ActEntry e, String previousValue) {
+    if ("".equals(e.getValue())) {
+      e.setValue("-");
+    }
+    if (e.getValue().length() > getMaxLength()) {
+      e.setValue(e.getValue().substring(0, getMaxLength()), false);
+    }
+    for (ActField obs : observers) {
+      obs.notifyUpdate(this, e, previousValue);
+    }
   }
 
   /**
    * Another field notifies us of its update.
    */
-  protected void notifyUpdate(ActField f, ActEntry e) {
+  protected void notifyUpdate(ActField f, ActEntry e, String previousValue) {
     throw new UnsupportedOperationException();
   }
 
