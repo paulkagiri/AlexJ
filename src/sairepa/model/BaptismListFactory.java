@@ -20,6 +20,8 @@ public class BaptismListFactory extends ActListFactory
   public static FieldLayout fields = null;
 
   static {
+    ActField tmpLastName1;
+
     try {
       fields = new FieldLayout(new FieldLayoutElement[] {
 	  new NumericField("JOUR", 2, 1, 31),
@@ -27,7 +29,7 @@ public class BaptismListFactory extends ActListFactory
 	  new NumericField("ANNEE", 4),
 	  new FieldLayout("Renseignements concernant le baptis\351",
 			  new FieldLayoutElement[] {
-			    new ActField(new CharField("NOM1", 20)),
+			    tmpLastName1 = new LastNameField("NOM1"),
 			    new ActField(new CharField("PRN1", 23)),
 			    new SexField("SEX1"),
 			    new ActField(new CharField("NEE", 7)),
@@ -35,7 +37,7 @@ public class BaptismListFactory extends ActListFactory
 	    }),
 	  new FieldLayout("Informations concernant le p\350re du baptis\351",
 			  new FieldLayoutElement[] {
-			    new ActField(new CharField("NOM2", 20)),
+			    new LastNameField("NOM2", tmpLastName1),
 			    new ActField(new CharField("NOM2CV", 20)),
 			    new ActField(new CharField("PRN2", 23)),
 			    new ActField(new CharField("PRN2CV", 8)),
@@ -43,7 +45,7 @@ public class BaptismListFactory extends ActListFactory
 			  }),
 	  new FieldLayout("Informations concernant la m\350re du baptis\351",
 			  new FieldLayoutElement[] {
-			    new ActField(new CharField("NOM3", 20)),
+			    new LastNameField("NOM3"),
 			    new ActField(new CharField("NOM3CV", 20)),
 			    new ActField(new CharField("PRN3", 23)),
 			    new ActField(new CharField("PRN3CV", 8)),
@@ -51,13 +53,13 @@ public class BaptismListFactory extends ActListFactory
 			  }),
 	  new FieldLayout("Informations concernant le parrain",
 			  new FieldLayoutElement[] {
-			    new ActField(new CharField("NOMP", 20)),
+			    new LastNameField("NOMP"),
 			    new ActField(new CharField("PRNP", 23)),
 			    new ActField(new CharField("NOTP", 40)),
 			  }),
 	  new FieldLayout("Informations concernant la marraine",
 			  new FieldLayoutElement[] {
-			    new ActField(new CharField("NOMM", 20)),
+			    new LastNameField("NOMM"),
 			    new ActField(new CharField("PRNM", 23)),
 			    new ActField(new CharField("NOTM", 40)),
 			  }),

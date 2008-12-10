@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Vector;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -62,7 +64,8 @@ public class ActViewer extends Viewer implements ActionListener
     refresh();
   }
 
-  protected class VisualActField implements ActionListener, InputMethodListener, CaretListener, FocusListener {
+  protected class VisualActField implements ActionListener, InputMethodListener,
+				 CaretListener, FocusListener, Observer {
     private final long serialVersionUID = 1;
 
     private VisualActField nextField = null;
@@ -80,15 +83,15 @@ public class ActViewer extends Viewer implements ActionListener
     private JPanel parentPanel;
 
     public VisualActField(ActField field, JLabel associatedLabel, JPanel parent) {
-      this.parentPanel = parent;
-
       Util.check(field != null);
+      Util.check(parent != null);
 
       this.field = field;
+      this.parentPanel = parent;
       this.associatedLabel = associatedLabel;
 
       if (!field.isMemo()) {
-	JTextField f = new JTextField(maximizeLength(field.getLength()));
+	JTextField f = new JTextField(maximizeLength(field.getMaxLength()));
 	f.addActionListener(this);
 	textComponent = f;
 	component = textComponent;
@@ -118,7 +121,12 @@ public class ActViewer extends Viewer implements ActionListener
     }
 
     public void setEntry(ActEntry entry) {
+      if (this.entry != null) {
+	this.entry.deleteObserver(this);
+      }
+
       this.entry = entry;
+      entry.addObserver(this);
       refresh();
     }
 
@@ -130,8 +138,8 @@ public class ActViewer extends Viewer implements ActionListener
       textComponent.requestFocus();
     }
 
-    public void updateEntry() {
-      entry.setValue(textComponent.getText());
+    public void updateEntry(boolean notify) {
+      entry.setValue(textComponent.getText(), notify);
 
       if (entry.validate()) {
 	textComponent.setForeground(initialColor);
@@ -144,7 +152,7 @@ public class ActViewer extends Viewer implements ActionListener
     }
 
     public void actionPerformed(ActionEvent e) {
-      updateEntry();
+      updateEntry(true);
       refresh();
 
       if (nextField != null) {
@@ -156,24 +164,35 @@ public class ActViewer extends Viewer implements ActionListener
 
     public void refresh() {
       textComponent.setText(entry.getValue());
+      textComponent.repaint();
     }
 
-    public void caretPositionChanged(InputMethodEvent event) { }
+    public void caretPositionChanged(InputMethodEvent event) {
+      updateEntry(false);
+    }
 
     public void inputMethodTextChanged(InputMethodEvent event) {
-      updateEntry();
+      updateEntry(false);
     }
 
     public void	caretUpdate(CaretEvent e) {
-      updateEntry();
+      updateEntry(false);
     }
 
     public void	focusGained(FocusEvent e) {
+      refresh();
       java.awt.Rectangle rect = textComponent.getBounds(null);
       parentPanel.scrollRectToVisible(rect);
     }
 
-    public void focusLost(FocusEvent e) { }
+    public void focusLost(FocusEvent e) {
+      updateEntry(true);
+      refresh();
+    }
+
+    public void update(Observable o, Object param) {
+      refresh();
+    }
   }
 
 
@@ -244,7 +263,7 @@ public class ActViewer extends Viewer implements ActionListener
 	   i < els.length && els[i] instanceof ActField && !((ActField)els[i]).isMemo();
 	   i++) {
 	ActField field = (ActField)els[i];
-	int lng = field.getName().length() + 5 + maximizeLength(field.getLength());
+	int lng = field.getName().length() + 5 + maximizeLength(field.getMaxLength());
 	nmbChars += lng;
 	if (nmbChars > MAX_LINE_LENGTH && lng < MAX_LINE_LENGTH) {
 	  break;
@@ -390,7 +409,7 @@ public class ActViewer extends Viewer implements ActionListener
   private boolean saveAct() {
     // just to make sure
     for (VisualActField vFields : visualActFieldsOrdered) {
-      vFields.updateEntry();
+      vFields.updateEntry(true);
       vFields.refresh();
     }
 
@@ -440,6 +459,7 @@ public class ActViewer extends Viewer implements ActionListener
       currentAct = actList.createAct();
       newAct = true;
       refresh();
+      visualActFieldsOrdered.get(0).focus();
   }
 
   private void moveBack() {

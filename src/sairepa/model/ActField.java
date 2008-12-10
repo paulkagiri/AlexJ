@@ -2,13 +2,18 @@ package sairepa.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.xBaseJ.micro.fields.Field;
 import org.xBaseJ.micro.fields.MemoField;
 
+/**
+ * ActField can observe each others
+ */
 public class ActField implements FieldLayoutElement
 {
   private Field fieldPrototype;
+  private List<ActField> observers = new ArrayList<ActField>();
 
   /**
    * fieldPrototype : will be clone()
@@ -25,11 +30,15 @@ public class ActField implements FieldLayoutElement
     return (fieldPrototype instanceof MemoField);
   }
 
+  /**
+   * @see #getMaxLength()
+   */
+  @Deprecated
   public int getLength() {
     return getMaxLength();
   }
 
-  private int getMaxLength() {
+  public int getMaxLength() {
     int maxLength = 255;
 
     if (!(fieldPrototype instanceof MemoField)) {
@@ -79,8 +88,7 @@ public class ActField implements FieldLayoutElement
 
 
   /**
-   * Allow to change entry value during typing of the act.
-   * Called by ActEntry when modified.
+   * Called when an entry is modified; can modify the value
    */
   protected void notifyUpdate(ActEntry e) {
       if ("".equals(e.getValue())) {
@@ -89,6 +97,16 @@ public class ActField implements FieldLayoutElement
       if (e.getValue().length() > getMaxLength()) {
 	  e.setValue(e.getValue().substring(0, getMaxLength()), false);
       }
+      for (ActField obs : observers) {
+	obs.notifyUpdate(this, e);
+      }
+  }
+
+  /**
+   * Another field notifies us of its update.
+   */
+  protected void notifyUpdate(ActField f, ActEntry e) {
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -109,5 +127,9 @@ public class ActField implements FieldLayoutElement
 
   public int getNmbChildElements() {
     return 1;
+  }
+
+  public void addObserver(ActField f) {
+    observers.add(f);
   }
 }

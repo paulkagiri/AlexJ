@@ -1,6 +1,9 @@
 package sairepa.model;
 
-public class ActEntry
+import java.util.Observable;
+import java.util.Observer;
+
+public class ActEntry extends Observable
 {
   private Act act;
   private ActField field;
@@ -35,9 +38,11 @@ public class ActEntry
 
   public void setValue(String value, boolean notify) {
     this.value = value.trim();
+    setChanged();
 
     if (notify) {
       field.notifyUpdate(this);
+      notifyObservers(value);
     }
   }
 
