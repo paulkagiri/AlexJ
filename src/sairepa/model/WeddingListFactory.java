@@ -32,7 +32,7 @@ public class WeddingListFactory extends ActListFactory
 	  new FieldLayout("Renseignement concernant l'\351poux",
 			  new FieldLayoutElement[] {
 			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE),
-			    new ActField(new CharField("NOM2CV", 20)),
+			    new ConvLastNameField("NOM2CV", Sex.MALE, tmpLastName2),
 			    new ActField(new CharField("PRN2", 23)),
 			    new ActField(new CharField("PRN2CV", 8)),
 			    new ActField(new CharField("LOC2", 50)),
@@ -54,7 +54,7 @@ public class WeddingListFactory extends ActListFactory
 	  new FieldLayout("Renseignement concernant l'\351pouse",
 			  new FieldLayoutElement[] {
 			    tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
-			    new ActField(new CharField("NOM3CV", 20)),
+			    new ConvLastNameField("NOM3CV", Sex.FEMALE, tmpLastName3),
 			    new ActField(new CharField("PRN3", 23)),
 			    new ActField(new CharField("PRN3CV", 8)),
 			    new ActField(new CharField("LOC3", 50)),

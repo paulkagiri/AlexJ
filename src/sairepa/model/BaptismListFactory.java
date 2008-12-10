@@ -21,6 +21,8 @@ public class BaptismListFactory extends ActListFactory
 
   static {
     ActField tmpLastName1;
+    ActField tmpLastName2;
+    ActField tmpLastName3;
 
     try {
       fields = new FieldLayout(new FieldLayoutElement[] {
@@ -37,16 +39,16 @@ public class BaptismListFactory extends ActListFactory
 	    }),
 	  new FieldLayout("Informations concernant le p\350re du baptis\351",
 			  new FieldLayoutElement[] {
-			    new LastNameField("NOM2", Sex.MALE, tmpLastName1),
-			    new ActField(new CharField("NOM2CV", 20)),
+			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE, tmpLastName1),
+			    new ConvLastNameField("NOM2CV", Sex.MALE, tmpLastName2),
 			    new ActField(new CharField("PRN2", 23)),
 			    new ActField(new CharField("PRN2CV", 8)),
 			    new ActField(new CharField("NOT2", 40)),
 			  }),
 	  new FieldLayout("Informations concernant la m\350re du baptis\351",
 			  new FieldLayoutElement[] {
-			    new LastNameField("NOM3", Sex.FEMALE),
-			    new ActField(new CharField("NOM3CV", 20)),
+			    tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
+			    new ConvLastNameField("NOM3CV", Sex.FEMALE, tmpLastName3) ,
 			    new ActField(new CharField("PRN3", 23)),
 			    new ActField(new CharField("PRN3CV", 8)),
 			    new ActField(new CharField("NOT3", 40)),

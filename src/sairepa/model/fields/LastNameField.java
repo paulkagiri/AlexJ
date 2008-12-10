@@ -86,20 +86,12 @@ public class LastNameField extends ActField {
 
       if (getSex() == Sex.MALE) {
 	if (!(origin instanceof LastNameField) || ((LastNameField)origin).getSex() != Sex.MALE) {
-	  theirValue = extractMalePart(theirValue);
+	  theirValue = Util.extractMalePart(theirValue);
 	}
       }
 
       ourEntry.setValue(theirValue);
     }
-  }
-
-  public static String extractMalePart(String in) {
-    char[] chars = in.toCharArray();
-    int i;
-    for (i = chars.length-1; Character.isLowerCase(chars[i]) && i > 0 ; i--);
-    if (i < 0) return in;
-    return in.substring(0, i+1);
   }
 
   public boolean validate(ActEntry e) {

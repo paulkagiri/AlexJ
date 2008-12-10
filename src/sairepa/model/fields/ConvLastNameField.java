@@ -19,7 +19,6 @@ public class ConvLastNameField extends ActField {
     this.sexField = null;
     for (int i = 0 ; i< origins.length ; i++) { origins[i] = null; };
     origins[sex.toInteger()] = origin;
-    origin.addObserver(this);
   }
 
   public ConvLastNameField(String fieldName, SexField sexField,
@@ -32,7 +31,6 @@ public class ConvLastNameField extends ActField {
     origins[Sex.MALE.toInteger()] = originMale;
     origins[Sex.FEMALE.toInteger()] = originFemale;
     origins[Sex.UNKNOWN.toInteger()] = originUnknown;
-    for (ActField origin : origins) origin.addObserver(this);
   }
 
   public Sex getSex(Act a) {
@@ -41,6 +39,17 @@ public class ConvLastNameField extends ActField {
       return SexField.getSex(e);
     }
     return sex;
+  }
+
+  public void hasFocus(ActEntry e) {
+    super.hasFocus(e);
+
+    if ("".equals(e.getValue())) {
+      ActField origin = origins[getSex(e.getAct()).toInteger()];
+      if (origin == null) return;
+      ActEntry src = e.getAct().getEntry(origin);
+      e.setValue(Util.conventionalize(src.getValue()));
+    }
   }
 
   protected void notifyUpdate(ActEntry e, String previousValue) {
