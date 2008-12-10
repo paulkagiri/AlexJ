@@ -5,6 +5,7 @@
 	<property name="src.dir" value="src" />
 	<property name="bin.dir" value="build" />
 	<property name="images.dir" value="images" />
+	<property name="data.dir" value="data" />
 	<property name="lib.dir" value="lib" />
 	<property name="javadoc.dir" value="javadoc" />
 
@@ -50,6 +51,9 @@
 			</manifest>
 			<fileset dir="${bin.dir}">
 			   <include name="**" />
+			</fileset>
+			<fileset dir="${data.dir}">
+			  <include name="**" />
 			</fileset>
 		</jar>
 	</target>

@@ -1,6 +1,5 @@
 package sairepa;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -8,6 +7,15 @@ import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+
+import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 
 import sairepa.controller.Controller;
 import sairepa.model.Model;
@@ -70,6 +78,42 @@ public class Main {
     }
   }
 
+  public void extractFileFromJar(String src, String dst) throws Exception {
+    try {
+      String realHome = this.getClass().getProtectionDomain().
+	getCodeSource().getLocation().toString();
+
+      String home = java.net.URLDecoder.decode(realHome.substring(5), "UTF-8");
+
+      System.out.println("Extracting : "+realHome+" ; "+src+" ; "+dst);
+
+      ZipFile jar = new ZipFile(home);
+      ZipEntry entry = jar.getEntry(src);
+
+      File jarFile = new File(dst);
+
+
+      InputStream in = new BufferedInputStream(jar.getInputStream(entry));
+      OutputStream out = new BufferedOutputStream(new FileOutputStream(jarFile));
+
+      byte[] buffer = new byte[2048];
+
+      int nBytes;
+
+      while( (nBytes = in.read(buffer)) > 0) {
+	out.write(buffer, 0, nBytes);
+      }
+
+      out.flush();
+      out.close();
+      in.close();
+
+      return;
+    } catch(IOException e) {
+      throw new Exception("Can't extract '" + src + "'", e);
+    }
+  }
+
   /**
    * @param args the command line arguments
    */
@@ -80,6 +124,7 @@ public class Main {
 
     try {
       Main main = new Main();
+      main.extractFileFromJar("prncv.dbf", "prncv.dbf");
       main.init();
     } catch(Exception e) {
       ErrorMessage.displayError("Erreur lors de l'initialisation de SaiRePa", e);
