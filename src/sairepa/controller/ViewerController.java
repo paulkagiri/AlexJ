@@ -2,6 +2,7 @@ package sairepa.controller;
 
 import sairepa.model.Act;
 import sairepa.model.Model;
+import sairepa.view.ErrorMessage;
 import sairepa.view.View;
 import sairepa.view.Viewer;
 
@@ -58,8 +59,12 @@ public class ViewerController implements Viewer.ViewerObserver
   }
 
   public void viewerClosing(Viewer v) {
-    if (v.canClose()) {
+    String reason;
+
+    if ( (reason = v.canClose()) == null ) {
       view.getMainWindow().removeViewer(v);
+    } else {
+      ErrorMessage.displayError(reason);
     }
   }
 }

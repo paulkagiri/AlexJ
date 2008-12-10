@@ -1,5 +1,7 @@
 package sairepa.controller;
 
+import javax.swing.JFrame;
+
 import sairepa.model.Model;
 import sairepa.view.View;
 
@@ -18,6 +20,8 @@ public class Controller
         new ActionQuit(model, view, this));
     view.getMainWindow().getQuitButton().addActionListener(
 	new ActionQuit(model, view, this));
+    view.getMainWindow().setDefaultCloseOperation(
+	JFrame.DO_NOTHING_ON_CLOSE);
     view.getMainWindow().getTabSelecter().addObserver(
         new TabController(model, view));
   }

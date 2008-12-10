@@ -6,10 +6,12 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 import sairepa.model.Model;
 import sairepa.view.ErrorMessage;
 import sairepa.view.View;
+import sairepa.view.Viewer;
 
 public class ActionQuit implements ActionListener, WindowListener
 {
@@ -32,6 +34,12 @@ public class ActionQuit implements ActionListener, WindowListener
   }
 
   public void quit(int code) {
+    if (code == 0) {
+      if (!canQuit() && !askUserIfTheyReallyWantToDoThat()) {
+	return;
+      }
+    }
+
     System.out.println("Quitting ...");
 
     try {
@@ -50,6 +58,25 @@ public class ActionQuit implements ActionListener, WindowListener
       e.printStackTrace();
       ErrorMessage.displayError("Erreur au moment de quitter", e);
     }
+  }
+
+  public boolean canQuit() {
+    for (Viewer v : view.getMainWindow().getViewers()) {
+      if (v.canClose() != null) {
+	return false;
+      }
+    }
+    return true;
+  }
+
+  public boolean askUserIfTheyReallyWantToDoThat() {
+    int r = JOptionPane.showConfirmDialog(view.getMainWindow(),
+					  "Certaines tabs contiennent des donn\351es invalides "
+					  + "qui ne seront pas sauvegard\351es. "
+					  + "\312tes-vous s\373r de vouloir quitter ?",
+					  "\312tes-vous s\373r ?",
+					  JOptionPane.YES_NO_OPTION);
+    return (r == JOptionPane.YES_OPTION);
   }
 
   public void actionPerformed(ActionEvent e) {

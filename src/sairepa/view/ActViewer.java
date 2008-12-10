@@ -537,7 +537,28 @@ public class ActViewer extends Viewer implements ActionListener
     updateButtonStates();
   }
 
-  public boolean canClose() {
-    return currentAct.validate();
+  @Override
+  public void close() {
+    if (currentAct.validate()) {
+      continueTyping();
+    }
+    super.close();
+  }
+
+  @Override
+  public String canClose() {
+    if (currentAct.validate()) {
+      return null;
+    } else {
+      if (newAct && actList.getRowCount() <= 0) {
+	// we are working on an empty list, so
+	// when the user cancels, they get a new act
+	// all the time, that are invalids by default
+	return null;
+      }
+
+      return "L'acte actuellement en cours d'\351dition "+
+	"est invalide et ne peut \352tre enregistr\351";
+    }
   }
 }

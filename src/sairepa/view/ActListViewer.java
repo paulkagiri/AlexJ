@@ -151,26 +151,13 @@ public class ActListViewer extends Viewer implements Table.ReorderingListener
     refresh();
   }
 
-  public boolean canClose() {
-    /*
-    List<Integer> invalids = new ArrayList<Integer>();
+  @Override
+  public void close() {
+    super.close();
+  }
 
-    for (Act a : actList) {
-      if (!a.validate()) {
-	invalids.add(a.getRow() + 1);
-      }
-    }
-
-    if (invalids.size() > 0) {
-	String errMsg = "Le ou les acte(s) num. ";
-	for (Integer i : invalids) {
-	    errMsg += i.toString() + ", ";
-	}
-	errMsg += " sont invalides";
-	ErrorMessage.displayError(errMsg);
-	return false;
-    }
-    */
-    return true;
+  @Override
+  public String canClose() {
+    return null;
   }
 }
