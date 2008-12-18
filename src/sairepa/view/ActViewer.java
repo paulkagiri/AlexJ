@@ -182,6 +182,7 @@ public class ActViewer extends Viewer implements ActionListener
     public void	focusGained(FocusEvent e) {
       field.hasFocus(entry);
       refresh();
+      textComponent.selectAll();
       java.awt.Rectangle rect = textComponent.getBounds(null);
       parentPanel.scrollRectToVisible(rect);
     }
@@ -579,7 +580,7 @@ public class ActViewer extends Viewer implements ActionListener
       }
 
       return "L'acte actuellement en cours d'\351dition "+
-	"est invalide et ne peut \352tre enregistr\351";
+	"est invalide et ne peut \352tre enregistr\351.";
     }
   }
 }
