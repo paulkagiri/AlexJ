@@ -119,13 +119,14 @@ public class Util
   }
 
   private static String conventionalizeReplacements(String in) {
-    in = in.replace("ae", "e");
-    in = in.replace("oe", "e");
+    in = in.replaceAll("ae", "e");
+    in = in.replaceAll("oe", "e");
     return in;
   }
 
-  public static String conventionalize(String in) {
+  public static String conventionalizeLastName(String in) {
     in = extractMalePart(in);
+    in = in.replaceAll("-", " ");
     in = conventionalizeAccents(in.toLowerCase());
     in = conventionalizeDoubles(in);
     in = conventionalizeReplacements(in);

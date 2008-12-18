@@ -48,7 +48,7 @@ public class ConvLastNameField extends ActField {
       ActField origin = origins[getSex(e.getAct()).toInteger()];
       if (origin == null) return;
       ActEntry src = e.getAct().getEntry(origin);
-      e.setValue(Util.conventionalize(src.getValue()));
+      e.setValue(Util.conventionalizeLastName(src.getValue()));
     }
   }
 
