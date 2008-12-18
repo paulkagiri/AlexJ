@@ -15,6 +15,9 @@ public class Model
 
   private ActListFactory[] factories;
 
+  // dirty singleton
+  private static final PrncvDb prncvDb = new PrncvDb();
+
   protected Model(File projectDir) throws SQLException, FileNotFoundException {
     this.projectDir = projectDir;
 
@@ -27,6 +30,10 @@ public class Model
       new WeddingListFactory(projectDir),
       new SepulchreListFactory(projectDir)
     };
+  }
+
+  public static PrncvDb getPrncvDb() {
+    return prncvDb;
   }
 
   public ActListFactory[] getFactories() {

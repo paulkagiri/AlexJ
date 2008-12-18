@@ -7,22 +7,22 @@ import sairepa.model.*;
 import org.xBaseJ.micro.xBaseJException;
 import org.xBaseJ.micro.fields.CharField;
 
-public class ConvLastNameField extends ActField {
+public class ConvFirstNameField extends ActField {
   private Sex sex;
   private SexField sexField;
 
   private ActField[] origins = new ActField[3];
 
-  public ConvLastNameField(String fieldName, Sex sex, ActField origin) throws xBaseJException, IOException {
-    super(new CharField(fieldName, 20));
+  public ConvFirstNameField(String fieldName, Sex sex, ActField origin) throws xBaseJException, IOException {
+    super(new CharField(fieldName, 8));
     this.sex = sex;
     this.sexField = null;
     for (int i = 0 ; i< origins.length ; i++) { origins[i] = null; };
     origins[sex.toInteger()] = origin;
   }
 
-  public ConvLastNameField(String fieldName, SexField sexField,
-			   ActField originMale, ActField originFemale, ActField originUnknown)
+  public ConvFirstNameField(String fieldName, SexField sexField,
+			    ActField originMale, ActField originFemale, ActField originUnknown)
     throws xBaseJException, IOException {
 
     super(new CharField(fieldName, 20));
@@ -45,11 +45,15 @@ public class ConvLastNameField extends ActField {
   public void hasFocus(ActEntry e) {
     super.hasFocus(e);
 
-    if ("".equals(e.getValue().trim()) || "-".equals(e.getValue().trim())) {
+    if ("".equals(e.getValue().trim())
+	|| "-".equals(e.getValue().trim())
+	|| PrncvDb.UNKNOWN.equals(e.getValue().trim())) {
       ActField origin = origins[getSex(e.getAct()).toInteger()];
       if (origin == null) return;
       ActEntry src = e.getAct().getEntry(origin);
-      e.setValue(Util.conventionalizeLastName(src.getValue(), getSex(e.getAct())));
+      String str = Util.conventionalizeFirstName(src.getValue());
+      str = Model.getPrncvDb().getPrncv(str, getSex(e.getAct()));
+      e.setValue(str);
     }
   }
 

@@ -22,7 +22,9 @@ public class WeddingListFactory extends ActListFactory
 
   static {
     ActField tmpLastName2;
+    ActField tmpFirstName2;
     ActField tmpLastName3;
+    ActField tmpFirstName3;
 
     try {
       fields = new FieldLayout(new FieldLayoutElement[] {
@@ -33,8 +35,8 @@ public class WeddingListFactory extends ActListFactory
 			  new FieldLayoutElement[] {
 			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE),
 			    new ConvLastNameField("NOM2CV", Sex.MALE, tmpLastName2),
-			    new ActField(new CharField("PRN2", 23)),
-			    new ActField(new CharField("PRN2CV", 8)),
+			    tmpFirstName2 = new ActField(new CharField("PRN2", 23)),
+			    new ConvFirstNameField("PRN2CV", Sex.MALE, tmpFirstName2),
 			    new ActField(new CharField("LOC2", 50)),
 			    new ActField(new CharField("LOC2ID", 38)),
 			    new ActField(new CharField("CVF2", 1)),
@@ -55,8 +57,8 @@ public class WeddingListFactory extends ActListFactory
 			  new FieldLayoutElement[] {
 			    tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
 			    new ConvLastNameField("NOM3CV", Sex.FEMALE, tmpLastName3),
-			    new ActField(new CharField("PRN3", 23)),
-			    new ActField(new CharField("PRN3CV", 8)),
+			    tmpFirstName3 = new ActField(new CharField("PRN3", 23)),
+			    new ConvFirstNameField("PRN3CV", Sex.FEMALE, tmpFirstName3),
 			    new ActField(new CharField("LOC3", 50)),
 			    new ActField(new CharField("LOC3ID", 38)),
 			    new ActField(new CharField("CVF3", 1)),

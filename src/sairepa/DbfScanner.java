@@ -19,23 +19,36 @@ public class DbfScanner
 {
     public static void main(String args[]) throws Exception
     {
-      DBF dbfFile = new DBF(args[0], DBF.READ_ONLY);
+      DBF dbfFile = new DBF(args[0], DBF.READ_ONLY, "CP850");
 
-      for (int i = 1 ; i <= dbfFile.getFieldCount() ; i++) {
-	Field field = dbfFile.getField(i);
+      try {
+	for (int i = 1 ; i <= dbfFile.getFieldCount() ; i++) {
+	  Field field = dbfFile.getField(i);
 
-	System.out.println("====================");
-	System.out.println("Name: " + field.getName());
-	System.out.println("Type: " + field.getClass().getName());
-	System.out.println("Length: " + field.Length);
+	  System.out.println("====================");
+	  System.out.println("Name: " + field.getName());
+	  System.out.println("Type: " + field.getClass().getName());
+	  System.out.println("Length: " + field.Length);
 
-	if (field instanceof NumField) {
-	  System.out.println("DecPosition: " + ((NumField)field).decPosition);
+	  if (field instanceof NumField) {
+	    System.out.println("DecPosition: " + ((NumField)field).decPosition);
+	  }
+
+	  System.out.println("");
 	}
 
-	System.out.println("");
+	if (args.length >= 2) {
+	  while(true) {
+	    dbfFile.read();
+	    System.out.println("\n=====================");
+	    for (int i = 1 ; i <= dbfFile.getFieldCount() ; i++) {
+	    Field field = dbfFile.getField(i);
+	    System.out.println(field.getName() + " : " + field.get());
+	    }
+	  }
+	}
+      } finally {
+	dbfFile.close();
       }
-
-      dbfFile.close();
     }
 }

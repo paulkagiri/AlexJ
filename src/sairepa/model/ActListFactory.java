@@ -195,11 +195,17 @@ public abstract class ActListFactory
   }
 
   private void createField(String name) throws SQLException {
-    PreparedStatement st =
+    try {
+      PreparedStatement st =
         db.prepareStatement("INSERT INTO fields (file, name) VALUES (?, ?)");
-    st.setInt(1, fileId);
-    st.setString(2, name);
-    st.execute();
+      st.setInt(1, fileId);
+      st.setString(2, name);
+      st.execute();
+    } catch (SQLException e) {
+      System.err.println("SQLException when inserting field: "
+			 + Integer.toString(fileId) + "/'" + name + "'");
+      throw e;
+    }
   }
 
   private void insertEntry(int fieldId, int row, String value)

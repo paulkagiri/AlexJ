@@ -13,7 +13,7 @@ public class SexField extends ActField {
     super(new CharField(name, 1));
   }
 
-  protected void notifyUpdate(ActEntry e, String previousValue) {
+  public void notifyUpdate(ActEntry e, String previousValue) {
     super.notifyUpdate(e, previousValue);
     e.setValue(e.getValue().toUpperCase(), false);
   }

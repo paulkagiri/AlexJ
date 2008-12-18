@@ -24,4 +24,14 @@ public enum Sex
     default: return "unknown";
     }
   }
+
+  public static Sex getSex(String str) {
+    if ("m".equals(str.trim().toLowerCase())) {
+      return Sex.MALE;
+    } else if ("f".equals(str.trim().toLowerCase())) {
+      return Sex.FEMALE;
+    } else {
+      return Sex.UNKNOWN;
+    }
+  }
 }

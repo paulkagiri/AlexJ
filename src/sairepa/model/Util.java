@@ -1,5 +1,7 @@
 package sairepa.model;
 
+import sairepa.model.fields.Sex;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -124,12 +126,52 @@ public class Util
     return in;
   }
 
-  public static String conventionalizeLastName(String in) {
-    in = extractMalePart(in);
-    in = in.replaceAll("-", " ");
+  public static String upperCase(String str, boolean lastName, Sex sex) {
+    char[] chars = str.toCharArray();
+    int max = chars.length;
+
+    if (lastName && sex != Sex.MALE && str.toLowerCase().endsWith("in")) {
+      max -= 2;
+    }
+
+    int i;
+
+    for (i = 0 ; i < max ; i++) {
+      if ( (chars[i] >= 'a' && chars[i] <= 'z')
+	   || (chars[i] >= 'A' && chars[i] <= 'Z') ) { // exclude the accents
+	chars[i] = Character.toUpperCase(chars[i]);
+      } else {
+	chars[i] = Character.toLowerCase(chars[i]);
+      }
+
+      if (lastName && chars[i] == '\377') chars[i] = 'Y';
+    }
+
+    for (; i < chars.length ; i++) {
+      chars[i] = Character.toLowerCase(chars[i]);
+    }
+
+    return new String(chars);
+  }
+
+  public static String conventionalizeLastName(String in, Sex sex) {
+    if (sex != Sex.FEMALE) {
+      in = extractMalePart(in);
+    }
     in = conventionalizeAccents(in.toLowerCase());
     in = conventionalizeDoubles(in);
     in = conventionalizeReplacements(in);
-    return in.toUpperCase();
+    return upperCase(in, true, sex);
+  }
+
+  public static String conventionalizeFirstName(String in) {
+    in = in.replaceAll("-", " ");
+    String[] split = in.split(" ");
+    if (split.length <= 0) return "";
+    in = split[split.length-1];
+    in = conventionalizeAccents(in);
+    in = conventionalizeDoubles(in);
+    in = conventionalizeReplacements(in);
+    return in;
   }
 }
