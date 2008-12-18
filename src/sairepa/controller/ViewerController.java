@@ -1,5 +1,7 @@
 package sairepa.controller;
 
+import javax.swing.JOptionPane;
+
 import sairepa.model.Act;
 import sairepa.model.Model;
 import sairepa.view.ErrorMessage;
@@ -64,7 +66,14 @@ public class ViewerController implements Viewer.ViewerObserver
     if ( (reason = v.canClose()) == null ) {
       view.getMainWindow().removeViewer(v);
     } else {
-      ErrorMessage.displayError(reason);
+      //ErrorMessage.displayError(reason);
+      int ret = JOptionPane.showConfirmDialog(view.getMainWindow(),
+					      reason + " Voulez-vous vraiment fermer cette tabulation ?",
+					      "Etes-vous sur ?",
+					      JOptionPane.YES_NO_OPTION);
+      if (ret == JOptionPane.YES_OPTION) {
+	view.getMainWindow().removeViewer(v);
+      }
     }
   }
 }

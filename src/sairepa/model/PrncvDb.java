@@ -70,7 +70,6 @@ public class PrncvDb
   public String getPrncv(String lu, Sex sex) {
     Util.check(sex != Sex.UNKNOWN);
     if ("-".equals(lu)) return "-";
-    System.out.println("PrncvDB: looking for : " + lu + "/" + sex.toString());
     String cv = (String)prncvs[sex.toInteger()].get(lu.trim().toLowerCase());
     return ((cv == null) ? UNKNOWN : cv);
   }
