@@ -11,6 +11,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import sairepa.gui.CloseableTabbedPane;
 import sairepa.model.Model;
@@ -19,15 +21,18 @@ import sairepa.model.Model;
  * Represents the main window of this software.
  * @author jflesch
  */
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements ChangeListener {
   public static final long serialVersionUID = 1;
 
   private int DEFAULT_SIZE_X = 800;
   private int DEFAULT_SIZE_Y = 600;
 
+  private JMenuItem menuFilePrint;
   private JMenuItem menuFileQuit;
   private TabSelecter tabOpener;
   private CloseableTabbedPane tabs;
+
+  private List<TabObserver> tabObservers = new Vector<TabObserver>();
 
   private final static ViewerFactory[] viewerFactories = new ViewerFactory[] {
     new ActViewerFactory(),
@@ -52,10 +57,34 @@ public class MainWindow extends JFrame {
                               new JScrollPane(tabOpener = createTabSelecter(model)),
 			      BorderLayout.WEST);
 
+    tabs.addChangeListener(this);
     tabOpenerScrollPane.getVerticalScrollBar().setUnitIncrement(15);
     tabOpenerScrollPane.setPreferredSize(new java.awt.Dimension(140, 140));
 
     setSize(DEFAULT_SIZE_X, DEFAULT_SIZE_Y);
+  }
+
+  public static interface TabObserver {
+    public void tabSelected(Viewer v);
+    public void allTabClosed();
+  }
+
+  public void addTabObserver(TabObserver obs) {
+    tabObservers.add(obs);
+  }
+
+  public void deleteTabObserver(TabObserver obs) {
+    tabObservers.remove(obs);
+  }
+
+  public void stateChanged(ChangeEvent e) {
+    for (TabObserver obs : tabObservers) {
+      if (tabs.getTabCount() <= 0) {
+	obs.allTabClosed();
+      } else {
+	obs.tabSelected((Viewer)tabs.getSelectedComponent());
+      }
+    }
   }
 
   public ViewerFactory[] getViewerFactories() {
@@ -65,7 +94,10 @@ public class MainWindow extends JFrame {
   private JMenuBar createMenuBar() {
     JMenuBar menuBar = new JMenuBar();
     JMenu menuFile = new JMenu("Fichier");
+    menuFilePrint = new JMenuItem("Imprimer");
+    menuFilePrint.setEnabled(false);
     menuFileQuit = new JMenuItem("Quitter");
+    menuFile.add(menuFilePrint);
     menuFile.add(menuFileQuit);
     menuBar.add(menuFile);
 
@@ -84,10 +116,14 @@ public class MainWindow extends JFrame {
     return menuFileQuit;
   }
 
+  public AbstractButton getPrintButton() {
+    return menuFilePrint;
+  }
+
   private Vector<Viewer> viewers = new Vector<Viewer>();
 
   public void addViewer(Viewer v) {
-      //tabs.addTab(v.getName(), v.getIcon(), v);
+    //tabs.addTab(v.getName(), v.getIcon(), v);
     tabs.addTab(v.getName(), v);
     viewers.add(v);
   }

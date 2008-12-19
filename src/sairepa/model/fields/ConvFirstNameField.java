@@ -51,7 +51,7 @@ public class ConvFirstNameField extends ActField {
       ActField origin = origins[getSex(e.getAct()).toInteger()];
       if (origin == null) return;
       ActEntry src = e.getAct().getEntry(origin);
-      String str = Util.conventionalizeFirstName(src.getValue());
+      String str = Util.conventionalizeFirstName(src.getValue(), getSex(e.getAct()));
       str = Model.getPrncvDb().getPrncv(str, getSex(e.getAct()));
       e.setValue(str);
     }

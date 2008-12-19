@@ -3,6 +3,7 @@ package sairepa.view;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 import sairepa.model.Act;
@@ -87,5 +88,17 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
     for (ViewerObserver obs : observers) {
       obs.viewerClosing(this);
     }
+  }
+
+  public boolean canBePrinted() {
+    return false;
+  }
+
+  public JComponent getPrintableComponent() {
+    return null;
+  }
+
+  public boolean printOnOnePage() {
+    return true;
   }
 }

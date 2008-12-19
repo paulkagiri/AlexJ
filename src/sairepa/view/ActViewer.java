@@ -55,6 +55,8 @@ public class ActViewer extends Viewer implements ActionListener
   private List<VisualActField> visualActFieldsOrdered = new ArrayList<VisualActField>();
   private Map<ActField, VisualActField> visualActFields = new HashMap<ActField, VisualActField>();
 
+  private JPanel printablePanel;
+
   public ActViewer(ActList actList) {
     super(actList, ActViewerFactory.NAME, ActViewerFactory.ICON);
     this.actList = actList;
@@ -201,7 +203,7 @@ public class ActViewer extends Viewer implements ActionListener
   private void prepareUI(ActList actList) {
     this.setLayout(new BorderLayout(5, 5));
     JScrollPane scrollPane =
-      new JScrollPane(createPanel(actList.getFields()),
+      new JScrollPane(printablePanel = createPanel(actList.getFields()),
 		      JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 		      JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     scrollPane.getVerticalScrollBar().setUnitIncrement(15);
@@ -583,4 +585,18 @@ public class ActViewer extends Viewer implements ActionListener
 	"est invalide et ne peut \352tre enregistr\351.";
     }
   }
+
+  public boolean canBePrinted() {
+    return true;
+  }
+
+  public JComponent getPrintableComponent() {
+    return printablePanel;
+  }
+
+  public boolean printOnOnePage() {
+    return true;
+  }
 }
+
+

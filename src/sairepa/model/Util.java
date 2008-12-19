@@ -91,6 +91,8 @@ public class Util
     accents.put('\373' /* û */, 'u');
     accents.put('y'    /* y */, 'i'); // no mistake here
     accents.put('\377' /* ÿ */, 'i');
+    accents.put(':',            '.');
+    accents.put(';',            '.');
   }
 
   private static String conventionalizeAccents(String in) {
@@ -154,7 +156,15 @@ public class Util
     return new String(chars);
   }
 
+  private static String dropEndIfItsThisOne(String in, String end) {
+    if (in.endsWith(end)) {
+      in = in.substring(0, in.length() - end.length());
+    }
+    return in;
+  }
+
   public static String conventionalizeLastName(String in, Sex sex) {
+    in = in.trim();
     if (sex != Sex.FEMALE) {
       in = extractMalePart(in);
     }
@@ -164,11 +174,23 @@ public class Util
     return upperCase(in, true, sex);
   }
 
-  public static String conventionalizeFirstName(String in) {
+  public static String conventionalizeFirstName(String in, Sex sex) {
+    in = in.trim();
     in = in.replaceAll("-", " ");
+    in = dropEndIfItsThisOne(in, "+");
+    in = dropEndIfItsThisOne(in, "?");
+
     String[] split = in.split(" ");
     if (split.length <= 0) return "";
     in = split[split.length-1];
+
+    if (in.startsWith("Chris")) in = in.replaceFirst("Chris", "Cris");
+    if (sex != Sex.FEMALE) {
+      in = dropEndIfItsThisOne(in, "o");
+      in = dropEndIfItsThisOne(in, "i");
+    } else if (sex != Sex.MALE) {
+      in = dropEndIfItsThisOne(in, "ius");
+    }
     in = conventionalizeAccents(in);
     in = conventionalizeDoubles(in);
     in = conventionalizeReplacements(in);
