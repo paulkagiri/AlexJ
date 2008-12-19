@@ -26,6 +26,7 @@ public class ActionPrint implements ActionListener, MainWindow.TabObserver
 
   public void actionPerformed(ActionEvent e) {
     PrintingManager.print(selectedViewer.getPrintableComponent(),
+			  selectedViewer.getPrintableName(),
 			  selectedViewer.printOnOnePage());
   }
 

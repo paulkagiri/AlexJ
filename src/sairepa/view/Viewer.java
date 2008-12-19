@@ -61,6 +61,16 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
     return factoryName + "/" + viewerName;
   }
 
+  public String getPrintableName() {
+    String ret = factoryName;
+
+    if (ret.endsWith("s")) {
+      ret = ret.substring(0, ret.length()-1);
+    }
+
+    return ret;
+  }
+
   public abstract void refresh();
 
   /**
