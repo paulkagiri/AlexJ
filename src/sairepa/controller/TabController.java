@@ -22,7 +22,8 @@ public class TabController implements TabSelecter.TabSelecterObserver
   }
 
   public void tabSelected(ActListFactory actListFactory, ViewerFactory viewerFactory) {
-    Viewer v = viewerFactory.createViewer(viewerFactory.extractActList(actListFactory));
+    Viewer v = viewerFactory.createViewer(view.getMainWindow(),
+					  viewerFactory.extractActList(actListFactory));
     Util.check(v != null);
     v.addObserver(new ViewerController(model, view));
     view.getMainWindow().addViewer(v);

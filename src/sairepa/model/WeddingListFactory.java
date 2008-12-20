@@ -99,6 +99,6 @@ public class WeddingListFactory extends ActListFactory
   }
 
   public String toString() {
-    return "Marriages";
+    return "Mariages";
   }
 }

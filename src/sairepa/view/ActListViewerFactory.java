@@ -25,7 +25,7 @@ public class ActListViewerFactory implements ViewerFactory
     return factory.getActList();
   }
 
-  public Viewer createViewer(ActList list) {
+  public Viewer createViewer(MainWindow mainWindow, ActList list) {
     return new ActListViewer(list);
   }
 }

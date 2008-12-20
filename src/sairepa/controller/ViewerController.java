@@ -68,7 +68,7 @@ public class ViewerController implements Viewer.ViewerObserver
     } else {
       //ErrorMessage.displayError(reason);
       int ret = JOptionPane.showConfirmDialog(view.getMainWindow(),
-					      reason + " Voulez-vous vraiment fermer cette tabulation ?",
+					      reason + " Voulez-vous vraiment fermer cet onglet ?",
 					      "Etes-vous sur ?",
 					      JOptionPane.YES_NO_OPTION);
       if (ret == JOptionPane.YES_OPTION) {

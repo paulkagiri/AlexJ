@@ -14,5 +14,10 @@ public interface ViewerFactory
    * let the viewer ask the factory for the more adapted ActList.
    */
   public ActList extractActList(ActListFactory factory);
-  public Viewer createViewer(ActList list);
+
+  /**
+   * @param mainWindow just provided if you must create
+   *        a dialog, don't touch it directly otherwise.
+   */
+  public Viewer createViewer(MainWindow mainWindow, ActList list);
 }

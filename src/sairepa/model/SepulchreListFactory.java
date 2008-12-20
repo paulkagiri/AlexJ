@@ -122,6 +122,6 @@ public class SepulchreListFactory extends ActListFactory
   }
 
   public String toString() {
-    return "Sepultures";
+    return "S\351pultures";
   }
 }

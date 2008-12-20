@@ -96,6 +96,6 @@ public class BaptismListFactory extends ActListFactory
   }
 
   public String toString() {
-    return "Baptemes";
+    return "Bapt\352mes";
   }
 }

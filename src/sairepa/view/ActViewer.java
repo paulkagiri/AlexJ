@@ -24,6 +24,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -52,22 +53,144 @@ public class ActViewer extends Viewer implements ActionListener
   private boolean newAct;
   private int newActRow = -1;
 
-  private List<VisualActField> visualActFieldsOrdered = new ArrayList<VisualActField>();
-  private Map<ActField, VisualActField> visualActFields = new HashMap<ActField, VisualActField>();
+  private GlobalPanel globalPanel;
 
-  private JPanel printablePanel;
+  private MainWindow mainWindow;
 
-  public ActViewer(ActList actList) {
+  public ActViewer(MainWindow mainWindow, ActList actList) {
     super(actList, ActViewerFactory.NAME, ActViewerFactory.ICON);
     this.actList = actList;
+    this.mainWindow = mainWindow;
     prepareUI(actList);
-    connectUIComponents(actList);
     initActList(actList);
     refresh();
   }
 
-  protected class VisualActField implements ActionListener, InputMethodListener,
-				 CaretListener, FocusListener, Observer {
+  private class GlobalPanel {
+    private JPanel gp;
+    private List<VisualActField> visualActFieldsOrdered = new ArrayList<VisualActField>();
+    private Map<ActField, VisualActField> visualActFields = new HashMap<ActField, VisualActField>();
+
+    public GlobalPanel() {
+      super();
+    }
+
+    public List<VisualActField> getVisualActFieldsOrdered() {
+      return visualActFieldsOrdered;
+    }
+
+    public Map<ActField, VisualActField> getVisualActFields() {
+      return visualActFields;
+    }
+
+    public JPanel getPanel() {
+      return gp;
+    }
+
+    private class PanelCreationResult {
+      public int nmbIdx = 0;
+      public JPanel panel = null;
+
+      public PanelCreationResult(int nmbIdx, JPanel panel) {
+	Util.check(nmbIdx > 0);
+	this.nmbIdx = nmbIdx;
+	this.panel = panel;
+      }
+    }
+
+    private JPanel createPanel(FieldLayout layout) {
+      JPanel panel = new JPanel(new BorderLayout(5, 5));
+      JPanel subPanel = panel;
+
+      for (int i = 0 ; i < layout.getElements().length ; ) {
+	FieldLayoutElement el = layout.getElements()[i];
+	PanelCreationResult r = createPanel(layout.getElements(), i);
+	subPanel.add(r.panel, BorderLayout.NORTH);
+	JPanel subsubPanel = new JPanel(new BorderLayout());
+	subPanel.add(subsubPanel, BorderLayout.CENTER);
+	subPanel = subsubPanel;
+	i += r.nmbIdx;
+      }
+
+      if (layout.getTitle() != null) {
+	panel.setBorder(BorderFactory.createTitledBorder(layout.getTitle()));
+      }
+
+      gp = panel;
+      return panel;
+    }
+
+    private PanelCreationResult createPanel(FieldLayoutElement[] els, int idx) {
+      if (els[idx] instanceof FieldLayout) {
+	return new PanelCreationResult(1, createPanel((FieldLayout)(els[idx])));
+      } else if (els[idx] instanceof ActField) {
+	if (((ActField)els[idx]).isMemo()) {
+	  return new PanelCreationResult(1, createPanel((ActField)els[idx]));
+	}
+
+	JPanel bigMess = new JPanel(new FlowLayout(FlowLayout.LEADING, 10, 10));
+
+	int i;
+	int nmbChars = 0;
+
+	for (i = idx;
+	     i < els.length && els[i] instanceof ActField && !((ActField)els[i]).isMemo();
+	     i++) {
+	  ActField field = (ActField)els[i];
+	  int lng = field.getName().length() + 5 + maximizeLength(field.getMaxLength());
+	  nmbChars += lng;
+	  if (nmbChars > MAX_LINE_LENGTH && lng < MAX_LINE_LENGTH) {
+	    break;
+	  }
+	  bigMess.add(createPanel(field));
+	}
+
+	return new PanelCreationResult(i-idx, bigMess);
+      } else {
+	Util.check(false);
+	return null;
+      }
+    }
+
+    private JPanel createPanel(ActField field) {
+      JLabel l = new JLabel(field.getName());
+      if (field.isMemo()) {
+	l.setVerticalAlignment(JLabel.TOP);
+      }
+      JPanel panel = new JPanel(new BorderLayout(5, 5));
+      VisualActField f = new VisualActField(field, l, panel);
+      visualActFields.put(field, f);
+      visualActFieldsOrdered.add(f);
+
+      panel.add(l, BorderLayout.WEST);
+      panel.add(f.getComponent(), BorderLayout.CENTER);
+
+      return panel;
+    }
+
+    public void refresh() {
+      for (ActEntry e : currentAct.getEntries()) {
+	VisualActField f = visualActFields.get(e.getField());
+	f.setEntry(e);
+      }
+    }
+
+    public void connectUIComponents(ActList actList) {
+      for (int i = 0 ; i < visualActFieldsOrdered.size() ; i++) {
+	VisualActField f = visualActFieldsOrdered.get(i);
+	VisualActField next = (((i+1) < visualActFieldsOrdered.size()) ?
+			       visualActFieldsOrdered.get(i+1) : null);
+	// we don't connect the memo field
+	if (next != null && next.getField().isMemo()) {
+	  next = null;
+	}
+	f.setNextField(next);
+      }
+    }
+  }
+
+  private class VisualActField implements ActionListener, InputMethodListener,
+			       CaretListener, FocusListener, Observer {
     private final long serialVersionUID = 1;
 
     private VisualActField nextField = null;
@@ -202,13 +325,17 @@ public class ActViewer extends Viewer implements ActionListener
 
   private void prepareUI(ActList actList) {
     this.setLayout(new BorderLayout(5, 5));
+    globalPanel = new GlobalPanel();
+    globalPanel.createPanel(actList.getFields());
     JScrollPane scrollPane =
-      new JScrollPane(printablePanel = createPanel(actList.getFields()),
+      new JScrollPane(globalPanel.getPanel(),
 		      JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 		      JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     scrollPane.getVerticalScrollBar().setUnitIncrement(15);
     this.add(scrollPane, BorderLayout.CENTER);
     this.add(createButtonPanel(), BorderLayout.SOUTH);
+
+    globalPanel.connectUIComponents(actList);
   }
 
   public final static int MAX_LINE_LENGTH = 60;
@@ -216,86 +343,6 @@ public class ActViewer extends Viewer implements ActionListener
 
   private int maximizeLength(int lng) {
     return (lng > MAX_FIELD_LENGTH ? MAX_FIELD_LENGTH : lng);
-  }
-
-  private class PanelCreationResult {
-    public int nmbIdx = 0;
-    public JPanel panel = null;
-
-    public PanelCreationResult(int nmbIdx, JPanel panel) {
-      Util.check(nmbIdx > 0);
-      this.nmbIdx = nmbIdx;
-      this.panel = panel;
-    }
-  }
-
-  private JPanel createPanel(FieldLayout layout) {
-    JPanel panel = new JPanel(new BorderLayout(5, 5));
-    JPanel subPanel = panel;
-
-    for (int i = 0 ; i < layout.getElements().length ; ) {
-      FieldLayoutElement el = layout.getElements()[i];
-      PanelCreationResult r = createPanel(layout.getElements(), i);
-      subPanel.add(r.panel, BorderLayout.NORTH);
-      JPanel subsubPanel = new JPanel(new BorderLayout());
-      subPanel.add(subsubPanel, BorderLayout.CENTER);
-      subPanel = subsubPanel;
-      i += r.nmbIdx;
-    }
-
-    if (layout.getTitle() != null) {
-      panel.setBorder(BorderFactory.createTitledBorder(layout.getTitle()));
-    }
-
-    return panel;
-  }
-
-  private PanelCreationResult createPanel(FieldLayoutElement[] els, int idx) {
-    if (els[idx] instanceof FieldLayout) {
-      return new PanelCreationResult(1, createPanel((FieldLayout)(els[idx])));
-    } else if (els[idx] instanceof ActField) {
-      if (((ActField)els[idx]).isMemo()) {
-	return new PanelCreationResult(1, createPanel((ActField)els[idx]));
-      }
-
-      JPanel bigMess = new JPanel(new FlowLayout(FlowLayout.LEADING, 10, 10));
-
-      int i;
-      int nmbChars = 0;
-
-      for (i = idx;
-	   i < els.length && els[i] instanceof ActField && !((ActField)els[i]).isMemo();
-	   i++) {
-	ActField field = (ActField)els[i];
-	int lng = field.getName().length() + 5 + maximizeLength(field.getMaxLength());
-	nmbChars += lng;
-	if (nmbChars > MAX_LINE_LENGTH && lng < MAX_LINE_LENGTH) {
-	  break;
-	}
-	bigMess.add(createPanel(field));
-      }
-
-      return new PanelCreationResult(i-idx, bigMess);
-    } else {
-      Util.check(false);
-      return null;
-    }
-  }
-
-  private JPanel createPanel(ActField field) {
-    JLabel l = new JLabel(field.getName());
-    if (field.isMemo()) {
-      l.setVerticalAlignment(JLabel.TOP);
-    }
-    JPanel panel = new JPanel(new BorderLayout(5, 5));
-    VisualActField f = new VisualActField(field, l, panel);
-    visualActFields.put(field, f);
-    visualActFieldsOrdered.add(f);
-
-    panel.add(l, BorderLayout.WEST);
-    panel.add(f.getComponent(), BorderLayout.CENTER);
-
-    return panel;
   }
 
   private JLabel positionLabel = new JLabel("x / y");
@@ -412,7 +459,7 @@ public class ActViewer extends Viewer implements ActionListener
 
   private boolean saveAct() {
     // just to make sure
-    for (VisualActField vFields : visualActFieldsOrdered) {
+    for (VisualActField vFields : globalPanel.getVisualActFieldsOrdered()) {
       vFields.updateEntry(true);
       vFields.refresh();
     }
@@ -455,15 +502,15 @@ public class ActViewer extends Viewer implements ActionListener
   }
 
   private void startNewAct() {
-      if (currentAct != null) {
-	  newActRow = currentAct.getRow() + 1;
-      } else {
-	  newActRow = 0;
-      }
-      currentAct = actList.createAct();
-      newAct = true;
-      refresh();
-      visualActFieldsOrdered.get(0).focus();
+    if (currentAct != null) {
+      newActRow = currentAct.getRow() + 1;
+    } else {
+      newActRow = 0;
+    }
+    currentAct = actList.createAct();
+    newAct = true;
+    refresh();
+    globalPanel.getVisualActFieldsOrdered().get(0).focus();
   }
 
   private void moveBack() {
@@ -490,6 +537,14 @@ public class ActViewer extends Viewer implements ActionListener
 
   private void deleteAct() {
     if (!newAct) {
+      int ret = JOptionPane.showConfirmDialog(mainWindow,
+          "Attention, cet acte sera d\351finitivement supprim\351. " +
+          "Etes-vous s\373r ?", "Effacer ?",
+	  JOptionPane.YES_NO_OPTION);
+      if (ret != JOptionPane.YES_OPTION) {
+	return;
+      }
+
       Act actToDelete = currentAct;
 
       if (!actListIterator.hasNext()) {
@@ -519,19 +574,6 @@ public class ActViewer extends Viewer implements ActionListener
     }
   }
 
-  private void connectUIComponents(ActList actList) {
-    for (int i = 0 ; i < visualActFieldsOrdered.size() ; i++) {
-      VisualActField f = visualActFieldsOrdered.get(i);
-      VisualActField next = (((i+1) < visualActFieldsOrdered.size()) ?
-			     visualActFieldsOrdered.get(i+1) : null);
-      // we don't connect the memo field
-      if (next != null && next.getField().isMemo()) {
-	next = null;
-      }
-      f.setNextField(next);
-    }
-  }
-
   private void initActList(ActList actList) {
     actListIterator = actList.iterator();
     if (actListIterator.hasNext()) {
@@ -553,10 +595,7 @@ public class ActViewer extends Viewer implements ActionListener
     reloadAct();
     updatePositionLabel();
 
-    for (ActEntry e : currentAct.getEntries()) {
-      VisualActField f = visualActFields.get(e.getField());
-      f.setEntry(e);
-    }
+    globalPanel.refresh();
 
     updateButtonStates();
   }
@@ -586,16 +625,26 @@ public class ActViewer extends Viewer implements ActionListener
     }
   }
 
+  @Override
   public boolean canBePrinted() {
     return true;
   }
 
+  @Override
   public JComponent getPrintableComponent() {
-    return printablePanel;
+    GlobalPanel gp = new GlobalPanel();
+    gp.createPanel(actList.getFields());
+    return gp.getPanel();
   }
 
+  @Override
   public boolean printOnOnePage() {
     return true;
+  }
+
+  @Override
+  public void printingDone() {
+
   }
 }
 

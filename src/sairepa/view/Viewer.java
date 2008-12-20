@@ -111,4 +111,8 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
   public boolean printOnOnePage() {
     return true;
   }
+
+  public void printingDone() {
+
+  }
 }

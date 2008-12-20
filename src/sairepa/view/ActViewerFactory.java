@@ -11,7 +11,7 @@ import sairepa.model.ActListFactory;
 
 public class ActViewerFactory implements ViewerFactory
 {
-  public final static String NAME = "Actes";
+  public final static String NAME = "Fiche";
   public final static ImageIcon ICON = IconBox.act;
 
   public ActViewerFactory() { }
@@ -28,7 +28,7 @@ public class ActViewerFactory implements ViewerFactory
     return factory.getActList();
   }
 
-  public Viewer createViewer(ActList list) {
-    return new ActViewer(list);
+  public Viewer createViewer(MainWindow mainWindow, ActList list) {
+    return new ActViewer(mainWindow, list);
   }
 }
