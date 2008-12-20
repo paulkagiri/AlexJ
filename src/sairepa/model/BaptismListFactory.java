@@ -15,6 +15,9 @@ import org.xBaseJ.micro.fields.MemoField;
 import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
+/**
+ * if you modify this class, modify also: ConfirmationListFactory
+ */
 public class BaptismListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;
@@ -42,17 +45,21 @@ public class BaptismListFactory extends ActListFactory
 	  new FieldLayout("Informations concernant le p\350re du baptis\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE, tmpLastName1),
-			    new ConvLastNameField("NOM2CV", Sex.MALE, tmpLastName2),
+			    new ConvNameField("NOM2CV", Conventionalizer.LAST_NAME,
+					      Sex.MALE, tmpLastName2),
 			    tmpFirstName2 = new ActField(new CharField("PRN2", 23)),
-			    new ConvFirstNameField("PRN2CV", Sex.MALE, tmpFirstName2),
+			    new ConvNameField("PRN2CV", Conventionalizer.FIRST_NAME,
+					      Sex.MALE, tmpFirstName2),
 			    new ActField(new CharField("NOT2", 40)),
 			  }),
 	  new FieldLayout("Informations concernant la m\350re du baptis\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
-			    new ConvLastNameField("NOM3CV", Sex.FEMALE, tmpLastName3) ,
+			    new ConvNameField("NOM3CV", Conventionalizer.LAST_NAME,
+					      Sex.FEMALE, tmpLastName3) ,
 			    tmpFirstName3 = new ActField(new CharField("PRN3", 23)),
-			    new ConvFirstNameField("PRN3CV", Sex.FEMALE, tmpFirstName3),
+			    new ConvNameField("PRN3CV", Conventionalizer.FIRST_NAME,
+					      Sex.FEMALE, tmpFirstName3),
 			    new ActField(new CharField("NOT3", 40)),
 			  }),
 	  new FieldLayout("Informations concernant le parrain",

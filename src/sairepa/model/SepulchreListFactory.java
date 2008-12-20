@@ -19,6 +19,10 @@ public class SepulchreListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;
 
+  private static boolean isEmpty(ActEntry e) {
+      return ("".equals(e.getValue().trim()) || "-".equals(e.getValue().trim()));
+  }
+
   private static class AdultTest implements Test {
     private ActField name2;
     private ActField name3;
@@ -30,10 +34,6 @@ public class SepulchreListFactory extends ActListFactory
       this.namec = namec;
     }
 
-    private boolean isEmpty(ActEntry e) {
-      return ("".equals(e.getValue().trim()) || "-".equals(e.getValue().trim()));
-    }
-
     public boolean test(Act a) {
       ActEntry name2e = a.getEntry(name2);
       ActEntry name3e = a.getEntry(name3);
@@ -43,13 +43,27 @@ public class SepulchreListFactory extends ActListFactory
     }
   }
 
+  private static class NonEmptyTest implements Test {
+    private ActField field;
+
+    public NonEmptyTest(ActField field) {
+      this.field = field;
+    }
+
+    public boolean test(Act a) {
+      return !isEmpty(a.getEntry(field));
+    }
+  }
+
   static {
     ActField tmpLastName1;
+    ActField tmpFirstName1;
     ActField tmpLastName2;
     ActField tmpFirstName2;
     ActField tmpLastName3;
     ActField tmpFirstName3;
     ActField tmpLastNameC;
+    ActField tmpFirstNameC;
     SexField tmpSexField;
 
     try {
@@ -60,7 +74,7 @@ public class SepulchreListFactory extends ActListFactory
 	  new FieldLayout("Renseignements concernant le d\351funt",
 			  new FieldLayoutElement[] {
 			    tmpLastName1 = new LastNameField("NOM1", Sex.UNKNOWN),
-			    new ActField(new CharField("PRN1", 23)),
+			    tmpFirstName1 = new ActField(new CharField("PRN1", 23)),
 			    tmpSexField = new SexField("SEX1"),
 			    new ActField(new CharField("AGE1", 13)),
 			    new ActField(new CharField("NOT1", 40)),
@@ -80,23 +94,40 @@ public class SepulchreListFactory extends ActListFactory
 	  new FieldLayout("Conjoint du d\351funt",
 			  new FieldLayoutElement[] {
 			    tmpLastNameC = new LastNameField("NOMC", Sex.UNKNOWN),
-			    new ActField(new CharField("PRNC", 23)),
+			    tmpFirstNameC = new ActField(new CharField("PRNC", 23)),
 			    new ActField(new CharField("NOTC", 40)),
 			  }),
-	  new FieldLayout("Prenoms/Noms conventionnels",
+	  // the following part gives me a freaking headache.
+	  new FieldLayout("Noms/Pr\351noms conventionnels",
 			  new FieldLayoutElement[] {
 			    new ConditionalField(new CharField("NOM2CV", 20),
 						 new AdultTest(tmpLastName2, tmpLastName3, tmpLastNameC),
-						 new ConvLastNameField("NOM2CV", tmpSexField,
-								       tmpLastName1, tmpLastNameC, null),
-						 new ConvLastNameField("NOM2CV", Sex.UNKNOWN, tmpLastName2)),
-			    new ConvFirstNameField("PRN2CV", Sex.MALE, tmpFirstName2),
+						 new ConvNameField("NOM2CV", Conventionalizer.LAST_NAME,
+								   tmpSexField, tmpLastName1, tmpLastNameC, null),
+						 new ConditionalField(new CharField("NOM2CV", 20),
+								      new NonEmptyTest(tmpLastName2),
+								      new ConvNameField("NOM2CV", Conventionalizer.LAST_NAME,
+											Sex.MALE, tmpLastName2),
+								      new ConvNameField("NOM2CV", Conventionalizer.LAST_NAME,
+											Sex.MALE, tmpLastName1))),
+			    new ConditionalField(new CharField("PRN2CV", 20),
+						 new AdultTest(tmpFirstName2, tmpFirstName3, tmpFirstNameC),
+						 new ConvNameField("PRN2CV", Conventionalizer.FIRST_NAME,
+								   tmpSexField, tmpFirstName1, tmpFirstNameC, null),
+						 new ConvNameField("PRN2CV", Conventionalizer.FIRST_NAME,
+								   Sex.MALE, tmpFirstName2)),
 			    new ConditionalField(new CharField("NOM3CV", 20),
 						 new AdultTest(tmpLastName2, tmpLastName3, tmpLastNameC),
-						 new ConvLastNameField("NOM3CV", tmpSexField,
-								       tmpLastNameC, tmpLastName1, null),
-						 new ConvLastNameField("NOM3CV", Sex.UNKNOWN, tmpLastName3)),
-			    new ConvFirstNameField("PRN3CV", Sex.FEMALE, tmpFirstName3),
+						 new ConvNameField("NOM3CV", Conventionalizer.LAST_NAME,
+								   tmpSexField, tmpLastNameC, tmpLastName1, null),
+						 new ConvNameField("NOM3CV", Conventionalizer.LAST_NAME,
+								   Sex.FEMALE, tmpLastName3, "?")),
+			    new ConditionalField(new CharField("PRN3CV", 20),
+						 new AdultTest(tmpFirstName2, tmpFirstName3, tmpFirstNameC),
+						 new ConvNameField("PRN3CV", Conventionalizer.FIRST_NAME,
+								   tmpSexField, tmpFirstNameC, tmpFirstName1, null),
+						 new ConvNameField("PRN3CV", Conventionalizer.FIRST_NAME,
+								   Sex.FEMALE, tmpFirstName3, "?")),
 			  }),
 	  new FieldLayout("Renseignement divers concernant l'acte",
 			  new FieldLayoutElement[] {
