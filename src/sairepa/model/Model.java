@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Vector;
 
+import sairepa.model.structs.*;
+
 public class Model
 {
   private File projectDir;

@@ -1,10 +1,10 @@
-
-package sairepa.model;
+package sairepa.model.structs;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 
+import sairepa.model.*;
 import sairepa.model.fields.*;
 
 import org.xBaseJ.micro.xBaseJException;

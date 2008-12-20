@@ -1,9 +1,10 @@
-package sairepa.model;
+package sairepa.model.structs;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 
+import sairepa.model.*;
 import sairepa.model.fields.*;
 
 import org.xBaseJ.micro.xBaseJException;
@@ -16,9 +17,9 @@ import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
 /**
- * if you modify this class, modify also: ConfirmationListFactory, BirthListFactory
+ * if you modify this class, modify also: ConfirmationListFactory, BaptismListFactory
  */
-public class BaptismListFactory extends ActListFactory
+public class BirthListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;
 
@@ -34,7 +35,7 @@ public class BaptismListFactory extends ActListFactory
 	  new NumericField("JOUR", 2, 0, 31),
 	  new NumericField("MOIS", 2, 0, 12),
 	  new NumericField("ANNEE", 4, 1500, 2020),
-	  new FieldLayout("Renseignements concernant le baptis\351",
+	  new FieldLayout("Renseignements concernant le nouveau-n\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName1 = new LastNameField("NOM1", Sex.UNKNOWN),
 			    new ActField(new CharField("PRN1", 23)),
@@ -42,7 +43,7 @@ public class BaptismListFactory extends ActListFactory
 			    new ActField(new CharField("NEE", 7)),
 			    new ActField(new CharField("NOT1", 40)),
 	    }),
-	  new FieldLayout("Informations concernant le p\350re du baptis\351",
+	  new FieldLayout("Informations concernant le p\350re du nouveau-n\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE, tmpLastName1),
 			    new ConvNameField("NOM2CV", Conventionalizer.LAST_NAME,
@@ -52,7 +53,7 @@ public class BaptismListFactory extends ActListFactory
 					      Sex.MALE, tmpFirstName2),
 			    new ActField(new CharField("NOT2", 40)),
 			  }),
-	  new FieldLayout("Informations concernant la m\350re du baptis\351",
+	  new FieldLayout("Informations concernant la m\350re du nouveau-n\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
 			    new ConvNameField("NOM3CV", Conventionalizer.LAST_NAME,
@@ -92,17 +93,17 @@ public class BaptismListFactory extends ActListFactory
     }
   }
 
-  public BaptismListFactory(File projectDir)
+  public BirthListFactory(File projectDir)
       throws java.io.FileNotFoundException {
-    this(projectDir, "bapteme5.dbf");
+    this(projectDir, "naissan5.dbf");
   }
 
-  protected BaptismListFactory(File projectDir, String filename)
+  protected BirthListFactory(File projectDir, String filename)
       throws java.io.FileNotFoundException {
     super(Util.getFile(projectDir, filename), fields);
   }
 
   public String toString() {
-    return "Bapt\352mes";
+    return "Naissances";
   }
 }

@@ -1,4 +1,4 @@
-package sairepa.model;
+package sairepa.model.structs;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +15,8 @@ import org.xBaseJ.micro.DBF;
 import org.xBaseJ.micro.xBaseJException;
 import org.xBaseJ.micro.fields.Field;
 import org.xBaseJ.micro.fields.MemoField;
+
+import sairepa.model.*;
 
 /**
  * Do the work about importing/exporting DBF files into Hsqldb
