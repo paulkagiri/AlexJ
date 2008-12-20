@@ -30,6 +30,7 @@ public class Model
 	new String[] {
 	  "Pr\351-r\351volution",
 	  "Post-r\351volution",
+	  "Actes notari\351s",
 	},
 	new ActListFactory[][] {
 	  new ActListFactory[] {
@@ -39,9 +40,14 @@ public class Model
 	    new SepulchreListFactory(projectDir)
 	  },
 	  new ActListFactory[] {
-	    new UnionListFactory(projectDir),
 	    new BirthListFactory(projectDir),
+	    new UnionListFactory(projectDir),
 	    new DeceaseListFactory(projectDir),
+	  },
+	  new ActListFactory[] {
+	    new NotarialConfirmationListFactory(projectDir),
+	    new WeddingContractListFactory(projectDir),
+	    new NotarialDeceaseListFactory(projectDir),
 	  },
 	});
   }

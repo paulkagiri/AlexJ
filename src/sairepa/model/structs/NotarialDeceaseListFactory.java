@@ -17,9 +17,9 @@ import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
 /**
- * if you modify this class, modify also: DeceaseListFactory, SepultureListFactory
+ * if you modify this class, modify also: SepultureListFactory, DeceaseListFactory
  */
-public class SepulchreListFactory extends ActListFactory
+public class NotarialDeceaseListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;
 
@@ -151,12 +151,12 @@ public class SepulchreListFactory extends ActListFactory
     }
   }
 
-  public SepulchreListFactory(File projectDir)
+  public NotarialDeceaseListFactory(File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "sepultu5.dbf"), fields);
+    super(Util.getFile(projectDir, "dec_inv5.dbf"), fields);
   }
 
   public String toString() {
-    return "S\351pultures";
+    return "D\351c\350s";
   }
 }

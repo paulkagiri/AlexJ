@@ -17,9 +17,9 @@ import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
 /**
- * if you modify this class, modify also: UnionListFactory, WeddingContractListFactory
+ * if you modify this class, modify also: UnionListFactory, WeddingListFactory
  */
-public class WeddingListFactory extends ActListFactory
+public class WeddingContractListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;
 
@@ -100,9 +100,9 @@ public class WeddingListFactory extends ActListFactory
     }
   }
 
-  public WeddingListFactory(File projectDir)
+  public WeddingContractListFactory(File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "mariage5.dbf"), fields);
+    super(Util.getFile(projectDir, "ctt_mar5.dbf"), fields);
   }
 
   public String toString() {

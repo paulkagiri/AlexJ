@@ -20,6 +20,8 @@ public class TabSelecter extends JPanel
   public final static long serialVersionUID = 1;
   private ArrayList<TabSelecterObserver> observers;
 
+  private final static int SPACE_BETWEEN_FACTORY_SET = 30;
+
   public TabSelecter(ActListFactoryLayout actListFactories, ViewerFactory[] viewerFactories) {
     super(new BorderLayout());
 
@@ -28,13 +30,13 @@ public class TabSelecter extends JPanel
     ActListFactory[][] allFactories = actListFactories.getFactories();
     String[] factorySetNames = actListFactories.getFactorySetNames();
 
-    JPanel global = new JPanel(new BorderLayout(20, 20));
+    JPanel global = new JPanel(new BorderLayout(SPACE_BETWEEN_FACTORY_SET,
+						SPACE_BETWEEN_FACTORY_SET));
     JPanel veryGlobal = global;
 
     for (int i = 0 ; i < allFactories.length ; i++) {
 
       JPanel sub = new JPanel(new GridLayout(allFactories[i].length, 1, 10, 10));
-
       for (ActListFactory actListFactory : allFactories[i]) {
 	JPanel subsub = new JPanel(new GridLayout(viewerFactories.length, 1));
 	//JLabel title = new JLabel(actListFactory.toString());
@@ -46,11 +48,11 @@ public class TabSelecter extends JPanel
 	subsub.setBorder(BorderFactory.createTitledBorder(actListFactory.toString()));
 	sub.add(subsub);
       }
-
       sub.setBorder(BorderFactory.createTitledBorder(factorySetNames[i]));
 
       global.add(sub, BorderLayout.CENTER);
-      sub = new JPanel(new BorderLayout(0, 0));
+      sub = new JPanel(new BorderLayout(SPACE_BETWEEN_FACTORY_SET,
+					SPACE_BETWEEN_FACTORY_SET));
       global.add(sub, BorderLayout.SOUTH);
       global = sub;
     }

@@ -17,7 +17,7 @@ import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
 /**
- * if you modify this class, modify also: SepultureListFactory
+ * if you modify this class, modify also: SepultureListFactory, NotarialDeceaseListFactory
  */
 public class DeceaseListFactory extends ActListFactory
 {

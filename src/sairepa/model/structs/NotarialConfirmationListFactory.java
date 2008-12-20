@@ -17,13 +17,14 @@ import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
 /**
- * if you modify this class, modify also: UnionListFactory, WeddingContractListFactory
+ * if you modify this class, modify also: ConfirmationListFactory, BirthListFactory, BaptismListFactory
  */
-public class WeddingListFactory extends ActListFactory
+public class NotarialConfirmationListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;
 
   static {
+    ActField tmpLastName1;
     ActField tmpLastName2;
     ActField tmpFirstName2;
     ActField tmpLastName3;
@@ -32,62 +33,54 @@ public class WeddingListFactory extends ActListFactory
     try {
       fields = new FieldLayout(new FieldLayoutElement[] {
 	  new NumericField("JOUR", 2, 0, 31),
-	  new NumericField("MOIS", 2, 0, 31),
+	  new NumericField("MOIS", 2, 0, 12),
 	  new NumericField("ANNEE", 4, 1500, 2020),
-	  new FieldLayout("Renseignement concernant l'\351poux",
+	  new FieldLayout("Renseignements concernant le confirm\351",
 			  new FieldLayoutElement[] {
-			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE),
+			    tmpLastName1 = new LastNameField("NOM1", Sex.UNKNOWN),
+			    new ActField(new CharField("PRN1", 23)),
+			    new SexField("SEX1"),
+			    new ActField(new CharField("NEE", 7)),
+			    new ActField(new CharField("NOT1", 40)),
+	    }),
+	  new FieldLayout("Informations concernant le p\350re du confirm\351",
+			  new FieldLayoutElement[] {
+			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE, tmpLastName1),
 			    new ConvNameField("NOM2CV", Conventionalizer.LAST_NAME,
 					      Sex.MALE, tmpLastName2),
 			    tmpFirstName2 = new ActField(new CharField("PRN2", 23)),
 			    new ConvNameField("PRN2CV", Conventionalizer.FIRST_NAME,
 					      Sex.MALE, tmpFirstName2),
-			    new ActField(new CharField("LOC2", 50)),
-			    new ActField(new CharField("LOC2ID", 38)),
-			    new ActField(new CharField("CVF2", 1)),
 			    new ActField(new CharField("NOT2", 40)),
-			    new FieldLayout("P\350re de l'\351poux",
-					    new FieldLayoutElement[] {
-					      new LastNameField("NOM4", Sex.MALE, tmpLastName2),
-					      new ActField(new CharField("PRN4", 23)),
-					      new ActField(new CharField("NOT4", 40)),
-					    }),
-			    new FieldLayout("M\350re de l'\351poux",
-					    new FieldLayoutElement[] {
-					      new LastNameField("NOM5", Sex.FEMALE),
-					      new ActField(new CharField("PRN5", 23)),
-					    })
 			  }),
-	  new FieldLayout("Renseignement concernant l'\351pouse",
+	  new FieldLayout("Informations concernant la m\350re du confirm\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
 			    new ConvNameField("NOM3CV", Conventionalizer.LAST_NAME,
-					      Sex.FEMALE, tmpLastName3),
+					      Sex.FEMALE, tmpLastName3) ,
 			    tmpFirstName3 = new ActField(new CharField("PRN3", 23)),
 			    new ConvNameField("PRN3CV", Conventionalizer.FIRST_NAME,
 					      Sex.FEMALE, tmpFirstName3),
-			    new ActField(new CharField("LOC3", 50)),
-			    new ActField(new CharField("LOC3ID", 38)),
-			    new ActField(new CharField("CVF3", 1)),
 			    new ActField(new CharField("NOT3", 40)),
-			    new FieldLayout("P\350re de l'\351pouse",
-					    new FieldLayoutElement[] {
-					      new LastNameField("NOM6", Sex.MALE, tmpLastName3),
-					      new ActField(new CharField("PRN6", 23)),
-					      new ActField(new CharField("NOT6", 40)),
-					    }),
-			    new FieldLayout("M\350re de l'\351pouse",
-					    new FieldLayoutElement[] {
-					      new LastNameField("NOM7", Sex.FEMALE),
-					      new ActField(new CharField("PRN7", 23)),
-					    }),
 			  }),
-	  new FieldLayout("Renseignement divers concernant l'acte",
+	  new FieldLayout("Informations concernant le parrain",
 			  new FieldLayoutElement[] {
-			    new ActField(new CharField("TEMOIN", 50)),
+			    new LastNameField("NOMP", Sex.MALE),
+			    new ActField(new CharField("PRNP", 23)),
+			    new ActField(new CharField("NOTP", 40)),
+			  }),
+	  new FieldLayout("Informations concernant la marraine",
+			  new FieldLayoutElement[] {
+			    new LastNameField("NOMM", Sex.FEMALE),
+			    new ActField(new CharField("PRNM", 23)),
+			    new ActField(new CharField("NOTM", 40)),
+			  }),
+	  new FieldLayout("Renseignements divers concernant l'acte",
+			  new FieldLayoutElement[] {
 			    new ActField(new CharField("DIVERS", 40)),
+			    new ActField(new CharField("LOC2ID", 38)),
 			    new ActField(new MemoField("TXTLONG"))
-			  })
+			  }),
 	});
     } catch (xBaseJException e) {
       System.err.println("Can't instanciate field prototypes because : " + e.toString());
@@ -100,12 +93,17 @@ public class WeddingListFactory extends ActListFactory
     }
   }
 
-  public WeddingListFactory(File projectDir)
+  public NotarialConfirmationListFactory(File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "mariage5.dbf"), fields);
+    this(projectDir, "conf_fi5.dbf");
+  }
+
+  protected NotarialConfirmationListFactory(File projectDir, String filename)
+      throws java.io.FileNotFoundException {
+    super(Util.getFile(projectDir, filename), fields);
   }
 
   public String toString() {
-    return "Mariages";
+    return "Confirmations";
   }
 }
