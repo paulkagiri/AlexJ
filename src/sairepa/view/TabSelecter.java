@@ -5,12 +5,14 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import sairepa.model.ActListFactory;
+import sairepa.model.ActListFactoryLayout;
 import sairepa.model.Model;
 
 public class TabSelecter extends JPanel
@@ -18,28 +20,43 @@ public class TabSelecter extends JPanel
   public final static long serialVersionUID = 1;
   private ArrayList<TabSelecterObserver> observers;
 
-  public TabSelecter(ActListFactory[] actListFactories, ViewerFactory[] viewerFactories) {
+  public TabSelecter(ActListFactoryLayout actListFactories, ViewerFactory[] viewerFactories) {
     super(new BorderLayout());
 
     observers = new ArrayList<TabSelecterObserver>();
 
-    JPanel sub = new JPanel(new GridLayout(actListFactories.length, 1, 20, 20));
+    ActListFactory[][] allFactories = actListFactories.getFactories();
+    String[] factorySetNames = actListFactories.getFactorySetNames();
 
-    for (ActListFactory actListFactory : actListFactories) {
-      JPanel subsub = new JPanel(new GridLayout(viewerFactories.length + 1, 1));
+    JPanel global = new JPanel(new BorderLayout(20, 20));
+    JPanel veryGlobal = global;
 
-      JLabel title = new JLabel(actListFactory.toString());
-      subsub.add(title);
+    for (int i = 0 ; i < allFactories.length ; i++) {
 
-      for (ViewerFactory viewerFactory : viewerFactories) {
-	TabSelecterButton button = new TabSelecterButton(actListFactory, viewerFactory);
-	subsub.add(button);
+      JPanel sub = new JPanel(new GridLayout(allFactories[i].length, 1, 10, 10));
+
+      for (ActListFactory actListFactory : allFactories[i]) {
+	JPanel subsub = new JPanel(new GridLayout(viewerFactories.length, 1));
+	//JLabel title = new JLabel(actListFactory.toString());
+	//subsub.add(title);
+	for (ViewerFactory viewerFactory : viewerFactories) {
+	  TabSelecterButton button = new TabSelecterButton(actListFactory, viewerFactory);
+	  subsub.add(button);
+	}
+	subsub.setBorder(BorderFactory.createTitledBorder(actListFactory.toString()));
+	sub.add(subsub);
       }
 
-      sub.add(subsub);
+      sub.setBorder(BorderFactory.createTitledBorder(factorySetNames[i]));
+
+      global.add(sub, BorderLayout.CENTER);
+      sub = new JPanel(new BorderLayout(0, 0));
+      global.add(sub, BorderLayout.SOUTH);
+      global = sub;
     }
 
-    this.add(sub, BorderLayout.NORTH);
+
+    this.add(veryGlobal, BorderLayout.NORTH);
     this.add(new JLabel(""), BorderLayout.CENTER);
   }
 
@@ -50,7 +67,8 @@ public class TabSelecter extends JPanel
     private ViewerFactory viewerFactory;
 
     protected TabSelecterButton(ActListFactory actListFactory, ViewerFactory viewerFactory) {
-      super(viewerFactory.getName(), viewerFactory.getIcon());
+      //super(viewerFactory.getName(), viewerFactory.getIcon());
+      super(viewerFactory.getName());
       setHorizontalAlignment(JButton.LEFT);
 
       this.actListFactory = actListFactory;

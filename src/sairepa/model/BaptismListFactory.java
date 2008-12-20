@@ -16,7 +16,7 @@ import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
 /**
- * if you modify this class, modify also: ConfirmationListFactory
+ * if you modify this class, modify also: ConfirmationListFactory, BirthListFactory
  */
 public class BaptismListFactory extends ActListFactory
 {

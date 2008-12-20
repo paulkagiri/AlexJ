@@ -16,9 +16,9 @@ import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
 /**
- * if you modify this class, modify also: BaptismListFactory, BirthListFactory
+ * if you modify this class, modify also: ConfirmationListFactory, BaptismListFactory
  */
-public class ConfirmationListFactory extends ActListFactory
+public class BirthListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;
 
@@ -34,7 +34,7 @@ public class ConfirmationListFactory extends ActListFactory
 	  new NumericField("JOUR", 2, 0, 31),
 	  new NumericField("MOIS", 2, 0, 12),
 	  new NumericField("ANNEE", 4, 1500, 2020),
-	  new FieldLayout("Renseignements concernant le confirm\351",
+	  new FieldLayout("Renseignements concernant le nouveau-n\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName1 = new LastNameField("NOM1", Sex.UNKNOWN),
 			    new ActField(new CharField("PRN1", 23)),
@@ -42,7 +42,7 @@ public class ConfirmationListFactory extends ActListFactory
 			    new ActField(new CharField("NEE", 7)),
 			    new ActField(new CharField("NOT1", 40)),
 	    }),
-	  new FieldLayout("Informations concernant le p\350re du confirm\351",
+	  new FieldLayout("Informations concernant le p\350re du nouveau-n\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE, tmpLastName1),
 			    new ConvNameField("NOM2CV", Conventionalizer.LAST_NAME,
@@ -52,14 +52,14 @@ public class ConfirmationListFactory extends ActListFactory
 					      Sex.MALE, tmpFirstName2),
 			    new ActField(new CharField("NOT2", 40)),
 			  }),
-	  new FieldLayout("Informations concernant la m\350re du confirm\351",
+	  new FieldLayout("Informations concernant la m\350re du nouveau-n\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
 			    new ConvNameField("NOM3CV", Conventionalizer.LAST_NAME,
 					      Sex.FEMALE, tmpLastName3) ,
 			    tmpFirstName3 = new ActField(new CharField("PRN3", 23)),
 			    new ConvNameField("PRN3CV", Conventionalizer.FIRST_NAME,
-					      Sex.FEMALE, tmpLastName3),
+					      Sex.FEMALE, tmpFirstName3),
 			    new ActField(new CharField("NOT3", 40)),
 			  }),
 	  new FieldLayout("Informations concernant le parrain",
@@ -92,17 +92,17 @@ public class ConfirmationListFactory extends ActListFactory
     }
   }
 
-  protected ConfirmationListFactory(File projectDir, String filename)
+  public BirthListFactory(File projectDir)
+      throws java.io.FileNotFoundException {
+    this(projectDir, "naissan5.dbf");
+  }
+
+  protected BirthListFactory(File projectDir, String filename)
       throws java.io.FileNotFoundException {
     super(Util.getFile(projectDir, filename), fields);
   }
 
-  public ConfirmationListFactory(File projectDir)
-      throws java.io.FileNotFoundException {
-    this(projectDir, "confirm5.dbf");
-  }
-
   public String toString() {
-    return "Confirmations";
+    return "Naissances";
   }
 }

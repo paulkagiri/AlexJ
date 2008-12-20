@@ -13,7 +13,7 @@ public class Model
   private File projectDir;
   private Hsqldb db;
 
-  private ActListFactory[] factories;
+  private ActListFactoryLayout factories;
 
   // dirty singleton
   private static final PrncvDb prncvDb = new PrncvDb();
@@ -24,19 +24,31 @@ public class Model
     db = new Hsqldb();
     db.connect(projectDir.getName());
 
-    factories = new ActListFactory[] {
-      new BaptismListFactory(projectDir),
-      new ConfirmationListFactory(projectDir),
-      new WeddingListFactory(projectDir),
-      new SepulchreListFactory(projectDir)
-    };
+    factories = new ActListFactoryLayout(
+	new String[] {
+	  "Pr\351-r\351volution",
+	  "Post-r\351volution",
+	},
+	new ActListFactory[][] {
+	  new ActListFactory[] {
+	    new BaptismListFactory(projectDir),
+	    new ConfirmationListFactory(projectDir),
+	    new WeddingListFactory(projectDir),
+	    new SepulchreListFactory(projectDir)
+	  },
+	  new ActListFactory[] {
+	    new UnionListFactory(projectDir),
+	    new BirthListFactory(projectDir),
+	    new DeceaseListFactory(projectDir),
+	  },
+	});
   }
 
   public static PrncvDb getPrncvDb() {
     return prncvDb;
   }
 
-  public ActListFactory[] getFactories() {
+  public ActListFactoryLayout getFactories() {
     return factories;
   }
 

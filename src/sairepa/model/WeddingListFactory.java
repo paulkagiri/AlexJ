@@ -15,7 +15,9 @@ import org.xBaseJ.micro.fields.MemoField;
 import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
-
+/**
+ * if you modify this class, modify also: UnionListFactory
+ */
 public class WeddingListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;

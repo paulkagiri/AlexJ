@@ -1,3 +1,4 @@
+
 package sairepa.model;
 
 import java.io.File;
@@ -16,9 +17,9 @@ import org.xBaseJ.micro.fields.NumField;
 import org.xBaseJ.micro.fields.PictureField;
 
 /**
- * if you modify this class, modify also: DeceaseListFactory
+ * if you modify this class, modify also: SepultureListFactory
  */
-public class SepulchreListFactory extends ActListFactory
+public class DeceaseListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;
 
@@ -150,12 +151,12 @@ public class SepulchreListFactory extends ActListFactory
     }
   }
 
-  public SepulchreListFactory(File projectDir)
+  public DeceaseListFactory(File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "sepultu5.dbf"), fields);
+    super(Util.getFile(projectDir, "deces__5.dbf"), fields);
   }
 
   public String toString() {
-    return "S\351pultures";
+    return "D\351c\350s";
   }
 }
