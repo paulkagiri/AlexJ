@@ -175,9 +175,9 @@ public class Table extends JTable implements MouseListener {
     /**
      * @return null if default color
      */
-    public static Color setBackground(Component c, int row, boolean isSelected) {
+    public static Color setBackground(Component c, int col, int row, boolean isSelected) {
       if (!isSelected) {
-	if (row % 2 == 0) {
+	if (row % 2 == 0 && col > 0) {
 	  if (c != null)
 	    c.setBackground(COLOR_ONE);
 	  return COLOR_ONE;
@@ -220,7 +220,7 @@ public class Table extends JTable implements MouseListener {
 
       }
 
-      setBackground(cell, row, isSelected);
+      setBackground(cell, column, row, isSelected);
 
       if (value instanceof ActEntry && !((ActEntry)value).validate()) {
     	  cell.setBackground(Color.RED);

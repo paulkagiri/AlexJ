@@ -15,6 +15,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import sairepa.gui.CloseableTabbedPane;
+import sairepa.gui.IconBox;
 import sairepa.model.Model;
 
 /**
@@ -27,6 +28,7 @@ public class MainWindow extends JFrame implements ChangeListener {
   private int DEFAULT_SIZE_X = 800;
   private int DEFAULT_SIZE_Y = 600;
 
+  private JMenuItem menuFileSearch;
   private JMenuItem menuFilePrint;
   private JMenuItem menuFileQuit;
   private TabSelecter tabOpener;
@@ -94,11 +96,28 @@ public class MainWindow extends JFrame implements ChangeListener {
   private JMenuBar createMenuBar() {
     JMenuBar menuBar = new JMenuBar();
     JMenu menuFile = new JMenu("Fichier");
-    menuFilePrint = new JMenuItem("Imprimer");
+
+    menuFileSearch = new JMenuItem("Rechercher", IconBox.search);
+    menuFileSearch.setAccelerator(
+        javax.swing.KeyStroke.getKeyStroke(
+        java.awt.event.KeyEvent.VK_F, java.awt.Event.CTRL_MASK));
+    menuFileSearch.setEnabled(false);
+
+    menuFilePrint = new JMenuItem("Imprimer", IconBox.print);
+    menuFilePrint.setAccelerator(
+        javax.swing.KeyStroke.getKeyStroke(
+        java.awt.event.KeyEvent.VK_P, java.awt.Event.CTRL_MASK));
     menuFilePrint.setEnabled(false);
-    menuFileQuit = new JMenuItem("Quitter");
+
+    menuFileQuit = new JMenuItem("Quitter", IconBox.quit);
+    menuFileQuit.setAccelerator(
+        javax.swing.KeyStroke.getKeyStroke(
+        java.awt.event.KeyEvent.VK_Q, java.awt.Event.CTRL_MASK));
+
+    menuFile.add(menuFileSearch);
     menuFile.add(menuFilePrint);
     menuFile.add(menuFileQuit);
+
     menuBar.add(menuFile);
 
     return menuBar;
@@ -114,6 +133,10 @@ public class MainWindow extends JFrame implements ChangeListener {
 
   public AbstractButton getQuitButton() {
     return menuFileQuit;
+  }
+
+  public AbstractButton getSearchButton() {
+    return menuFileSearch;
   }
 
   public AbstractButton getPrintButton() {

@@ -115,4 +115,12 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
   public void printingDone() {
 
   }
+
+  public boolean canBeSearched() {
+    return false;
+  }
+
+  public void displaySearchForm() {
+
+  }
 }

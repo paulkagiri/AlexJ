@@ -2,24 +2,40 @@ package sairepa.view;
 
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputMethodEvent;
+import java.awt.event.InputMethodListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import sairepa.gui.IconBox;
 import sairepa.gui.Table;
 import sairepa.model.Act;
 import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.ActList;
 import sairepa.model.ActListFactory;
+import sairepa.model.Util;
 
-public class ActListViewer extends Viewer implements Table.ReorderingListener
+public class ActListViewer extends Viewer
+  implements Table.ReorderingListener, ActionListener, CaretListener, ListSelectionListener
 {
   public final static long serialVersionUID = 1;
 
@@ -37,7 +53,11 @@ public class ActListViewer extends Viewer implements Table.ReorderingListener
     table = new Table(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     table.addReorderingListener(this);
+    table.setRowSelectionAllowed(true);
+    table.setColumnSelectionAllowed(true);
+    table.getSelectionModel().addListSelectionListener(this);
     this.add(new JScrollPane(table), BorderLayout.CENTER);
+    this.add(createSearchForm(), BorderLayout.SOUTH);
   }
 
   @Override
@@ -159,5 +179,196 @@ public class ActListViewer extends Viewer implements Table.ReorderingListener
   @Override
   public String canClose() {
     return null;
+  }
+
+  public void valueChanged(ListSelectionEvent e) {
+    if (table.getSelectedColumn() == 0) {
+      table.getSelectionModel().removeListSelectionListener(this);
+      table.setColumnSelectionInterval(0, model.getColumnCount()-1);
+      table.getSelectionModel().addListSelectionListener(this);
+    }
+  }
+
+  private JLabel searchLabel = new JLabel(IconBox.search);
+  private JTextField searchField = new JTextField(20);
+  private Color defaultFieldBackColor = null;
+  private Color notFoundBackColor = new Color(255, 64, 64);
+  private JCheckBox searchColumnOnly = new JCheckBox("Uniquement sur la colone s\351l\351ctionn\351e", false);
+  private JButton nextSearchButton = new JButton(IconBox.down);
+  private JButton previousSearchButton = new JButton(IconBox.up);
+
+  private JPanel createSearchForm() {
+    JPanel p = new JPanel(new BorderLayout());
+
+    JPanel realPanel = new JPanel(new BorderLayout(10, 10));
+
+    JPanel searchPanel = new JPanel(new BorderLayout());
+    searchField.addActionListener(this);
+    searchField.addCaretListener(this);
+    searchPanel.add(searchLabel, BorderLayout.WEST);
+    searchPanel.add(searchField, BorderLayout.CENTER);
+
+    realPanel.add(searchPanel, BorderLayout.WEST);
+
+    //searchColumnOnly.addActionListener(this);
+    realPanel.add(searchColumnOnly, BorderLayout.CENTER);
+
+    JPanel buttonPanel = new JPanel(new GridLayout(1, 2));
+    nextSearchButton.addActionListener(this);
+    nextSearchButton.setToolTipText("Suivant");
+    buttonPanel.add(nextSearchButton);
+    previousSearchButton.setToolTipText("Precedent");
+    previousSearchButton.addActionListener(this);
+    buttonPanel.add(previousSearchButton);
+    realPanel.add(buttonPanel, BorderLayout.EAST);
+
+    p.add(realPanel, BorderLayout.WEST);
+    p.add(new JLabel(""), BorderLayout.CENTER);
+    return p;
+  }
+
+  private void focusSearchField() {
+    searchField.requestFocus();
+  }
+
+  @Override
+  public boolean canBeSearched() {
+    return true;
+  }
+
+  @Override
+  public void displaySearchForm() {
+    focusSearchField();
+  }
+
+  private final static Object SEARCH_LOCK = new Object();
+
+  private class SearchThread implements Runnable {
+    private String str;
+    private int col;
+    private int row;
+    private boolean colOnly;
+    private boolean cont;
+    private int move;
+    private boolean running;
+
+    /**
+     * @param colOnly don't move to another column
+     * @param move +1 or -1, depending of the way you want to go
+     */
+    public SearchThread(String str, int col, int row, boolean colOnly, boolean cont, int move) {
+      this.str = str;
+      this.col = col;
+      this.row = row;
+      this.colOnly = colOnly;
+      this.cont = cont;
+      this.move = move;
+      running = true;
+    }
+
+    public void stop() {
+      running = false;
+    }
+
+    public void run() {
+      synchronized(SEARCH_LOCK) {
+	Util.check(move == 1 || move == -1);
+
+	str = str.toLowerCase().trim();
+	if ("".equals(str)) {
+	  return;
+	}
+
+	if (cont) {
+	  if (colOnly) {
+	    row += move;
+	  } else {
+	    col += move;
+	  }
+	}
+
+	System.out.println("Searching '" + str + "' ...");
+
+	int rowCount = model.getRowCount();
+	int colCount = model.getColumnCount();
+	int targetRow = -1;
+	int targetCol = -1;
+
+	while (row >= 0 && row < rowCount && targetRow < 0 && running) {
+	  while (col >= 0 && col < colCount && targetCol < 0 && running) {
+	    if (model.getValueAt(row, col).toString().trim().toLowerCase().contains(str)) {
+	      targetRow = row;
+	      targetCol = col;
+	    }
+	    if (!colOnly) col += move;
+	    else break;
+	  }
+	  row += move;
+	  if (!colOnly)
+	    col = 0;
+	}
+
+	if (targetRow < 0 || targetCol < 0) {
+	  if (defaultFieldBackColor == null) defaultFieldBackColor = searchField.getBackground();
+	  searchField.setBackground(notFoundBackColor);
+	  System.out.println("Not found");
+	} else {
+	  System.out.println("Found");
+	  searchField.setBackground(defaultFieldBackColor);
+	  selectCell(targetRow, targetCol);
+	}
+      }
+    }
+  }
+
+  private void selectCell(int row, int column) {
+    table.setRowSelectionInterval(row, row);
+    table.setColumnSelectionInterval(column, column);
+    java.awt.Rectangle rect = table.getCellRect(row, column, true);
+    System.out.println("Rect: " + rect.getX() + "," + rect.getY());
+    table.scrollRectToVisible(rect);
+    table.repaint();
+  }
+
+  private SearchThread currentSearch = null;
+
+  public void searchAndSelect(String str, int col, int row, boolean colOnly, boolean cont, int move) {
+    synchronized(this) {
+      if (currentSearch != null) currentSearch.stop(); // there can be only one
+      currentSearch = new SearchThread(str, col, row, colOnly, cont, move);
+      Thread th = new Thread(currentSearch);
+      th.start();
+    }
+  }
+
+  public void caretUpdate(CaretEvent e) {
+    if (e.getSource() == searchField) {
+      if (!"".equals(searchField.getText().trim())) {
+	searchAndSelect(searchField.getText(), 0, 0, searchColumnOnly.isSelected(), false, 1);
+      } else {
+	selectCell(0, 0);
+      }
+    }
+  }
+
+  public void actionPerformed(ActionEvent e) {
+    if (model.getRowCount() <= 0) return;
+
+    if (e.getSource() == searchField) {
+      searchAndSelect(searchField.getText(), 0, 0, searchColumnOnly.isSelected(), false, 1);
+    } else {
+      int row = table.getSelectedRow();
+      int col = table.getSelectedColumn();
+      if (row < 0) row = 0;
+      if (col < 0) col = 0;
+
+      if (e.getSource() == nextSearchButton) {
+	searchAndSelect(searchField.getText(),
+			col, row, searchColumnOnly.isSelected(), true, 1);
+      } else if (e.getSource() == previousSearchButton) {
+	searchAndSelect(searchField.getText(),
+			col, row, searchColumnOnly.isSelected(), true, -1);
+      }
+    }
   }
 }

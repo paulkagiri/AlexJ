@@ -8,6 +8,11 @@ public class IconBox
   public final static ImageIcon minTabClose = loadIcon("tab-close.png");
   public final static ImageIcon actList     = loadIcon("act-list.png");
   public final static ImageIcon act         = loadIcon("act.png");
+  public final static ImageIcon up          = loadIcon("up.png");
+  public final static ImageIcon down        = loadIcon("down.png");
+  public final static ImageIcon search      = loadIcon("search.png");
+  public final static ImageIcon quit        = loadIcon("quit.png");
+  public final static ImageIcon print       = loadIcon("print.png");
 
   private IconBox() { }
 

@@ -29,6 +29,10 @@ public class Controller
     ActionPrint actionPrint = new ActionPrint(model, view, this);
     view.getMainWindow().addTabObserver(actionPrint);
     view.getMainWindow().getPrintButton().addActionListener(actionPrint);
+
+    ActionSearch actionSearch = new ActionSearch(model, view, this);
+    view.getMainWindow().addTabObserver(actionSearch);
+    view.getMainWindow().getSearchButton().addActionListener(actionSearch);
   }
 
   public void close() {
