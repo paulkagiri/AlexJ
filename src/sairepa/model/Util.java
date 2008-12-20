@@ -124,7 +124,33 @@ public class Util
 
   private static String conventionalizeReplacements(String in) {
     in = in.replaceAll("ae", "e");
+    in = in.replaceAll("Ae", "E");
+    in = in.replaceAll("AE", "E");
+
     in = in.replaceAll("oe", "e");
+    in = in.replaceAll("Oe", "E");
+    in = in.replaceAll("OE", "E");
+
+    in = in.replaceAll("ue", "u");
+    in = in.replaceAll("Ue", "U");
+    in = in.replaceAll("UE", "U");
+
+    in = in.replaceAll("uo", "u");
+    in = in.replaceAll("Uo", "U");
+    in = in.replaceAll("UO", "U");
+
+    in = in.replaceAll("dt", "d");
+    in = in.replaceAll("Dt", "D");
+    in = in.replaceAll("DT", "D");
+
+    in = in.replaceAll("tz", "z");
+    in = in.replaceAll("Tz", "Z");
+    in = in.replaceAll("TZ", "Z");
+
+    in = in.replaceAll("th", "t");
+    in = in.replaceAll("Th", "T");
+    in = in.replaceAll("TH", "T");
+
     return in;
   }
 
@@ -165,12 +191,10 @@ public class Util
 
   public static String conventionalizeLastName(String in, Sex sex) {
     in = in.trim();
-    if (sex != Sex.FEMALE) {
+    if (sex != Sex.FEMALE) { // MALE
       in = extractMalePart(in);
     }
     in = conventionalizeAccents(in.toLowerCase());
-    in = conventionalizeDoubles(in);
-    in = conventionalizeReplacements(in);
     return upperCase(in, true, sex);
   }
 
@@ -179,21 +203,44 @@ public class Util
     in = in.replaceAll("-", " ");
     in = dropEndIfItsThisOne(in, "+");
     in = dropEndIfItsThisOne(in, "?");
+    in = in.trim();
 
     String[] split = in.split(" ");
     if (split.length <= 0) return "";
     in = split[split.length-1];
+    in = in.trim();
 
     if (in.startsWith("Chris")) in = in.replaceFirst("Chris", "Cris");
-    if (sex != Sex.FEMALE) {
-      in = dropEndIfItsThisOne(in, "o");
-      in = dropEndIfItsThisOne(in, "i");
-    } else if (sex != Sex.MALE) {
-      in = dropEndIfItsThisOne(in, "ius");
-    }
+
     in = conventionalizeAccents(in);
     in = conventionalizeDoubles(in);
+
+    if (sex != Sex.MALE) { // FEMALE
+      if (in.endsWith("ae") || in.endsWith("am")) {
+	in = in.substring(0, in.length() - 1); // we drop the 'e' or the 'm'
+      }
+    } else { // MALE
+      if (in.endsWith("ae")) {
+	in = in.substring(0, in.length() - 1); // we drop the 'e'
+      } else if (in.endsWith("um")) {
+	in = in.substring(0, in.length() - 1) + "s"; // we drop the 'm' and put a 's'
+      } else if (in.endsWith("em")) {
+	in = in.substring(0, in.length() - 2) + "is"; // we drop the 'em' and put a 'is'
+      } else
+	in = dropEndIfItsThisOne(in, "iu");
+    }
+
+    if (sex != Sex.FEMALE) { // MALE
+      if (!(in.equals("Eloi") || in.equals("Elio"))) {
+	in = dropEndIfItsThisOne(in, "o");
+	in = dropEndIfItsThisOne(in, "i");
+      }
+    } else if (sex != Sex.MALE) { // FEMALE
+      in = dropEndIfItsThisOne(in, "ius");
+    }
+
     in = conventionalizeReplacements(in);
+
     return in;
   }
 }
