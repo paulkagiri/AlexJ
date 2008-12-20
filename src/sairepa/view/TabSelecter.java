@@ -1,7 +1,9 @@
 package sairepa.view;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -10,6 +12,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
 
 import sairepa.model.ActListFactory;
 import sairepa.model.ActListFactoryLayout;
@@ -48,7 +52,8 @@ public class TabSelecter extends JPanel
 	subsub.setBorder(BorderFactory.createTitledBorder(actListFactory.toString()));
 	sub.add(subsub);
       }
-      sub.setBorder(BorderFactory.createTitledBorder(factorySetNames[i]));
+      sub.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
+						     factorySetNames[i]));
 
       global.add(sub, BorderLayout.CENTER);
       sub = new JPanel(new BorderLayout(SPACE_BETWEEN_FACTORY_SET,
