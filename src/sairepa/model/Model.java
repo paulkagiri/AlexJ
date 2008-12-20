@@ -29,15 +29,15 @@ public class Model
     factories = new ActListFactoryLayout(
 	new String[] {
 	  "Pr\351-r\351volution",
-	  "Post-r\351volution",
+	  "Etat-civil",
 	  "Actes notari\351s",
 	},
 	new ActListFactory[][] {
 	  new ActListFactory[] {
 	    new BaptismListFactory(projectDir),
-	    new ConfirmationListFactory(projectDir),
 	    new WeddingListFactory(projectDir),
-	    new SepulchreListFactory(projectDir)
+	    new SepulchreListFactory(projectDir),
+	    new ConfirmationListFactory(projectDir),
 	  },
 	  new ActListFactory[] {
 	    new BirthListFactory(projectDir),
@@ -45,7 +45,6 @@ public class Model
 	    new DeceaseListFactory(projectDir),
 	  },
 	  new ActListFactory[] {
-	    new NotarialConfirmationListFactory(projectDir),
 	    new WeddingContractListFactory(projectDir),
 	    new NotarialDeceaseListFactory(projectDir),
 	  },

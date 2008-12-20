@@ -157,6 +157,6 @@ public class NotarialDeceaseListFactory extends ActListFactory
   }
 
   public String toString() {
-    return "D\351c\350s";
+    return "Inv. apr. D\351c\350s";
   }
 }

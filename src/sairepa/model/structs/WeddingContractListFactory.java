@@ -106,6 +106,6 @@ public class WeddingContractListFactory extends ActListFactory
   }
 
   public String toString() {
-    return "Mariages";
+    return "Contrat mariages";
   }
 }

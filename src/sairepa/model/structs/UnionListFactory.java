@@ -106,6 +106,6 @@ public class UnionListFactory extends ActListFactory
   }
 
   public String toString() {
-    return "Union";
+    return "Mariages";
   }
 }
