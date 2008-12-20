@@ -1,4 +1,4 @@
-package sairepa.model.structs;
+package sairepa.model;
 
 import java.io.File;
 import java.io.IOException;
