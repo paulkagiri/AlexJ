@@ -1,0 +1,16 @@
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <outfile>bin/SaiRePa.exe</outfile>
+  <jar>bin/SaiRePa.jar</jar>
+  <dontWrapJar>false</dontWrapJar>
+
+  <errTitle>SaiRePa</errTitle>
+
+  <stayAlive>true</stayAlive>
+
+  <jre>
+    <path />
+    <minVersion>1.5.0</minVersion>
+  </jre>
+
+</launch4jConfig>
