@@ -37,6 +37,10 @@ public abstract class ActListFactory
     this.dbf = dbf;
   }
 
+  public File getDbf() {
+    return dbf;
+  }
+
   public void init(Connection db) throws SQLException, IOException {
     this.db = db;
 

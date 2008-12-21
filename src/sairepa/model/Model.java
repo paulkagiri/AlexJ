@@ -80,21 +80,43 @@ public class Model
     return projects;
   }
 
-  public void init() throws SQLException, IOException {
+  /**
+   * @param obs can't be null ; pass a dumb object if you need to
+   */
+  public void init(ProgressionObserver obs) throws SQLException, IOException {
+    obs.setProgression(0, "Initialisation de la base de donn\351es ...");
     createTables();
 
+    int nmb = factories.getNumberOfFactories() + 1;
+    int i = 1;
+
     for (ActListFactory factory : factories) {
+      obs.setProgression(i * 100 / nmb,
+          "Chargement de '" + factory.getDbf().getName() + "' ...");
       factory.init(db.getConnection());
+      i++;
     }
   }
 
-  public void save() throws SQLException, IOException {
+  /**
+   * @param obs can't be null ; pass a dumb object if you need to
+   */
+  public void save(ProgressionObserver obs) throws SQLException, IOException {
+    int nmb = factories.getNumberOfFactories() + 1;
+    int i = 0;
+
     for (ActListFactory factory : factories) {
+      obs.setProgression(i * 98 / nmb,
+          "Ecriture de '" + factory.getDbf().getName() + "' ...");
       factory.save();
     }
   }
 
-  public void close() throws SQLException {
+  /**
+   * @param obs can't be null ; pass a dumb object if you need to
+   */
+  public void close(ProgressionObserver obs) throws SQLException {
+    obs.setProgression(99, "Fermeture de la base de donn\351es");
     db.disconnect();
   }
 

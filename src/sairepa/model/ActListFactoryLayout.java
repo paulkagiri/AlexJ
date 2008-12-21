@@ -14,6 +14,12 @@ public class ActListFactoryLayout implements Iterable<ActListFactory>
     this.factories = factories;
   }
 
+  public int getNumberOfFactories() {
+    int i = 0;
+    for (ActListFactory[] fs : factories) i += fs.length;
+    return i;
+  }
+
   public class ActListFactoryIterator implements Iterator<ActListFactory> {
     private int posNextX = 0;
     private int posNextY = 0;

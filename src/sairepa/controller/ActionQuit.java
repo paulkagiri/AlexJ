@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 
 import sairepa.model.Model;
 import sairepa.view.ErrorMessage;
+import sairepa.view.SplashScreen;
 import sairepa.view.View;
 import sairepa.view.Viewer;
 
@@ -42,11 +43,15 @@ public class ActionQuit implements ActionListener, WindowListener
 
     System.out.println("Quitting ...");
 
+    SplashScreen ss = new SplashScreen();
+
     try {
       view.close();
       controller.close();
-      model.save();
-      model.close();
+      ss.start();
+      ss.setProgression(0, "Fermeture ...");
+      model.save(ss);
+      model.close(ss);
 
       System.exit(code);
     } catch (SQLException e) {
@@ -57,6 +62,8 @@ public class ActionQuit implements ActionListener, WindowListener
       System.out.println("IOException: " + e.toString());
       e.printStackTrace();
       ErrorMessage.displayError("Erreur au moment de quitter", e);
+    } finally {
+      ss.stop();
     }
   }
 

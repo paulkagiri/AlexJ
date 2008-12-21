@@ -46,7 +46,7 @@ public class MainWindow extends JFrame implements ChangeListener {
    * @param main
    */
   public MainWindow(Model model) {
-    super("SaiRePa");
+    super(sairepa.Main.APPLICATION_NAME);
 
     this.getContentPane().setLayout(new BorderLayout(5, 5));
 

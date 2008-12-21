@@ -19,9 +19,11 @@ import java.io.FileOutputStream;
 
 import sairepa.controller.Controller;
 import sairepa.model.Model;
+import sairepa.model.ProgressionObserver;
 import sairepa.model.Project;
 import sairepa.view.ErrorMessage;
 import sairepa.view.ProjectSelector;
+import sairepa.view.SplashScreen;
 import sairepa.view.View;
 
 /**
@@ -29,6 +31,8 @@ import sairepa.view.View;
  * @author jflesch
  */
 public class Main {
+  public final static String APPLICATION_NAME = "Sairepa";
+
   private Model model;
   private View view;
   private Controller controller;
@@ -62,19 +66,28 @@ public class Main {
       return;
     }
 
+    SplashScreen ss = new SplashScreen();
+    ss.start();
+
     try {
       model = p.createModel();
       view = new View(model);
       controller = new Controller(model, view);
 
-      model.init();
+      model.init(ss);
+
+      ss.setProgression(99, "Preparation de l'interface utilisateur ...");
       controller.init();
       view.init();
     } catch (Exception e) {
       view.close();
       controller.close();
-      model.close(); // no saving.
+      model.close(new ProgressionObserver() {
+	  public void setProgression(int progression, String txt) { /* dumb */ }
+	}); // no saving.
       throw e;
+    } finally {
+      ss.stop();
     }
   }
 
