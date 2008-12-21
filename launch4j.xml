@@ -9,7 +9,7 @@
   <stayAlive>true</stayAlive>
 
   <jre>
-    <path />
+    <path>.\JRE</path>
     <minVersion>1.5.0</minVersion>
   </jre>
 
