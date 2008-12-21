@@ -1,11 +1,14 @@
 package sairepa.view;
 
-import java.awt.GridLayout;
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Frame;
+import java.awt.GridLayout;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import javax.swing.JButton;
@@ -16,8 +19,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-public class ErrorMessage
+import sairepa.gui.IconBox;
+
+public class ErrorMessage implements ActionListener
 {
+  private JDialog dialog;
   private static final int SIZE_X = 500;
   private static final int SIZE_Y = 400;
 
@@ -35,6 +41,41 @@ public class ErrorMessage
 
   public static void displayError(Component parent, Exception e) {
     displayError(parent, null, e);
+  }
+
+  private ErrorMessage(Component parent, Component insidePane) {
+    if (parent instanceof Frame) {
+      dialog = new JDialog((Frame)parent, "Erreur");
+    } else {
+      dialog = new JDialog((Dialog)parent, "Erreur");
+    }
+
+    JLabel errorLabel = new JLabel("Erreur");
+    errorLabel.setIcon(IconBox.warning);
+
+    JPanel south = new JPanel(new BorderLayout());
+    south.add(new JLabel(""), BorderLayout.CENTER);
+    JButton okButton = new JButton("Ok");
+    okButton.setPreferredSize(new java.awt.Dimension(75, 40));
+    okButton.addActionListener(this);
+    south.add(okButton, BorderLayout.EAST);
+
+    dialog.getContentPane().setLayout(new BorderLayout());
+    dialog.getContentPane().add(errorLabel, BorderLayout.NORTH);
+    dialog.getContentPane().add(insidePane, BorderLayout.CENTER);
+    dialog.getContentPane().add(south, BorderLayout.SOUTH);
+    dialog.setSize(SIZE_X, SIZE_Y);
+    dialog.setResizable(true);
+    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+  }
+
+  public void setVisible(boolean v) {
+    dialog.setVisible(v);
+  }
+
+  public void actionPerformed(ActionEvent e) {
+    dialog.setVisible(false);
+    dialog.dispose();
   }
 
   public static void displayError(Component parent, String message,
@@ -55,12 +96,8 @@ public class ErrorMessage
 	    });
     }
 
-    JDialog dialog;
-    dialog = new JOptionPane(insidePanel, JOptionPane.ERROR_MESSAGE).createDialog(parent, "Erreur");
-    dialog.setSize(SIZE_X, SIZE_Y);
-    dialog.setResizable(true);
-    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-    dialog.setVisible(true);
+    ErrorMessage msg = new ErrorMessage(parent, insidePanel);
+    msg.setVisible(true);
   }
 
   public static String addDetailHeader(String str) {

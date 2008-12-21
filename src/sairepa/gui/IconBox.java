@@ -13,6 +13,7 @@ public class IconBox
   public final static ImageIcon search      = loadIcon("search.png");
   public final static ImageIcon quit        = loadIcon("quit.png");
   public final static ImageIcon print       = loadIcon("print.png");
+  public final static ImageIcon warning     = loadIcon("warning.png");
 
   private IconBox() { }
 
