@@ -28,7 +28,8 @@ public class Util
     public ProjectFileFilter() { }
 
     public boolean accept(File file) {
-      return (file.isDirectory() && file.getName().length() == 3);
+      //return (file.isDirectory() && file.getName().length() == 3);
+      return file.isDirectory();
     }
   }
 

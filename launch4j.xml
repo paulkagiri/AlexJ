@@ -7,6 +7,7 @@
   <errTitle>Sairepa</errTitle>
 
   <stayAlive>true</stayAlive>
+  <chdir>.</chdir>
 
   <jre>
     <path>.\JRE</path>
