@@ -1,10 +1,10 @@
 <launch4jConfig>
   <headerType>gui</headerType>
-  <outfile>bin/SaiRePa.exe</outfile>
-  <jar>bin/SaiRePa.jar</jar>
+  <outfile>bin/Sairepa.exe</outfile>
+  <jar>bin/Sairepa.jar</jar>
   <dontWrapJar>false</dontWrapJar>
 
-  <errTitle>SaiRePa</errTitle>
+  <errTitle>Sairepa</errTitle>
 
   <stayAlive>true</stayAlive>
 
