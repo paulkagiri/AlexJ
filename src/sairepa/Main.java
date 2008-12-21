@@ -1,5 +1,7 @@
 package sairepa;
 
+import java.awt.Font;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -33,9 +35,9 @@ import sairepa.view.View;
 public class Main {
   public final static String APPLICATION_NAME = "Sairepa";
 
-  private Model model;
-  private View view;
-  private Controller controller;
+  private Model model = null;
+  private View view = null;
+  private Controller controller = null;
 
   private Main() throws Exception {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -66,7 +68,8 @@ public class Main {
       return;
     }
 
-    SplashScreen ss = new SplashScreen();
+    SplashScreen ss = new SplashScreen(APPLICATION_NAME,
+				       new Font("Dialog", Font.BOLD, 32));
     ss.start();
 
     try {
@@ -80,11 +83,14 @@ public class Main {
       controller.init();
       view.init();
     } catch (Exception e) {
-      view.close();
-      controller.close();
-      model.close(new ProgressionObserver() {
-	  public void setProgression(int progression, String txt) { /* dumb */ }
-	}); // no saving.
+      if (view != null)
+	view.close();
+      if (controller != null)
+	controller.close();
+      if (model != null)
+	model.close(new ProgressionObserver() {
+	    public void setProgression(int progression, String txt) { /* dumb */ }
+	  }); // no saving.
       throw e;
     } finally {
       ss.stop();

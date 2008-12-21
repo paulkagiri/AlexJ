@@ -21,14 +21,19 @@ public class SplashScreen extends JDialog implements ProgressionObserver
   private JPanel p = new JPanel(new BorderLayout());
   private JProgressBar bar = new JProgressBar(0, 100);
 
-  public SplashScreen() {
+  public SplashScreen(String txt) {
+    this(txt, null);
+  }
+
+  public SplashScreen(String txt, Font font) {
     super();
     bar.setStringPainted(true);
     setProgression(0, "");
 
     getContentPane().setLayout(new GridLayout(1, 1));
-    final JLabel appNameLabel = new JLabel(sairepa.Main.APPLICATION_NAME);
-    appNameLabel.setFont(new Font("Dialog", Font.BOLD, 32));
+    final JLabel appNameLabel = new JLabel(txt);
+    if (font != null)
+      appNameLabel.setFont(font);
     appNameLabel.setHorizontalAlignment(JLabel.CENTER);
     p.add(appNameLabel, BorderLayout.CENTER);
     p.add(bar, BorderLayout.SOUTH);

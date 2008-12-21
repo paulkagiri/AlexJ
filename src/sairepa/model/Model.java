@@ -109,6 +109,7 @@ public class Model
       obs.setProgression(i * 98 / nmb,
           "Ecriture de '" + factory.getDbf().getName() + "' ...");
       factory.save();
+      i++;
     }
   }
 

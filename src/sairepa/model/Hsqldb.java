@@ -1,5 +1,8 @@
 package sairepa.model;
 
+import java.io.File;
+import java.io.IOException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -8,6 +11,7 @@ import java.sql.Statement;
 public class Hsqldb {
   public static final Object dbLock = new Object();
   private Connection connection = null;
+  private String project;
 
   public Hsqldb() throws SQLException {
     try {
@@ -26,6 +30,9 @@ public class Hsqldb {
 	disconnect();
       }
 
+      project = projectName;
+      lockProject(project); // throw a runtime exception if can't
+
       connection = DriverManager.getConnection(
           "jdbc:hsqldb:file:sairepa_" + projectName + ".db;shutdown=true", "sa", "");
       synchronized(connection) {
@@ -42,8 +49,33 @@ public class Hsqldb {
 	connection.commit();
 	executeQuery("SHUTDOWN");
 	connection.close();
+	unlockProject(project);
       }
     }
+  }
+
+  private static void lockProject(String project) {
+    File f = new File(project + ".lock");
+    boolean b;
+
+    try {
+      b = f.createNewFile();
+    } catch (IOException e) {
+      throw new RuntimeException("Erreur lors de la verification du verrou du projet '" + project + "'.", e);
+    }
+
+    if (!b) {
+      throw new RuntimeException("Ce projet semble etre deja utilise par une autre instance de Sairepa. " +
+				 "Si ce n'est pas le cas, veuillez effacer le fichier '" + project + ".lock' " +
+				 "du repertoire Sairepa");
+    } else {
+      f.deleteOnExit();
+    }
+  }
+
+  private static void unlockProject(String project) {
+    File f = new File(project + ".lock");
+    f.delete();
   }
 
   /**

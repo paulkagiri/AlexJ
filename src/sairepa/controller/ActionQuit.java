@@ -43,7 +43,7 @@ public class ActionQuit implements ActionListener, WindowListener
 
     System.out.println("Quitting ...");
 
-    SplashScreen ss = new SplashScreen();
+    SplashScreen ss = new SplashScreen("Fermeture de " + sairepa.Main.APPLICATION_NAME);
 
     try {
       view.close();
