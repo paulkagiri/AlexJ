@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="Sairepa" default="jar">
+<project name="AlexJ" default="jar">
 
 	<property name="src.dir" value="src" />
 	<property name="bin.dir" value="build" />
@@ -44,7 +44,7 @@
 
 	<target name="jar" depends="compile" description="Make the Jar" >
 		<mkdir dir="${final.dir}" />
-		<jar jarfile="${final.dir}/Sairepa.jar" basedir="${bin.dir}">
+		<jar jarfile="${final.dir}/AlexJ.jar" basedir="${bin.dir}">
 		        <manifest>
 			        <attribute name="Main-Class" value="sairepa.Main" />
 				<attribute name="Class-Path" value="." />
@@ -66,7 +66,7 @@
 
 	<target name="clean">
 		<delete dir="${bin.dir}"/>
-		<delete file="${final.dir}/Sairepa.jar"/>
+		<delete file="${final.dir}/AlexJ.jar"/>
 		<delete>
 		  <fileset dir="${final.dir}">
 		    <include name="*.db.*" />

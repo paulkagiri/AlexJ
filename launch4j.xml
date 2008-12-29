@@ -1,10 +1,10 @@
 <launch4jConfig>
   <headerType>gui</headerType>
-  <outfile>bin/Sairepa.exe</outfile>
-  <jar>bin/Sairepa.jar</jar>
+  <outfile>bin/AlexJ.exe</outfile>
+  <jar>bin/AlexJ.jar</jar>
   <dontWrapJar>false</dontWrapJar>
 
-  <errTitle>Sairepa</errTitle>
+  <errTitle>AlexJ</errTitle>
 
   <stayAlive>true</stayAlive>
   <chdir>.</chdir>

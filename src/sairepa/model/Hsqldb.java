@@ -34,7 +34,7 @@ public class Hsqldb {
       lockProject(project); // throw a runtime exception if can't
 
       connection = DriverManager.getConnection(
-          "jdbc:hsqldb:file:sairepa_" + projectName + ".db;shutdown=true", "sa", "");
+          "jdbc:hsqldb:file:" + sairepa.Main.APPLICATION_NAME + "_" + projectName + ".db;shutdown=true", "sa", "");
       synchronized(connection) {
 	executeQuery("SET LOGSIZE 50;");
 	executeQuery("SET CHECKPOINT DEFRAG 50;");
