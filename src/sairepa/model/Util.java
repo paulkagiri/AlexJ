@@ -65,6 +65,13 @@ public class Util
     }
   }
 
+  public static void check(boolean b, String msg) {
+    if (!b) {
+      throw new AssertionError(msg);
+    }
+  }
+
+
   public static String extractMalePart(String in) {
     char[] chars = in.toCharArray();
     int i;

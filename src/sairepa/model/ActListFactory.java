@@ -78,7 +78,7 @@ public abstract class ActListFactory
 
   public void save() throws SQLException, IOException {
     synchronized(db) {
-      if (mustRewriteDbf()) {
+      if (!dbf.exists() || mustRewriteDbf()) {
 	System.out.println("Writing '" + dbf.getPath() + "' ...");
 	if(rewriteDbf()) {
 	  updateDbfSyncTimestamp();
@@ -93,11 +93,6 @@ public abstract class ActListFactory
    * @return -1 if must read, +1 if must rewrite
    */
   private int mustSyncDbf() throws SQLException {
-    if (!dbf.exists()) {
-      // let's create it
-      return 1;
-    }
-
     PreparedStatement st = db.prepareStatement(
         "SELECT lastDbfSync FROM files WHERE LOWER(file) = ? LIMIT 1");
     st.setString(1, dbf.getPath().toLowerCase());

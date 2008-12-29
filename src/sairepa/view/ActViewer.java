@@ -43,6 +43,7 @@ import sairepa.model.Util;
 
 /**
  * is a JPanel displaying one act at a time.
+ * Note: all the methods prefixed with "sub" won't save the act !
  */
 public class ActViewer extends Viewer implements ActionListener
 {
@@ -421,7 +422,7 @@ public class ActViewer extends Viewer implements ActionListener
 
     if (e.getSource() == beginningButton) {
       if (!hasElements()) {
-	startNewAct();
+	subStartNewAct();
       } else {
 	currentAct = actListIterator.seek(0);
 	newAct = false;
@@ -447,13 +448,13 @@ public class ActViewer extends Viewer implements ActionListener
 	refresh();
       }
     } else if (e.getSource() == endButton) {
-      goToLastAct();
+      subGoToLastAct();
     } else if (e.getSource() == applyButton) {
-      continueTyping();
+      subContinueTyping();
     } else if (e.getSource() == deleteButton) {
-      deleteAct();
+      subDeleteAct();
     } else if (e.getSource() == newButton) {
-      startNewAct();
+      subStartNewAct();
     }
   }
 
@@ -482,13 +483,21 @@ public class ActViewer extends Viewer implements ActionListener
   }
 
   private void continueTyping() {
+    if (!currentAct.validate())
+      return;
+    if (!saveAct())
+      return;
+    subContinueTyping();
+  }
+
+  private void subContinueTyping() {
     if (!currentAct.validate()) {
       return;
     }
 
     // has already been saved
     if (newAct) {
-      startNewAct();
+      subStartNewAct();
     } else {
       if (actListIterator.hasNext()) {
 	currentAct = actListIterator.next();
@@ -501,7 +510,7 @@ public class ActViewer extends Viewer implements ActionListener
     }
   }
 
-  private void startNewAct() {
+  private void subStartNewAct() {
     if (currentAct != null) {
       newActRow = currentAct.getRow() + 1;
     } else {
@@ -513,7 +522,7 @@ public class ActViewer extends Viewer implements ActionListener
     globalPanel.getVisualActFieldsOrdered().get(0).focus();
   }
 
-  private void moveBack() {
+  private void subMoveBack() {
     // we are on the last element, so we need to go back
     if (actListIterator.hasPrevious()) {
       currentAct = actListIterator.previous();
@@ -521,13 +530,13 @@ public class ActViewer extends Viewer implements ActionListener
       refresh();
     } else {
       // and if we can't ...
-      startNewAct();
+      subStartNewAct();
     }
   }
 
-  private void goToLastAct() {
+  private void subGoToLastAct() {
     if (!hasElements()) {
-      startNewAct();
+      subStartNewAct();
     } else {
       currentAct = actListIterator.seek(actList.getRowCount()-1);
       newAct = false;
@@ -535,7 +544,7 @@ public class ActViewer extends Viewer implements ActionListener
     }
   }
 
-  private void deleteAct() {
+  private void subDeleteAct() {
     if (!newAct) {
       int ret = JOptionPane.showConfirmDialog(mainWindow,
           "Attention, cet acte sera d\351finitivement supprim\351. " +
@@ -549,7 +558,7 @@ public class ActViewer extends Viewer implements ActionListener
 
       if (!actListIterator.hasNext()) {
 	// we are on the last element, so we need to go back
-	moveBack();
+	subMoveBack();
       }
 
       reloadAct();
@@ -558,7 +567,7 @@ public class ActViewer extends Viewer implements ActionListener
 	obs.deletingAct(this, actToDelete);
       }
     } else {
-      goToLastAct();
+      subGoToLastAct();
     }
   }
 
@@ -580,7 +589,8 @@ public class ActViewer extends Viewer implements ActionListener
       currentAct = actListIterator.seek(actList.getRowCount()-1);
       newAct = false;
     } else {
-      startNewAct();
+      // nothing to save -> so we can call a sub[...]() directly
+      subStartNewAct();
     }
   }
 

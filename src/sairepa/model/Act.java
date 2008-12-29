@@ -164,7 +164,8 @@ public class Act
 	  fieldIdGetter.setString(1, field.getName());
 	  fieldIdGetter.setInt(2, fileId);
 	  ResultSet set = fieldIdGetter.executeQuery();
-	  Util.check(set.next());
+	  Util.check(set.next(),
+		     "Can't find the field '" + field.getName() + "' / '" + fileId + "'");
 	  int fieldId = set.getInt(1);
 	  set.close();
 
