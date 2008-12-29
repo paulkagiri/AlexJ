@@ -266,14 +266,7 @@ public class ActViewer extends Viewer implements ActionListener
 
     public void updateEntry(boolean notify) {
       entry.setValue(textComponent.getText(), notify);
-
-      if (entry.validate()) {
-	textComponent.setForeground(initialColor);
-	associatedLabel.setForeground(initialLabelColor);
-      } else {
-	textComponent.setForeground(new Color(255, 0, 0));
-	associatedLabel.setForeground(new Color(255, 0, 0));
-      }
+      updateColor();
       updateButtonStates();
     }
 
@@ -288,17 +281,24 @@ public class ActViewer extends Viewer implements ActionListener
       }
     }
 
-    public void refresh() {
-      textComponent.setText(entry.getValue());
-
-      if (entry.validate()) {
-	textComponent.setForeground(initialColor);
-	associatedLabel.setForeground(initialLabelColor);
-      } else {
+    public void updateColor() {
+      if (!entry.validate()) {
+	// RED
 	textComponent.setForeground(new Color(255, 0, 0));
 	associatedLabel.setForeground(new Color(255, 0, 0));
+      } else if (entry.warning()) {
+	// ORANGE
+	textComponent.setForeground(new Color(255, 165, 0));
+	associatedLabel.setForeground(new Color(255, 165, 0));
+      } else {
+	textComponent.setForeground(initialColor);
+	associatedLabel.setForeground(initialColor);
       }
+    }
 
+    public void refresh() {
+      textComponent.setText(entry.getValue());
+      updateColor();
       textComponent.repaint();
     }
 

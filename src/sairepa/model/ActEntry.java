@@ -52,7 +52,11 @@ public class ActEntry extends Observable
   }
 
   public boolean validate() {
-    return field.validate(act);
+    return field.validate(this);
+  }
+
+  public boolean warning() {
+    return field.warning(this);
   }
 
   public String toString() {

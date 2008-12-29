@@ -223,7 +223,11 @@ public class Table extends JTable implements MouseListener {
       setBackground(cell, column, row, isSelected);
 
       if (value instanceof ActEntry && !((ActEntry)value).validate()) {
-    	  cell.setBackground(Color.RED);
+	// RED
+	cell.setBackground(new Color(255, 0, 0));
+      } else if (value instanceof ActEntry && ((ActEntry)value).warning()) {
+	// ORANGE
+	cell.setBackground(new Color(255, 165, 0));
       }
 
       return cell;

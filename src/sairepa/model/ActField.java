@@ -80,7 +80,7 @@ public class ActField implements FieldLayoutElement
   }
 
   /**
-   * Shouldn't be overriden
+   * Shouldn't be overriden. Used for act validation.
    */
   public boolean validate(Act a) {
     return validate(a.getEntry(this));
@@ -110,6 +110,13 @@ public class ActField implements FieldLayoutElement
    */
   public void notifyUpdate(ActField f, ActEntry e, String previousValue) {
     throw new UnsupportedOperationException();
+  }
+
+  /**
+   * If the user must be warned about something (usually if the field is full).
+   */
+  public boolean warning(ActEntry entry) {
+    return (getMaxLength() > 5 && entry.getValue().length() >= getMaxLength() - 1);
   }
 
   /**
