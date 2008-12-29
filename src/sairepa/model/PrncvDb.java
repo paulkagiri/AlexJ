@@ -49,8 +49,10 @@ public class PrncvDb
 	dbfFile.read();
 	Sex sex = Sex.getSex(dbfFile.getField("MFA").get());
 	Util.check(sex != Sex.UNKNOWN);
-	prncvs[sex.toInteger()].put(dbfFile.getField("PRN_TT").get().trim().toLowerCase(),
-				    dbfFile.getField("PRN_CV").get().trim());
+	String in = dbfFile.getField("PRN_TT").get().trim().toLowerCase();
+	String out = dbfFile.getField("PRN_CV").get().trim();
+
+	prncvs[sex.toInteger()].put(in, out);
       }
     } catch (IOException e) {
       System.err.println("Warning: Error while reading prncv ! (IOException)");
@@ -69,7 +71,7 @@ public class PrncvDb
 
   public String getPrncv(String lu, Sex sex) {
     Util.check(sex != Sex.UNKNOWN);
-    if ("-".equals(lu)) return "-";
+    if ("-".equals(lu.trim())) return "-";
     String cv = (String)prncvs[sex.toInteger()].get(lu.trim().toLowerCase());
     return ((cv == null) ? UNKNOWN : cv);
   }

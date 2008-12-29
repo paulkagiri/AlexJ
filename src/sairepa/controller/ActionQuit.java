@@ -78,7 +78,7 @@ public class ActionQuit implements ActionListener, WindowListener
 
   public boolean askUserIfTheyReallyWantToDoThat() {
     int r = JOptionPane.showConfirmDialog(view.getMainWindow(),
-					  "Certaines tabs contiennent des donn\351es invalides "
+					  "Certains onglets contiennent des donn\351es invalides "
 					  + "qui ne seront pas sauvegard\351es. "
 					  + "\312tes-vous s\373r de vouloir quitter ?",
 					  "\312tes-vous s\373r ?",

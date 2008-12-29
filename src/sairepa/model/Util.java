@@ -192,9 +192,9 @@ public class Util
 
   public static String conventionalizeLastName(String in, Sex sex) {
     in = in.trim();
-    if (sex != Sex.FEMALE) { // MALE
-      in = extractMalePart(in);
-    }
+    //if (sex != Sex.FEMALE) { // MALE
+    in = extractMalePart(in);
+    //}
     in = conventionalizeAccents(in.toLowerCase());
     return upperCase(in, true, sex);
   }
