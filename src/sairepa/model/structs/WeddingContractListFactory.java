@@ -100,9 +100,9 @@ public class WeddingContractListFactory extends ActListFactory
     }
   }
 
-  public WeddingContractListFactory(File projectDir)
+  public WeddingContractListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "ctt_mar5.dbf"), fields);
+    super(m, Util.getFile(projectDir, "ctt_mar5.dbf"), fields);
   }
 
   public String toString() {

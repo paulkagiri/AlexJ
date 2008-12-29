@@ -25,7 +25,7 @@ public class Project
   }
 
   public Model createModel() throws SQLException, FileNotFoundException {
-    return new Model(projectDir);
+    return new Model(projectDir, clientFile);
   }
 
   public String toString() {

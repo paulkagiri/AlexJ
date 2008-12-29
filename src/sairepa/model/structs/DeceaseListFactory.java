@@ -151,9 +151,9 @@ public class DeceaseListFactory extends ActListFactory
     }
   }
 
-  public DeceaseListFactory(File projectDir)
+  public DeceaseListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "deces__5.dbf"), fields);
+    super(m, Util.getFile(projectDir, "deces__5.dbf"), fields);
   }
 
   public String toString() {

@@ -24,17 +24,22 @@ import sairepa.model.*;
 public abstract class ActListFactory
 {
   private FieldLayout fields;
-
   private ActList actList;
+  private Model model;
 
   private File dbf;
   private int fileId; // db specific
 
   private Connection db;
 
-  public ActListFactory(File dbf, FieldLayout fields) {
+  public ActListFactory(Model m, File dbf, FieldLayout fields) {
     this.fields = fields;
     this.dbf = dbf;
+    this.model = model;
+  }
+
+  public Model getModel() {
+    return model;
   }
 
   public File getDbf() {
@@ -73,7 +78,7 @@ public abstract class ActListFactory
       }
     }
 
-    actList = new DbActList(db, fileId, fields, toString());
+    actList = new DbActList(this, db, fileId, fields, toString());
   }
 
   public void save() throws SQLException, IOException {

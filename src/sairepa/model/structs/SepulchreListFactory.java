@@ -151,9 +151,9 @@ public class SepulchreListFactory extends ActListFactory
     }
   }
 
-  public SepulchreListFactory(File projectDir)
+  public SepulchreListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "sepultu5.dbf"), fields);
+    super(m, Util.getFile(projectDir, "sepultu5.dbf"), fields);
   }
 
   public String toString() {

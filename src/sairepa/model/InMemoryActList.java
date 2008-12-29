@@ -13,6 +13,10 @@ public class InMemoryActList implements ActList
     refresh();
   }
 
+  public ActListFactory getFactory() {
+    return dbActList.getFactory();
+  }
+
   public String getName() {
     return dbActList.getName();
   }

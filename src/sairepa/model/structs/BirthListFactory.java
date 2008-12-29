@@ -93,14 +93,14 @@ public class BirthListFactory extends ActListFactory
     }
   }
 
-  public BirthListFactory(File projectDir)
+  public BirthListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    this(projectDir, "naissan5.dbf");
+    this(m, projectDir, "naissan5.dbf");
   }
 
-  protected BirthListFactory(File projectDir, String filename)
+  protected BirthListFactory(Model m, File projectDir, String filename)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, filename), fields);
+    super(m, Util.getFile(projectDir, filename), fields);
   }
 
   public String toString() {

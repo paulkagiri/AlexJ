@@ -151,9 +151,9 @@ public class NotarialDeceaseListFactory extends ActListFactory
     }
   }
 
-  public NotarialDeceaseListFactory(File projectDir)
+  public NotarialDeceaseListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "dec_inv5.dbf"), fields);
+    super(m, Util.getFile(projectDir, "dec_inv5.dbf"), fields);
   }
 
   public String toString() {

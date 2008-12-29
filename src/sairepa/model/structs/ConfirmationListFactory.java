@@ -93,14 +93,14 @@ public class ConfirmationListFactory extends ActListFactory
     }
   }
 
-  protected ConfirmationListFactory(File projectDir, String filename)
+  protected ConfirmationListFactory(Model m, File projectDir, String filename)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, filename), fields);
+    super(m, Util.getFile(projectDir, filename), fields);
   }
 
-  public ConfirmationListFactory(File projectDir)
+  public ConfirmationListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    this(projectDir, "confirm5.dbf");
+    this(m, projectDir, "confirm5.dbf");
   }
 
   public String toString() {

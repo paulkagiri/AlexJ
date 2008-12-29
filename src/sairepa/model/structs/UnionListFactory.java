@@ -100,9 +100,9 @@ public class UnionListFactory extends ActListFactory
     }
   }
 
-  public UnionListFactory(File projectDir)
+  public UnionListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "union__5.dbf"), fields);
+    super(m, Util.getFile(projectDir, "union__5.dbf"), fields);
   }
 
   public String toString() {

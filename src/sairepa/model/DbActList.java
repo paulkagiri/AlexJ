@@ -15,19 +15,25 @@ import java.util.Vector;
 
 public class DbActList implements ActList
 {
+  private ActListFactory factory;
   private Connection db;
   private int fileId;
   private FieldLayout fields;
   private int rowCount;
   private String name;
 
-  protected DbActList(Connection db, int fileId, FieldLayout fields, String name)
+  protected DbActList(ActListFactory factory, Connection db,
+		      int fileId, FieldLayout fields, String name)
       throws SQLException, IOException {
     this.db = db;
     this.fileId = fileId;
     this.fields = fields;
     this.rowCount = computeRowCount();
     this.name = name;
+  }
+
+  public ActListFactory getFactory() {
+    return factory;
   }
 
   public String getName() {
@@ -176,6 +182,10 @@ public class DbActList implements ActList
 	  sortingFieldId = -1;
 	}
       }
+    }
+
+    public ActListFactory getFactory() {
+      return DbActList.this.getFactory();
     }
 
     public String getName() {

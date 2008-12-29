@@ -14,14 +14,15 @@ public class Model
 {
   private File projectDir;
   private Hsqldb db;
-
+  private ClientFile clientFile;
   private ActListFactoryLayout factories;
 
   // dirty singleton
   private static final PrncvDb prncvDb = new PrncvDb();
 
-  protected Model(File projectDir) throws SQLException, FileNotFoundException {
+  protected Model(File projectDir, ClientFile clientFile) throws SQLException, FileNotFoundException {
     this.projectDir = projectDir;
+    this.clientFile = clientFile;
 
     db = new Hsqldb();
     db.connect(projectDir.getName());
@@ -34,21 +35,25 @@ public class Model
 	},
 	new ActListFactory[][] {
 	  new ActListFactory[] {
-	    new BaptismListFactory(projectDir),
-	    new WeddingListFactory(projectDir),
-	    new SepulchreListFactory(projectDir),
-	    new ConfirmationListFactory(projectDir),
+	    new BaptismListFactory(this, projectDir),
+	    new WeddingListFactory(this, projectDir),
+	    new SepulchreListFactory(this, projectDir),
+	    new ConfirmationListFactory(this, projectDir),
 	  },
 	  new ActListFactory[] {
-	    new BirthListFactory(projectDir),
-	    new UnionListFactory(projectDir),
-	    new DeceaseListFactory(projectDir),
+	    new BirthListFactory(this, projectDir),
+	    new UnionListFactory(this, projectDir),
+	    new DeceaseListFactory(this, projectDir),
 	  },
 	  new ActListFactory[] {
-	    new WeddingContractListFactory(projectDir),
-	    new NotarialDeceaseListFactory(projectDir),
+	    new WeddingContractListFactory(this, projectDir),
+	    new NotarialDeceaseListFactory(this, projectDir),
 	  },
 	});
+  }
+
+  public ClientFile getClientFile() {
+    return clientFile;
   }
 
   public static PrncvDb getPrncvDb() {

@@ -100,9 +100,9 @@ public class WeddingListFactory extends ActListFactory
     }
   }
 
-  public WeddingListFactory(File projectDir)
+  public WeddingListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, "mariage5.dbf"), fields);
+    super(m, Util.getFile(projectDir, "mariage5.dbf"), fields);
   }
 
   public String toString() {

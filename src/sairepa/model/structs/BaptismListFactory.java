@@ -93,14 +93,14 @@ public class BaptismListFactory extends ActListFactory
     }
   }
 
-  public BaptismListFactory(File projectDir)
+  public BaptismListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    this(projectDir, "bapteme5.dbf");
+    this(m, projectDir, "bapteme5.dbf");
   }
 
-  protected BaptismListFactory(File projectDir, String filename)
+  protected BaptismListFactory(Model m, File projectDir, String filename)
       throws java.io.FileNotFoundException {
-    super(Util.getFile(projectDir, filename), fields);
+    super(m, Util.getFile(projectDir, filename), fields);
   }
 
   public String toString() {

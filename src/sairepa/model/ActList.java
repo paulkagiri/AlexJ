@@ -15,6 +15,7 @@ import java.util.Vector;
 
 public interface ActList extends Iterable<Act>
 {
+  public ActListFactory getFactory();
   public String getName();
   public FieldLayout getFields();
   public int getRowCount();
