@@ -94,8 +94,8 @@ public class ActField implements FieldLayoutElement
    * Called when an entry is modified; can modify the value
    */
   public void notifyUpdate(ActEntry e, String previousValue) {
-    if ("".equals(e.getValue())) {
-      e.setValue("-");
+    if ("".equals(e.getValue()) && "".equals(previousValue)) {
+      e.setValue("-", false);
     }
     if (e.getValue().length() > getMaxLength()) {
       e.setValue(e.getValue().substring(0, getMaxLength()), false);

@@ -8,10 +8,16 @@ public class ActListFactoryLayout implements Iterable<ActListFactory>
 {
   private String[] setNames;
   private ActListFactory[][] factories;
+  private Model m;
 
-  public ActListFactoryLayout(String[] setNames, ActListFactory[][] factories) {
+  public ActListFactoryLayout(Model m, String[] setNames, ActListFactory[][] factories) {
     this.setNames = setNames;
     this.factories = factories;
+    this.m = m;
+  }
+
+  public Model getModel() {
+    return m;
   }
 
   public int getNumberOfFactories() {

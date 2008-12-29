@@ -290,6 +290,15 @@ public class ActViewer extends Viewer implements ActionListener
 
     public void refresh() {
       textComponent.setText(entry.getValue());
+
+      if (entry.validate()) {
+	textComponent.setForeground(initialColor);
+	associatedLabel.setForeground(initialLabelColor);
+      } else {
+	textComponent.setForeground(new Color(255, 0, 0));
+	associatedLabel.setForeground(new Color(255, 0, 0));
+      }
+
       textComponent.repaint();
     }
 
@@ -566,6 +575,8 @@ public class ActViewer extends Viewer implements ActionListener
       for (ViewerObserver obs : getObservers()) {
 	obs.deletingAct(this, actToDelete);
       }
+
+      refresh();
     } else {
       subGoToLastAct();
     }
@@ -604,9 +615,7 @@ public class ActViewer extends Viewer implements ActionListener
   public void refresh() {
     reloadAct();
     updatePositionLabel();
-
     globalPanel.refresh();
-
     updateButtonStates();
   }
 

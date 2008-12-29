@@ -78,7 +78,7 @@ public class DeceaseListFactory extends ActListFactory
 	  new FieldLayout("Renseignements concernant le d\351funt",
 			  new FieldLayoutElement[] {
 			    tmpLastName1 = new LastNameField("NOM1", Sex.UNKNOWN),
-			    tmpFirstName1 = new ActField(new CharField("PRN1", 23)),
+			    tmpFirstName1 = new FirstNameField("PRN1"),
 			    tmpSexField = new SexField("SEX1"),
 			    new ActField(new CharField("AGE1", 13)),
 			    new ActField(new CharField("NOT1", 40)),
@@ -86,19 +86,19 @@ public class DeceaseListFactory extends ActListFactory
 	  new FieldLayout("P\350re du d\351funt",
 			  new FieldLayoutElement[] {
 			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE, tmpLastName1),
-			    tmpFirstName2 = new ActField(new CharField("PRN2", 23)),
+			    tmpFirstName2 = new FirstNameField("PRN2"),
 			    new ActField(new CharField("NOT2", 40)),
 			  }),
 	  new FieldLayout("M\350re du d\351funt",
 			  new FieldLayoutElement[] {
 			    tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
-			    tmpFirstName3 = new ActField(new CharField("PRN3", 23)),
+			    tmpFirstName3 = new FirstNameField("PRN3"),
 			    new ActField(new CharField("NOT3", 40)),
 			  }),
 	  new FieldLayout("Conjoint du d\351funt",
 			  new FieldLayoutElement[] {
 			    tmpLastNameC = new LastNameField("NOMC", Sex.UNKNOWN),
-			    tmpFirstNameC = new ActField(new CharField("PRNC", 23)),
+			    tmpFirstNameC = new FirstNameField("PRNC"),
 			    new ActField(new CharField("NOTC", 40)),
 			  }),
 	  // the following part gives me a freaking headache.

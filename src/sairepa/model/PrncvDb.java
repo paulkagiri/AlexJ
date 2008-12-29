@@ -49,7 +49,7 @@ public class PrncvDb
 	dbfFile.read();
 	Sex sex = Sex.getSex(dbfFile.getField("MFA").get());
 	Util.check(sex != Sex.UNKNOWN);
-	String in = dbfFile.getField("PRN_TT").get().trim().toLowerCase();
+	String in = dbfFile.getField("PRN_TT").get().trim();
 	String out = dbfFile.getField("PRN_CV").get().trim();
 
 	prncvs[sex.toInteger()].put(in, out);
@@ -72,7 +72,7 @@ public class PrncvDb
   public String getPrncv(String lu, Sex sex) {
     Util.check(sex != Sex.UNKNOWN);
     if ("-".equals(lu.trim())) return "-";
-    String cv = (String)prncvs[sex.toInteger()].get(lu.trim().toLowerCase());
+    String cv = (String)prncvs[sex.toInteger()].get(lu.trim());
     return ((cv == null) ? UNKNOWN : cv);
   }
 }

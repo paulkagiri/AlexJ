@@ -28,17 +28,21 @@ public class LastNameField extends ActField {
     return sex;
   }
 
+  @Override
   public void notifyUpdate(ActEntry e, String previousValue) {
     super.notifyUpdate(e, previousValue);
-    if ("".equals(previousValue.trim())) {
+    if ("".equals(previousValue.trim())
+	|| "-".equals(previousValue.trim())) {
       e.setValue(Util.upperCase(e.getValue(), true, sex), false);
     }
   }
 
+  @Override
   public void notifyUpdate(ActField f, ActEntry theirEntry, String previousValue) {
-
+    super.notifyUpdate(f, theirEntry, previousValue);
   }
 
+  @Override
   public void hasFocus(ActEntry e) {
     if (origin == null) {
       return;
@@ -68,7 +72,10 @@ public class LastNameField extends ActField {
     }
   }
 
+  @Override
   public boolean validate(ActEntry e) {
-    return super.validate(e);
+    boolean v = super.validate(e);
+    if (v) v = e.getValue().matches("[\\D]*");
+    return v;
   }
 }

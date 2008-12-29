@@ -11,7 +11,7 @@ public interface Conventionalizer
     public String conventionalize(String name, Sex sex) {
       String conv = Util.conventionalizeFirstName(name, sex);
       if ("".equals(conv.trim()) || "-".equals(conv.trim())) return conv.trim();
-      return Model.getPrncvDb().getPrncv(name, sex);
+      return Model.getPrncvDb().getPrncv(conv, sex);
     }
   };
 

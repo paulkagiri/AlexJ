@@ -38,7 +38,7 @@ public class ActEntry extends Observable
 
   public void setValue(String value, boolean notify) {
     String oldValue = this.value;
-    this.value = value.trim();
+    this.value = value;
     setChanged();
 
     if (notify) {

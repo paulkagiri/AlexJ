@@ -27,7 +27,7 @@ public class Model
     db = new Hsqldb();
     db.connect(projectDir.getName());
 
-    factories = new ActListFactoryLayout(
+    factories = new ActListFactoryLayout(this,
 	new String[] {
 	  "Pr\351-r\351volution",
 	  "Etat-civil",

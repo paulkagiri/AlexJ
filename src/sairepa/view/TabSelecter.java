@@ -62,7 +62,9 @@ public class TabSelecter extends JPanel
       global = sub;
     }
 
-
+    veryGlobal.add(new JLabel(actListFactories.getModel().getClientFile().getCommune(),
+			      JLabel.CENTER),
+		   BorderLayout.NORTH);
     this.add(veryGlobal, BorderLayout.NORTH);
     this.add(new JLabel(""), BorderLayout.CENTER);
   }
