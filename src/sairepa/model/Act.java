@@ -56,6 +56,10 @@ public class Act
     reload();
   }
 
+  public ActList getActList() {
+    return actList;
+  }
+
   public Collection<ActEntry> getEntries() {
     return entries.values();
   }

@@ -30,6 +30,7 @@ public class DbActList implements ActList
     this.fields = fields;
     this.rowCount = computeRowCount();
     this.name = name;
+    this.factory = factory;
   }
 
   public ActListFactory getFactory() {

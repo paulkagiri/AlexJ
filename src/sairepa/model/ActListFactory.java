@@ -35,7 +35,7 @@ public abstract class ActListFactory
   public ActListFactory(Model m, File dbf, FieldLayout fields) {
     this.fields = fields;
     this.dbf = dbf;
-    this.model = model;
+    this.model = m;
   }
 
   public Model getModel() {

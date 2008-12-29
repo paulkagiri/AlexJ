@@ -136,7 +136,7 @@ public class DeceaseListFactory extends ActListFactory
 	  new FieldLayout("Renseignement divers concernant l'acte",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("DIVERS", 40)),
-			    new ActField(new CharField("LOC1ID", 38)),
+			    new LocalityField("LOC1ID"),
 			    new ActField(new MemoField("TXTLONG"))
 			  }),
 	});

@@ -43,7 +43,7 @@ public class WeddingContractListFactory extends ActListFactory
 			    new ConvNameField("PRN2CV", Conventionalizer.CONV_FIRST_NAME,
 					      Sex.MALE, tmpFirstName2),
 			    new ActField(new CharField("LOC2", 50)),
-			    new ActField(new CharField("LOC2ID", 38)),
+			    new LocalityField("LOC2ID"),
 			    new ActField(new CharField("CVF2", 1)),
 			    new ActField(new CharField("NOT2", 40)),
 			    new FieldLayout("P\350re de l'\351poux",

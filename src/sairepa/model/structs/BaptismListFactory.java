@@ -78,7 +78,7 @@ public class BaptismListFactory extends ActListFactory
 	  new FieldLayout("Renseignements divers concernant l'acte",
 			  new FieldLayoutElement[] {
 			    new ActField(new CharField("DIVERS", 40)),
-			    new ActField(new CharField("LOC2ID", 38)),
+			    new LocalityField("LOC2ID"),
 			    new ActField(new MemoField("TXTLONG"))
 			  }),
 	});
