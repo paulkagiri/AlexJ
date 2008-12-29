@@ -44,7 +44,7 @@ public class UnionListFactory extends ActListFactory
 					      Sex.MALE, tmpFirstName2),
 			    new ActField(new CharField("LOC2", 50)),
 			    new LocalityField("LOC2ID"),
-			    new ActField(new CharField("CVF2", 1)),
+			    new CVField("CVF2"),
 			    new ActField(new CharField("NOT2", 40)),
 			    new FieldLayout("P\350re de l'\351poux",
 					    new FieldLayoutElement[] {
@@ -68,7 +68,7 @@ public class UnionListFactory extends ActListFactory
 					      Sex.FEMALE, tmpFirstName3),
 			    new ActField(new CharField("LOC3", 50)),
 			    new ActField(new CharField("LOC3ID", 38)),
-			    new ActField(new CharField("CVF3", 1)),
+			    new CVField("CVF3"),
 			    new ActField(new CharField("NOT3", 40)),
 			    new FieldLayout("P\350re de l'\351pouse",
 					    new FieldLayoutElement[] {
