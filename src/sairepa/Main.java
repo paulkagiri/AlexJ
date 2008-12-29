@@ -33,7 +33,7 @@ import sairepa.view.View;
  * @author jflesch
  */
 public class Main {
-  public final static String APPLICATION_NAME = "Sairepa";
+  public final static String APPLICATION_NAME = "AlexJ";
 
   private Model model = null;
   private View view = null;
