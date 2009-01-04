@@ -367,6 +367,8 @@ public class ActViewer extends Viewer implements ActionListener
   private List<JButton> buttons = new Vector<JButton>();
 
   private JPanel createButtonPanel() {
+    applyButton.setMnemonic(java.awt.event.KeyEvent.VK_E);
+
     JPanel globalPanel = new JPanel(new BorderLayout());
     globalPanel.add(new JLabel(""), BorderLayout.CENTER);
 
