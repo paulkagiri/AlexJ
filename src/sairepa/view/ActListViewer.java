@@ -287,8 +287,6 @@ public class ActListViewer extends Viewer
 	  }
 	}
 
-	System.out.println("Searching '" + str + "' ...");
-
 	int rowCount = model.getRowCount();
 	int colCount = model.getColumnCount();
 	int targetRow = -1;
@@ -311,9 +309,7 @@ public class ActListViewer extends Viewer
 	if (targetRow < 0 || targetCol < 0) {
 	  if (defaultFieldBackColor == null) defaultFieldBackColor = searchField.getBackground();
 	  searchField.setBackground(notFoundBackColor);
-	  System.out.println("Not found");
 	} else {
-	  System.out.println("Found");
 	  searchField.setBackground(defaultFieldBackColor);
 	  selectCell(targetRow, targetCol);
 	}
@@ -325,7 +321,6 @@ public class ActListViewer extends Viewer
     table.setRowSelectionInterval(row, row);
     table.setColumnSelectionInterval(column, column);
     java.awt.Rectangle rect = table.getCellRect(row, column, true);
-    System.out.println("Rect: " + rect.getX() + "," + rect.getY());
     table.scrollRectToVisible(rect);
     table.repaint();
   }
