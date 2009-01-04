@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
@@ -62,9 +63,14 @@ public class TabSelecter extends JPanel
       global = sub;
     }
 
-    veryGlobal.add(new JLabel(actListFactories.getModel().getClientFile().getCommune(),
-			      JLabel.CENTER),
-		   BorderLayout.NORTH);
+    JTextArea headerLabel = new JTextArea(actListFactories.getModel().getClientFile().getZipCode()
+					  + " " + actListFactories.getModel().getClientFile().getCommune());
+    headerLabel.setEditable(false);
+    headerLabel.setLineWrap(true);
+    headerLabel.setWrapStyleWord(true);
+    headerLabel.setBackground(new Color(220, 220, 220));
+
+    veryGlobal.add(headerLabel, BorderLayout.NORTH);
     this.add(veryGlobal, BorderLayout.NORTH);
     this.add(new JLabel(""), BorderLayout.CENTER);
   }
