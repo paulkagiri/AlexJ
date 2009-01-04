@@ -92,7 +92,6 @@ public class ClientFile {
 
   /**
    * Weak DRM system.
-   * @return the code.
    */
   protected long getCode(String string, final long a, final long b) {
     string = string.trim();

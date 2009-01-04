@@ -25,8 +25,8 @@ import sairepa.model.Model;
 public class MainWindow extends JFrame implements ChangeListener {
   public static final long serialVersionUID = 1;
 
-  private int DEFAULT_SIZE_X = 800;
-  private int DEFAULT_SIZE_Y = 600;
+  private int DEFAULT_SIZE_X = 900;
+  private int DEFAULT_SIZE_Y = 700;
 
   private JMenuItem menuFileSearch;
   private JMenuItem menuFilePrint;

@@ -17,10 +17,18 @@ public class FirstNameField extends ActField
   public void notifyUpdate(ActEntry e, String previousValue) {
     super.notifyUpdate(e, previousValue);
 
-    char[] str = e.getValue().toLowerCase().toCharArray();
-    if (str.length >= 1)
-      str[0] = Character.toUpperCase(str[0]);
-    e.setValue(new String(str), false);
+    if (" ".equals(e.getValue())) return;
+
+    char[] cars = e.getValue().trim().toLowerCase().toCharArray();
+
+    for (int i = 0 ; i < cars.length ; i++) {
+      if (i == 0
+	  || cars[i-1] == ' '
+	  || cars[i-1] == '-')
+	cars[i] = Character.toUpperCase(cars[i]);
+    }
+
+    e.setValue(new String(cars), false);
   }
 
   @Override
