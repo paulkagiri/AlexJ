@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -28,6 +29,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.JTextComponent;
@@ -181,6 +183,8 @@ public class ActViewer extends Viewer implements ActionListener
 	VisualActField f = visualActFieldsOrdered.get(i);
 	VisualActField next = (((i+1) < visualActFieldsOrdered.size()) ?
 			       visualActFieldsOrdered.get(i+1) : null);
+	if (next != null)
+	  next.setPreviousField(f);
 	// we don't connect the memo field
 	if (next != null && next.getField().isMemo()) {
 	  next = null;
@@ -195,6 +199,7 @@ public class ActViewer extends Viewer implements ActionListener
     private final long serialVersionUID = 1;
 
     private VisualActField nextField = null;
+    private VisualActField previousField = null;
     private JTextComponent textComponent;
     private JComponent component;
 
@@ -225,6 +230,25 @@ public class ActViewer extends Viewer implements ActionListener
 	JTextArea area = new JTextArea(5, MAX_LINE_LENGTH/2);
 	area.setLineWrap(true);
 	area.setWrapStyleWord(true);
+
+	AbstractAction tabAction = new AbstractAction() {
+	    public final static long serialVersionUID = 1;
+	    public void actionPerformed(ActionEvent e) {
+	      VisualActField.this.actionPerformed(null);
+	    }
+	  };
+	KeyStroke tabKey = KeyStroke.getKeyStroke("TAB");
+	area.getInputMap().put(tabKey, tabAction);
+
+	tabAction = new AbstractAction() {
+	    public final static long serialVersionUID = 1;
+	    public void actionPerformed(ActionEvent e) {
+	      goPreviousComponent();
+	    }
+	  };
+	tabKey = KeyStroke.getKeyStroke("shift TAB");
+	area.getInputMap().put(tabKey, tabAction);
+
 	textComponent = area;
 	component = new JScrollPane(textComponent);
 	((JScrollPane)component).getVerticalScrollBar().setUnitIncrement(10);
@@ -244,6 +268,10 @@ public class ActViewer extends Viewer implements ActionListener
 
     public void setNextField(VisualActField field) {
       this.nextField = field;
+    }
+
+    public void setPreviousField(VisualActField field) {
+      this.previousField = field;
     }
 
     public void setEntry(ActEntry entry) {
@@ -270,6 +298,9 @@ public class ActViewer extends Viewer implements ActionListener
       updateButtonStates();
     }
 
+    /**
+     * @param e can be null (see the content of the constructor of VisualActField)
+     */
     public void actionPerformed(ActionEvent e) {
       updateEntry(true);
       refresh();
@@ -278,6 +309,12 @@ public class ActViewer extends Viewer implements ActionListener
 	nextField.focus();
       } else {
 	continueTyping();
+      }
+    }
+
+    public void goPreviousComponent() {
+      if (previousField != null) {
+	previousField.focus();
       }
     }
 
