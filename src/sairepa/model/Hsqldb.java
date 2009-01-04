@@ -49,6 +49,7 @@ public class Hsqldb {
 	connection.commit();
 	executeQuery("SHUTDOWN");
 	connection.close();
+	connection = null;
 	unlockProject(project);
       }
     }

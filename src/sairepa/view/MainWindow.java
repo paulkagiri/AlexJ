@@ -1,6 +1,9 @@
 package sairepa.view;
 
 import java.awt.BorderLayout;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.AbstractButton;
@@ -30,11 +33,14 @@ public class MainWindow extends JFrame implements ChangeListener {
 
   private JMenuItem menuFileSearch;
   private JMenuItem menuFilePrint;
+  private JMenu menuFileRestore;
   private JMenuItem menuFileQuit;
   private TabSelecter tabOpener;
   private CloseableTabbedPane tabs;
 
   private List<TabObserver> tabObservers = new Vector<TabObserver>();
+
+  private Model model;
 
   private final static ViewerFactory[] viewerFactories = new ViewerFactory[] {
     new ActViewerFactory(),
@@ -43,14 +49,15 @@ public class MainWindow extends JFrame implements ChangeListener {
 
   /**
    * Creates new form MainWindow
-   * @param main
+   * @param model uninitialized
    */
   public MainWindow(Model model) {
     super(sairepa.Main.APPLICATION_NAME);
+    this.model = model;
 
     this.getContentPane().setLayout(new BorderLayout(5, 5));
 
-    this.setJMenuBar(createMenuBar());
+    this.setJMenuBar(createMenuBar(model));
 
     JScrollPane tabOpenerScrollPane;
 
@@ -93,7 +100,7 @@ public class MainWindow extends JFrame implements ChangeListener {
     return viewerFactories;
   }
 
-  private JMenuBar createMenuBar() {
+  private JMenuBar createMenuBar(Model model) {
     JMenuBar menuBar = new JMenuBar();
     JMenu menuFile = new JMenu("Fichier");
 
@@ -109,6 +116,9 @@ public class MainWindow extends JFrame implements ChangeListener {
         java.awt.event.KeyEvent.VK_P, java.awt.Event.CTRL_MASK));
     menuFilePrint.setEnabled(false);
 
+    menuFileRestore = new JMenu("Restaurer tout les actes");
+    menuFileRestore.setEnabled(false);
+
     menuFileQuit = new JMenuItem("Quitter", IconBox.quit);
     menuFileQuit.setAccelerator(
         javax.swing.KeyStroke.getKeyStroke(
@@ -116,6 +126,7 @@ public class MainWindow extends JFrame implements ChangeListener {
 
     menuFile.add(menuFileSearch);
     menuFile.add(menuFilePrint);
+    menuFile.add(menuFileRestore);
     menuFile.add(menuFileQuit);
 
     menuBar.add(menuFile);
@@ -143,6 +154,30 @@ public class MainWindow extends JFrame implements ChangeListener {
     return menuFilePrint;
   }
 
+  public static final DateFormat USER_DATE_FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM);
+  private List<AbstractButton> restoreButtons = new Vector<AbstractButton>();
+
+  private void initRestoreMenu() {
+    boolean a = false;
+
+    for (Date d : model.getBackupManager().getAvailableBackups()) {
+      a = true;
+      JMenuItem jmi = new JMenuItem(USER_DATE_FORMAT.format(d));
+      menuFileRestore.add(jmi);
+      restoreButtons.add(jmi);
+    }
+
+    menuFileRestore.setEnabled(a);
+  }
+
+  public List<AbstractButton> getRestoreButtons() {
+    return restoreButtons;
+  }
+
+  public void init() {
+    initRestoreMenu();
+  }
+
   private Vector<Viewer> viewers = new Vector<Viewer>();
 
   public void addViewer(Viewer v) {
@@ -158,6 +193,12 @@ public class MainWindow extends JFrame implements ChangeListener {
   public void removeViewer(Viewer v) {
     tabs.remove(v);
     viewers.remove(v);
+  }
+
+  public void closeAllViewers() {
+    Vector<Viewer> copy = (Vector<Viewer>)viewers.clone();
+    for (Viewer v : copy)
+      removeViewer(v);
   }
 
   public List<Viewer> getViewers() {

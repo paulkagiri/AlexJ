@@ -16,13 +16,13 @@ import java.util.Vector;
 public class DbActList implements ActList
 {
   private ActListFactory factory;
-  private Connection db;
+  private Hsqldb db;
   private int fileId;
   private FieldLayout fields;
   private int rowCount;
   private String name;
 
-  protected DbActList(ActListFactory factory, Connection db,
+  protected DbActList(ActListFactory factory, Hsqldb db,
 		      int fileId, FieldLayout fields, String name)
       throws SQLException, IOException {
     this.db = db;
@@ -46,8 +46,8 @@ public class DbActList implements ActList
   }
 
   public int computeRowCount() throws SQLException {
-    synchronized(db) {
-      PreparedStatement st = db.prepareStatement(
+    synchronized(db.getConnection()) {
+      PreparedStatement st = db.getConnection().prepareStatement(
           "SELECT entries.row " +
           "FROM ENTRIES INNER JOIN FIELDS ON entries.field = fields.id " +
 	  "WHERE fields.file = ? ORDER BY entries.row DESC LIMIT 1");
@@ -69,13 +69,13 @@ public class DbActList implements ActList
   private Act lastActReturned = null;
 
   public Act getAct(int row) {
-    synchronized(db) {
+    synchronized(db.getConnection()) {
       if (row == lastRowReturned && lastActReturned != null) {
 	return lastActReturned;
       }
 
       try {
-	Act act = new Act(db, this, fileId, fields, row);
+	Act act = new Act(db.getConnection(), this, fileId, fields, row);
 	this.lastActReturned = act;
 	this.lastRowReturned = row;
 	return act;
@@ -90,7 +90,7 @@ public class DbActList implements ActList
   }
 
   public void insert(Act act, int row) {
-    synchronized(db) {
+    synchronized(db.getConnection()) {
       try {
 	act.setRow(row, false);
 	shiftAfter(row, 1);
@@ -103,7 +103,7 @@ public class DbActList implements ActList
   }
 
   public void delete(Act act) {
-    synchronized(db) {
+    synchronized(db.getConnection()) {
       try {
 	act.delete();
 	shiftAfter(act.getRow(), -1);
@@ -115,16 +115,16 @@ public class DbActList implements ActList
   }
 
   public ActListIterator iterator() {
-    return new GenericActListIterator(db, this);
+    return new GenericActListIterator(db.getConnection(), this);
   }
 
   private void shiftAfter(int position, int shift) throws SQLException {
-    PreparedStatement selectFields = db.prepareStatement(
+    PreparedStatement selectFields = db.getConnection().prepareStatement(
         "SELECT fields.id FROM fields WHERE fields.file = ?");
     selectFields.setInt(1, fileId);
     ResultSet set = selectFields.executeQuery();
 
-    PreparedStatement update = db.prepareStatement(
+    PreparedStatement update = db.getConnection().prepareStatement(
         "UPDATE entries SET row = row + ? " +
 	"WHERE row >= ? AND field = ?");
 
@@ -140,7 +140,7 @@ public class DbActList implements ActList
    * this act is not stored until added to the list
    */
   public Act createAct() {
-    return new Act(db, this, fileId, fields);
+    return new Act(db.getConnection(), this, fileId, fields);
   }
 
   protected int getFileId() {
@@ -148,7 +148,7 @@ public class DbActList implements ActList
   }
 
   public void refresh() {
-    synchronized(db) {
+    synchronized(db.getConnection()) {
       lastRowReturned = -1;
       lastActReturned = null;
       try {
@@ -166,10 +166,10 @@ public class DbActList implements ActList
     public SortedActList(String sortedBy, boolean desc) {
       this.desc = desc;
 
-      synchronized(db) {
+      synchronized(db.getConnection()) {
 	if (sortedBy != null) {
 	  try {
-	    PreparedStatement fieldGetter = db.prepareStatement(
+	    PreparedStatement fieldGetter = db.getConnection().prepareStatement(
                 "SELECT fields.id FROM fields WHERE fields.name = ? AND fields.file = ? LIMIT 1");
 	    fieldGetter.setString(1, sortedBy);
 	    fieldGetter.setInt(2, fileId);
@@ -205,7 +205,7 @@ public class DbActList implements ActList
     private Act lastActReturned = null;
 
     public Act getAct(int position) {
-      synchronized(db) {
+      synchronized(db.getConnection()) {
 	if (position == lastPositionReturned && lastActReturned != null) {
 	  return lastActReturned;
 	}
@@ -214,7 +214,7 @@ public class DbActList implements ActList
 
 	if (sortingFieldId >= 0) {
 	  try {
-	    PreparedStatement rowGetter = db.prepareStatement(
+	    PreparedStatement rowGetter = db.getConnection().prepareStatement(
                 "SELECT row FROM entries WHERE field = ? ORDER BY value"
 	        + (desc ? " DESC" : "") + " LIMIT 1 OFFSET ?");
 	    rowGetter.setInt(1, sortingFieldId);
@@ -260,7 +260,7 @@ public class DbActList implements ActList
     }
 
     public ActListIterator iterator() {
-      return new GenericActListIterator(db, SortedActList.this);
+      return new GenericActListIterator(db.getConnection(), SortedActList.this);
     }
 
     public Act createAct() {
@@ -268,7 +268,7 @@ public class DbActList implements ActList
     }
 
     public void refresh() {
-      synchronized(db) {
+      synchronized(db.getConnection()) {
 	lastActReturned = null;
 	lastPositionReturned = -1;
 	DbActList.this.refresh();

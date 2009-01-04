@@ -6,4 +6,8 @@ package sairepa.model;
 public interface ProgressionObserver
 {
   public void setProgression(int progression, String txt);
+
+  public final static ProgressionObserver DUMB_OBSERVER = new ProgressionObserver() {
+      public void setProgression(int i, String s) { }
+    };
 }

@@ -29,6 +29,24 @@ public class Util
 
     public boolean accept(File file) {
       //return (file.isDirectory() && file.getName().length() == 3);
+      return file.isDirectory() && !file.getName().startsWith(".");
+    }
+  }
+
+  public static class NonDirectoryFilter implements FileFilter {
+    public NonDirectoryFilter() { }
+
+    public boolean accept(File file) {
+      return !file.isDirectory()
+	&& !".".equals(file.getName())
+	&& !"..".equals(file.getName());
+    }
+  }
+
+  public static class DirectoryFilter implements FileFilter {
+    public DirectoryFilter() { }
+
+    public boolean accept(File file) {
       return file.isDirectory();
     }
   }

@@ -12,10 +12,11 @@ import sairepa.model.structs.*;
 
 public class Model
 {
-  private File projectDir;
-  private Hsqldb db;
-  private ClientFile clientFile;
-  private ActListFactoryLayout factories;
+  private final File projectDir;
+  private final Hsqldb db;
+  private final ClientFile clientFile;
+  private final ActListFactoryLayout factories;
+  private final BackupManager backupManager;
 
   // dirty singleton
   private static final PrncvDb prncvDb = new PrncvDb();
@@ -25,7 +26,6 @@ public class Model
     this.clientFile = clientFile;
 
     db = new Hsqldb();
-    db.connect(projectDir.getName());
 
     factories = new ActListFactoryLayout(this,
 	new String[] {
@@ -50,6 +50,8 @@ public class Model
 	    new NotarialDeceaseListFactory(this, projectDir),
 	  },
 	});
+
+    backupManager = new BackupManager(projectDir);
   }
 
   public ClientFile getClientFile() {
@@ -62,6 +64,10 @@ public class Model
 
   public ActListFactoryLayout getFactories() {
     return factories;
+  }
+
+  public BackupManager getBackupManager() {
+    return backupManager;
   }
 
   public static Vector<Project> locateProjects(File baseDir) {
@@ -90,17 +96,21 @@ public class Model
    */
   public void init(ProgressionObserver obs) throws SQLException, IOException {
     obs.setProgression(0, "Initialisation de la base de donn\351es ...");
+    db.connect(projectDir.getName());
     createTables();
 
     int nmb = factories.getNumberOfFactories() + 1;
     int i = 1;
 
     for (ActListFactory factory : factories) {
-      obs.setProgression(i * 100 / nmb,
+      obs.setProgression(i * 90 / nmb,
           "Chargement de '" + factory.getDbf().getName() + "' ...");
-      factory.init(db.getConnection());
+      factory.init(db);
       i++;
     }
+
+    obs.setProgression(95, "Recherche de sauvegardes ...");
+    backupManager.init();
   }
 
   /**
@@ -111,18 +121,21 @@ public class Model
     int i = 0;
 
     for (ActListFactory factory : factories) {
-      obs.setProgression(i * 98 / nmb,
+      obs.setProgression(i * 90 / nmb,
           "Ecriture de '" + factory.getDbf().getName() + "' ...");
       factory.save();
       i++;
     }
+
+    obs.setProgression(95, "Sauvegarde ...");
+    backupManager.doBackup();
   }
 
   /**
    * @param obs can't be null ; pass a dumb object if you need to
    */
   public void close(ProgressionObserver obs) throws SQLException {
-    obs.setProgression(99, "Fermeture de la base de donn\351es");
+    obs.setProgression(99, "Fermeture de la base de donn\351es ...");
     db.disconnect();
   }
 

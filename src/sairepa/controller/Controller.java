@@ -1,5 +1,6 @@
 package sairepa.controller;
 
+import javax.swing.AbstractButton;
 import javax.swing.JFrame;
 
 import sairepa.model.Model;
@@ -33,6 +34,10 @@ public class Controller
     ActionSearch actionSearch = new ActionSearch(model, view, this);
     view.getMainWindow().addTabObserver(actionSearch);
     view.getMainWindow().getSearchButton().addActionListener(actionSearch);
+
+    ActionRestore actionRestore = new ActionRestore(model, view, this);
+    for (AbstractButton b : view.getMainWindow().getRestoreButtons())
+      b.addActionListener(actionRestore);
   }
 
   public void close() {

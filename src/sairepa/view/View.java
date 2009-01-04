@@ -11,6 +11,7 @@ public class View
   }
 
   public void init() {
+    mainWindow.init();
     mainWindow.setVisible(true);
   }
 

@@ -30,7 +30,7 @@ public abstract class ActListFactory
   private File dbf;
   private int fileId; // db specific
 
-  private Connection db;
+  private Hsqldb db;
 
   public ActListFactory(Model m, File dbf, FieldLayout fields) {
     this.fields = fields;
@@ -46,10 +46,10 @@ public abstract class ActListFactory
     return dbf;
   }
 
-  public void init(Connection db) throws SQLException, IOException {
+  public void init(Hsqldb db) throws SQLException, IOException {
     this.db = db;
 
-    synchronized(db) {
+    synchronized(db.getConnection()) {
       if ((fileId = getFileId()) < 0) {
 	createFileEntry();
 	Util.check((fileId = getFileId()) >= 0);
@@ -82,7 +82,7 @@ public abstract class ActListFactory
   }
 
   public void save() throws SQLException, IOException {
-    synchronized(db) {
+    synchronized(db.getConnection()) {
       if (!dbf.exists() || mustRewriteDbf()) {
 	System.out.println("Writing '" + dbf.getPath() + "' ...");
 	if(rewriteDbf()) {
@@ -98,7 +98,7 @@ public abstract class ActListFactory
    * @return -1 if must read, +1 if must rewrite
    */
   private int mustSyncDbf() throws SQLException {
-    PreparedStatement st = db.prepareStatement(
+    PreparedStatement st = db.getConnection().prepareStatement(
         "SELECT lastDbfSync FROM files WHERE LOWER(file) = ? LIMIT 1");
     st.setString(1, dbf.getPath().toLowerCase());
     ResultSet set = st.executeQuery();
@@ -135,17 +135,17 @@ public abstract class ActListFactory
   }
 
   private void purgeFieldsAndEntries() throws SQLException {
-    PreparedStatement st = db.prepareStatement(
+    PreparedStatement st = db.getConnection().prepareStatement(
         "SELECT id FROM fields WHERE file = ?");
     st.setInt(1, fileId);
 
     ResultSet set = st.executeQuery();
     while(set.next()) {
-      st = db.prepareStatement("DELETE FROM entries WHERE field = ?");
+      st = db.getConnection().prepareStatement("DELETE FROM entries WHERE field = ?");
       st.setInt(1, set.getInt(1));
       st.executeUpdate();
 
-      st = db.prepareStatement("DELETE FROM fields WHERE id = ?");
+      st = db.getConnection().prepareStatement("DELETE FROM fields WHERE id = ?");
       st.setInt(1, set.getInt(1));
       st.executeUpdate();
     }
@@ -153,7 +153,7 @@ public abstract class ActListFactory
   }
 
   private int getFileId() throws SQLException {
-    PreparedStatement st = db.prepareStatement(
+    PreparedStatement st = db.getConnection().prepareStatement(
         "SELECT id FROM files WHERE LOWER(file) = ? LIMIT 1");
     st.setString(1, dbf.getPath().toLowerCase());
     ResultSet set = st.executeQuery();
@@ -166,7 +166,7 @@ public abstract class ActListFactory
   }
 
   private void createFileEntry() throws SQLException {
-    PreparedStatement st = db.prepareStatement(
+    PreparedStatement st = db.getConnection().prepareStatement(
         "INSERT INTO files (file, lastDbfSync) VALUES (?, ?)");
     st.setString(1, dbf.getPath());
     st.setNull(2, Types.TIMESTAMP);
@@ -176,7 +176,7 @@ public abstract class ActListFactory
   private void updateFieldTable() throws SQLException {
     PreparedStatement st;
 
-    st = db.prepareStatement("DELETE FROM fields WHERE file = ?");
+    st = db.getConnection().prepareStatement("DELETE FROM fields WHERE file = ?");
     st.setInt(1, fileId);
     st.execute();
 
@@ -187,7 +187,7 @@ public abstract class ActListFactory
 
   private int getFieldId(String name) throws SQLException {
     PreparedStatement st =
-        db.prepareStatement("SELECT id FROM fields WHERE file = ? AND name = ? LIMIT 1");
+      db.getConnection().prepareStatement("SELECT id FROM fields WHERE file = ? AND name = ? LIMIT 1");
     st.setInt(1, fileId);
     st.setString(2, name);
 
@@ -203,7 +203,7 @@ public abstract class ActListFactory
   private void createField(String name) throws SQLException {
     try {
       PreparedStatement st =
-        db.prepareStatement("INSERT INTO fields (file, name) VALUES (?, ?)");
+        db.getConnection().prepareStatement("INSERT INTO fields (file, name) VALUES (?, ?)");
       st.setInt(1, fileId);
       st.setString(2, name);
       st.execute();
@@ -217,7 +217,7 @@ public abstract class ActListFactory
   private void insertEntry(int fieldId, int row, String value)
       throws SQLException {
     PreparedStatement st =
-        db.prepareStatement("INSERT INTO entries (field, row, value) " +
+      db.getConnection().prepareStatement("INSERT INTO entries (field, row, value) " +
 			    "VALUES (?, ?, ?)");
     st.setInt(1, fieldId);
     st.setInt(2, row);
@@ -266,7 +266,7 @@ public abstract class ActListFactory
     // Use as input value the lastModified() value of the DBF file
     Util.check(dbf.exists());
 
-    PreparedStatement st = db.prepareStatement(
+    PreparedStatement st = db.getConnection().prepareStatement(
         "UPDATE files SET lastDbfSync = ? WHERE id = ?");
     st.setTimestamp(1, new Timestamp(dbf.lastModified()));
     st.setInt(2, fileId);
@@ -294,7 +294,7 @@ public abstract class ActListFactory
 	dbfFile.addField(field);
       }
 
-      PreparedStatement st = db.prepareStatement(
+      PreparedStatement st = db.getConnection().prepareStatement(
           "SELECT fields.name, entries.row, entries.value " +
 	  "FROM fields INNER JOIN entries ON fields.id = entries.field " +
 	  "WHERE fields.file = ? ORDER BY entries.row");

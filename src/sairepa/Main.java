@@ -80,8 +80,8 @@ public class Main {
       model.init(ss);
 
       ss.setProgression(99, "Preparation de l'interface utilisateur ...");
-      controller.init();
       view.init();
+      controller.init();
     } catch (Exception e) {
       if (view != null)
 	view.close();

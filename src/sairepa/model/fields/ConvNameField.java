@@ -64,7 +64,8 @@ public class ConvNameField extends ActField {
   public void hasFocus(ActEntry e) {
     super.hasFocus(e);
 
-    if ("".equals(e.getValue().trim())) {
+    if ("".equals(e.getValue().trim())
+	|| PrncvDb.UNKNOWN.equals(e.getValue().trim())) {
       ActField origin = origins[getSex(e.getAct()).toInteger()];
       if (origin == null) return;
       ActEntry src = e.getAct().getEntry(origin);
