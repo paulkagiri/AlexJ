@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.xBaseJ.micro.fields.Field;
-import org.xBaseJ.micro.fields.MemoField;
+import org.xBaseJ.fields.Field;
+import org.xBaseJ.fields.MemoField;
 
 /**
  * ActField can observe each others
@@ -39,6 +39,10 @@ public class ActField implements FieldLayoutElement
   }
 
   public int getMaxLength() {
+    return getMaxLength(fieldPrototype);
+  }
+
+  public static int getMaxLength(Field fieldPrototype) {
     int maxLength = 255;
 
     if (!(fieldPrototype instanceof MemoField)) {
@@ -46,6 +50,15 @@ public class ActField implements FieldLayoutElement
     }
 
     return maxLength;
+  }
+
+  public static String pad(String initial, char pad, int length)
+  {
+    StringBuilder builder = new StringBuilder(initial);
+    for (int to_pad = length - initial.length();
+	 to_pad > 0; to_pad--)
+	builder.append(pad);
+    return builder.toString();
   }
 
   public Field createDBFField() {

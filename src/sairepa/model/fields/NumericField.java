@@ -5,8 +5,8 @@ import java.io.IOException;
 import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 
-import org.xBaseJ.micro.xBaseJException;
-import org.xBaseJ.micro.fields.NumField;
+import org.xBaseJ.xBaseJException;
+import org.xBaseJ.fields.NumField;
 
 public class NumericField extends ActField {
     private int min;

@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import sairepa.model.*;
 
-import org.xBaseJ.micro.xBaseJException;
-import org.xBaseJ.micro.fields.Field;
+import org.xBaseJ.xBaseJException;
+import org.xBaseJ.fields.Field;
 
 /**
  * Similar to the State pattern.

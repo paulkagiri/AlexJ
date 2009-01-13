@@ -1,16 +1,16 @@
 package sairepa;
 
-import org.xBaseJ.micro.DBF;
-import org.xBaseJ.micro.xBaseJException;
+import org.xBaseJ.DBF;
+import org.xBaseJ.xBaseJException;
 
-import org.xBaseJ.micro.fields.CharField;
-import org.xBaseJ.micro.fields.DateField;
-import org.xBaseJ.micro.fields.Field;
-import org.xBaseJ.micro.fields.FloatField;
-import org.xBaseJ.micro.fields.LogicalField;
-import org.xBaseJ.micro.fields.MemoField;
-import org.xBaseJ.micro.fields.NumField;
-import org.xBaseJ.micro.fields.PictureField;
+import org.xBaseJ.fields.CharField;
+import org.xBaseJ.fields.DateField;
+import org.xBaseJ.fields.Field;
+import org.xBaseJ.fields.FloatField;
+import org.xBaseJ.fields.LogicalField;
+import org.xBaseJ.fields.MemoField;
+import org.xBaseJ.fields.NumField;
+import org.xBaseJ.fields.PictureField;
 
 /**
  * Simple main() class/function to scan quickly a dbf file
@@ -29,10 +29,6 @@ public class DbfScanner
 	  System.out.println("Name: " + field.getName());
 	  System.out.println("Type: " + field.getClass().getName());
 	  System.out.println("Length: " + field.Length);
-
-	  if (field instanceof NumField) {
-	    System.out.println("DecPosition: " + ((NumField)field).decPosition);
-	  }
 
 	  System.out.println("");
 	}

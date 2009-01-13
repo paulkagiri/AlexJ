@@ -5,8 +5,8 @@ import java.io.IOException;
 import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 
-import org.xBaseJ.micro.xBaseJException;
-import org.xBaseJ.micro.fields.CharField;
+import org.xBaseJ.xBaseJException;
+import org.xBaseJ.fields.CharField;
 
 public class CVField extends ActField {
   public CVField(String name) throws xBaseJException, IOException {

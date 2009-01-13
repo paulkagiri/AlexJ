@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import sairepa.model.*;
 
-import org.xBaseJ.micro.xBaseJException;
-import org.xBaseJ.micro.fields.CharField;
+import org.xBaseJ.xBaseJException;
+import org.xBaseJ.fields.CharField;
 
 public class LocalityField extends ActField
 {

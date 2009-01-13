@@ -11,10 +11,10 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xBaseJ.micro.DBF;
-import org.xBaseJ.micro.xBaseJException;
-import org.xBaseJ.micro.fields.Field;
-import org.xBaseJ.micro.fields.MemoField;
+import org.xBaseJ.DBF;
+import org.xBaseJ.xBaseJException;
+import org.xBaseJ.fields.Field;
+import org.xBaseJ.fields.MemoField;
 
 import sairepa.model.*;
 
@@ -322,6 +322,18 @@ public abstract class ActListFactory
 			     field.getName() + " : " +
 			     Integer.toString(field.Length) +" : '"+ value+"' : " +
 			     Integer.toString(value.length()));
+	}
+
+	if (field instanceof MemoField
+	    && ("".equals(value.trim())
+		|| "-".equals(value.trim())))
+	  {
+	    value = "";
+	  }
+
+	if (!(field instanceof MemoField)) {
+	  int lng = ActField.getMaxLength(field);
+	  value = ActField.pad(value, ' ', lng);
 	}
 
 	field.put(value);

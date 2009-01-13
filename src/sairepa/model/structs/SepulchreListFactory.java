@@ -7,14 +7,14 @@ import java.sql.Connection;
 import sairepa.model.*;
 import sairepa.model.fields.*;
 
-import org.xBaseJ.micro.xBaseJException;
-import org.xBaseJ.micro.fields.CharField;
-import org.xBaseJ.micro.fields.DateField;
-import org.xBaseJ.micro.fields.FloatField;
-import org.xBaseJ.micro.fields.LogicalField;
-import org.xBaseJ.micro.fields.MemoField;
-import org.xBaseJ.micro.fields.NumField;
-import org.xBaseJ.micro.fields.PictureField;
+import org.xBaseJ.xBaseJException;
+import org.xBaseJ.fields.CharField;
+import org.xBaseJ.fields.DateField;
+import org.xBaseJ.fields.FloatField;
+import org.xBaseJ.fields.LogicalField;
+import org.xBaseJ.fields.MemoField;
+import org.xBaseJ.fields.NumField;
+import org.xBaseJ.fields.PictureField;
 
 /**
  * if you modify this class, modify also: DeceaseListFactory, SepultureListFactory

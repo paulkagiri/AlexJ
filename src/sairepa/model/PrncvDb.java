@@ -7,8 +7,8 @@ import java.util.Map;
 
 import sairepa.model.fields.Sex;
 
-import org.xBaseJ.micro.DBF;
-import org.xBaseJ.micro.xBaseJException;
+import org.xBaseJ.DBF;
+import org.xBaseJ.xBaseJException;
 
 public class PrncvDb
 {
