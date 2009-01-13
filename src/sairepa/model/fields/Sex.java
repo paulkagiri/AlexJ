@@ -34,4 +34,13 @@ public enum Sex
       return Sex.UNKNOWN;
     }
   }
+
+  public Sex reverse() {
+    if (this == Sex.MALE)
+      return Sex.FEMALE;
+    else if (this == Sex.FEMALE)
+      return Sex.MALE;
+    else
+      return Sex.UNKNOWN;
+  }
 }

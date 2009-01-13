@@ -53,11 +53,16 @@ public class ConvNameField extends ActField {
   }
 
   public Sex getSex(Act a) {
+    Sex s;
+
     if (sex == Sex.UNKNOWN && sexField != null) {
       ActEntry e = a.getEntry(sexField);
-      return SexField.getSex(e);
+      s = SexField.getSex(e);
     }
-    return sex;
+    else
+      s = sex;
+
+    return s;
   }
 
   @Override
