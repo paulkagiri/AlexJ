@@ -43,7 +43,7 @@ public class ActField implements FieldLayoutElement
   }
 
   public static int getMaxLength(Field fieldPrototype) {
-    int maxLength = 255;
+    int maxLength = 5000;
 
     if (!(fieldPrototype instanceof MemoField)) {
       maxLength = fieldPrototype.getLength();
