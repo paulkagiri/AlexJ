@@ -31,6 +31,8 @@ public class MainWindow extends JFrame implements ChangeListener {
   private int DEFAULT_SIZE_X = 900;
   private int DEFAULT_SIZE_Y = 700;
 
+  private JMenuItem menuFileOpen;
+  private JMenuItem menuFileSave;
   private JMenuItem menuFileSearch;
   private JMenuItem menuFilePrint;
   private JMenu menuFileRestore;
@@ -104,6 +106,18 @@ public class MainWindow extends JFrame implements ChangeListener {
     JMenuBar menuBar = new JMenuBar();
     JMenu menuFile = new JMenu("Fichier");
 
+    menuFileOpen = new JMenuItem("Ouvrir", IconBox.fileOpen);
+    menuFileOpen.setAccelerator(
+        javax.swing.KeyStroke.getKeyStroke(
+        java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK | java.awt.Event.SHIFT_MASK));
+    menuFileOpen.setEnabled(true);
+
+    menuFileSave = new JMenuItem("Enregistrer", IconBox.fileSave);
+    menuFileSave.setAccelerator(
+        javax.swing.KeyStroke.getKeyStroke(
+        java.awt.event.KeyEvent.VK_S, java.awt.Event.CTRL_MASK | java.awt.Event.SHIFT_MASK));
+    menuFileSave.setEnabled(true);
+
     menuFileSearch = new JMenuItem("Rechercher", IconBox.search);
     menuFileSearch.setAccelerator(
         javax.swing.KeyStroke.getKeyStroke(
@@ -116,7 +130,7 @@ public class MainWindow extends JFrame implements ChangeListener {
         java.awt.event.KeyEvent.VK_P, java.awt.Event.CTRL_MASK));
     menuFilePrint.setEnabled(false);
 
-    menuFileRestore = new JMenu("Restaurer tout les actes");
+    menuFileRestore = new JMenu("Restaurer");
     menuFileRestore.setEnabled(false);
 
     menuFileQuit = new JMenuItem("Quitter", IconBox.quit);
@@ -124,9 +138,11 @@ public class MainWindow extends JFrame implements ChangeListener {
         javax.swing.KeyStroke.getKeyStroke(
         java.awt.event.KeyEvent.VK_Q, java.awt.Event.CTRL_MASK));
 
+    menuFile.add(menuFileOpen);
+    menuFile.add(menuFileSave);
+    menuFile.add(menuFileRestore);
     menuFile.add(menuFileSearch);
     menuFile.add(menuFilePrint);
-    menuFile.add(menuFileRestore);
     menuFile.add(menuFileQuit);
 
     menuBar.add(menuFile);
@@ -152,6 +168,14 @@ public class MainWindow extends JFrame implements ChangeListener {
 
   public AbstractButton getPrintButton() {
     return menuFilePrint;
+  }
+
+  public AbstractButton getOpenButton() {
+    return menuFileOpen;
+  }
+
+  public AbstractButton getSaveButton() {
+    return menuFileSave;
   }
 
   public static final DateFormat USER_DATE_FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM);

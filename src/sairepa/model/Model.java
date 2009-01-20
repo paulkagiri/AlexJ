@@ -54,6 +54,10 @@ public class Model
     backupManager = new BackupManager(projectDir);
   }
 
+  public File getProjectDir() {
+    return projectDir;
+  }
+
   public ClientFile getClientFile() {
     return clientFile;
   }

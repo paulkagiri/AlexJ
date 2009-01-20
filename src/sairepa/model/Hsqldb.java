@@ -44,6 +44,9 @@ public class Hsqldb {
   }
 
   public void disconnect() throws java.sql.SQLException {
+    if (connection == null)
+      return;
+
     synchronized(dbLock) {
       synchronized (connection) {
 	connection.commit();

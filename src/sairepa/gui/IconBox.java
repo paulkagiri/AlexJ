@@ -14,6 +14,8 @@ public class IconBox
   public final static ImageIcon quit        = loadIcon("quit.png");
   public final static ImageIcon print       = loadIcon("print.png");
   public final static ImageIcon warning     = loadIcon("warning.png");
+  public final static ImageIcon fileSave    = loadIcon("filesave.png");
+  public final static ImageIcon fileOpen    = loadIcon("fileopen.png");
 
   private IconBox() { }
 

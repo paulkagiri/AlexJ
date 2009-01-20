@@ -21,6 +21,10 @@ public class Controller
         new ActionQuit(model, view, this));
     view.getMainWindow().getQuitButton().addActionListener(
 	new ActionQuit(model, view, this));
+    view.getMainWindow().getOpenButton().addActionListener(
+	new ActionOpen(model, view, this));
+    view.getMainWindow().getSaveButton().addActionListener(
+	new ActionSave(model, view, this));
     view.getMainWindow().setDefaultCloseOperation(
 	JFrame.DO_NOTHING_ON_CLOSE);
 
