@@ -12,6 +12,12 @@ import org.xBaseJ.xBaseJException;
 
 public class PrncvDb
 {
+  public static final int NMB_CARS = 6;
+
+  public static final String[] EXCEPTIONS = {
+    "Christ"
+  };
+
   public static final String UNKNOWN = "????????";
   private Map[] prncvs = new Map[2];
 
@@ -21,6 +27,19 @@ public class PrncvDb
 
   public PrncvDb(File dbf) {
     loadDbf(dbf);
+  }
+
+  public String truncate(String str) {
+    for (String exception : EXCEPTIONS) {
+      if (str.startsWith(exception)) {
+	if (str.length() == exception.length()) return str;
+	return str.substring(0, exception.length() + 1);
+      }
+    }
+    if (str.length() > NMB_CARS)
+      return str.substring(0, NMB_CARS);
+    else
+      return str;
   }
 
   private void loadDbf(File dbf) {
@@ -50,6 +69,7 @@ public class PrncvDb
 	Sex sex = Sex.getSex(dbfFile.getField("MFA").get());
 	Util.check(sex != Sex.UNKNOWN);
 	String in = dbfFile.getField("PRN_TT").get().trim();
+	in = truncate(in);
 	String out = dbfFile.getField("PRN_CV").get().trim();
 
 	prncvs[sex.toInteger()].put(in, out);
@@ -71,8 +91,11 @@ public class PrncvDb
 
   public String getPrncv(String lu, Sex sex) {
     Util.check(sex != Sex.UNKNOWN);
+    System.out.println("Prncv: '" + lu + "' / " +sex.toString());
     if ("-".equals(lu.trim())) return "-";
-    String cv = (String)prncvs[sex.toInteger()].get(lu.trim());
+    lu = lu.trim();
+    lu = truncate(lu);
+    String cv = (String)prncvs[sex.toInteger()].get(lu);
     return ((cv == null) ? UNKNOWN : cv);
   }
 }

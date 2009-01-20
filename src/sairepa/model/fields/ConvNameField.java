@@ -44,6 +44,14 @@ public class ConvNameField extends ActField {
     origins[Sex.UNKNOWN.toInteger()] = originUnknown;
   }
 
+  public ConvNameField(String fieldName, Conventionalizer conv, SexField sexField,
+		       ActField originMale, ActField originFemale, ActField originUnknown,
+		       Sex sex)
+    throws xBaseJException, IOException {
+    this(fieldName, conv, sexField, originMale, originFemale, originUnknown);
+    this.sex = sex;
+  }
+
   public ConvNameField(String fieldName,  Conventionalizer conv, SexField sexField,
 		       ActField originMale, ActField originFemale, ActField originUnknown,
 		       String defaultValue)
@@ -52,10 +60,19 @@ public class ConvNameField extends ActField {
     this.defaultValue = defaultValue;
   }
 
+  public ConvNameField(String fieldName,  Conventionalizer conv, SexField sexField,
+		       ActField originMale, ActField originFemale, ActField originUnknown,
+		       String defaultValue, Sex sex)
+    throws xBaseJException, IOException {
+    this(fieldName, conv, sexField, originMale, originFemale, originUnknown, defaultValue);
+    this.sex = sex;
+  }
+
+
   public Sex getSex(Act a) {
     Sex s;
 
-    if (sex == Sex.UNKNOWN && sexField != null) {
+    if (sexField != null) {
       ActEntry e = a.getEntry(sexField);
       s = SexField.getSex(e);
     }
@@ -74,7 +91,9 @@ public class ConvNameField extends ActField {
       ActField origin = origins[getSex(e.getAct()).toInteger()];
       if (origin == null) return;
       ActEntry src = e.getAct().getEntry(origin);
-      String str = conventionalizer.conventionalize(src.getValue(), getSex(e.getAct()));
+      Sex s = sex;
+      if (s == Sex.UNKNOWN) s = getSex(e.getAct());
+      String str = conventionalizer.conventionalize(src.getValue(), s);
       str = str.trim();
       if ("".equals(str) || "-".equals(str)) str = defaultValue;
       e.setValue(str);

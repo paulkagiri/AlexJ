@@ -17,7 +17,7 @@ import org.xBaseJ.fields.NumField;
 import org.xBaseJ.fields.PictureField;
 
 /**
- * if you modify this class, modify also: DeceaseListFactory, SepultureListFactory
+ * if you modify this class, modify also: DeceaseListFactory, NotarialDeceaseListFactory
  */
 public class SepulchreListFactory extends ActListFactory
 {
@@ -28,47 +28,64 @@ public class SepulchreListFactory extends ActListFactory
   }
 
   private static class AdultTest implements Test {
-    private ActField name2;
-    private ActField name3;
-    private ActField namec;
+    private ActField lastName2;
+    private ActField firstName2;
+    private ActField lastName3;
+    private ActField firstName3;
+    private ActField lastNameC;
+    private ActField firstNameC;
 
-    public AdultTest(ActField name2, ActField name3, ActField namec) {
-      this.name2 = name2;
-      this.name3 = name3;
-      this.namec = namec;
+    public AdultTest(ActField lastName2, ActField lastName3, ActField lastNameC,
+		     ActField firstName2, ActField firstName3, ActField firstNameC) {
+      this.lastName2 = lastName2;
+      this.lastName3 = lastName3;
+      this.lastNameC = lastNameC;
+      this.firstName2 = firstName2;
+      this.firstName3 = firstName3;
+      this.firstNameC = firstNameC;
+
+      Util.check(lastName2 != null);
+      Util.check(lastName3 != null);
+      Util.check(lastNameC != null);
+      Util.check(firstName2 != null);
+      Util.check(firstName3 != null);
+      Util.check(firstNameC != null);
     }
 
     public boolean test(Act a) {
-      ActEntry name2e = a.getEntry(name2);
-      ActEntry name3e = a.getEntry(name3);
-      ActEntry namece = a.getEntry(namec);
+      boolean name2e = isEmpty(a.getEntry(lastName2)) && isEmpty(a.getEntry(firstName2));
+      boolean name3e = isEmpty(a.getEntry(lastName3)) && isEmpty(a.getEntry(firstName3));
+      boolean nameCe = isEmpty(a.getEntry(lastNameC)) && isEmpty(a.getEntry(firstNameC));
 
-      return ( (isEmpty(name2e) && isEmpty(name3e)) || !isEmpty(namece) );
+      boolean t = ( !nameCe || (name2e && name3e) );
+      return t;
     }
   }
 
   private static class NonEmptyTest implements Test {
-    private ActField field;
+    private ActField field1;
+    private ActField field2;
 
-    public NonEmptyTest(ActField field) {
-      this.field = field;
+    public NonEmptyTest(ActField field1, ActField field2) {
+      this.field1 = field1;
+      this.field2 = field2;
     }
 
     public boolean test(Act a) {
-      return !isEmpty(a.getEntry(field));
+      return !(isEmpty(a.getEntry(field1)) && isEmpty(a.getEntry(field2)));
     }
   }
 
   static {
-    ActField tmpLastName1;
-    ActField tmpFirstName1;
-    ActField tmpLastName2;
-    ActField tmpFirstName2;
-    ActField tmpLastName3;
-    ActField tmpFirstName3;
-    ActField tmpLastNameC;
-    ActField tmpFirstNameC;
-    SexField tmpSexField;
+    ActField tmpLastName1 = null;
+    ActField tmpFirstName1 = null;
+    ActField tmpLastName2 = null;
+    ActField tmpFirstName2 = null;
+    ActField tmpLastName3 = null;
+    ActField tmpFirstName3 = null;
+    ActField tmpLastNameC = null;
+    ActField tmpFirstNameC = null;
+    SexField tmpSexField = null;
 
     try {
       fields = new FieldLayout(new FieldLayoutElement[] {
@@ -105,31 +122,35 @@ public class SepulchreListFactory extends ActListFactory
 	  new FieldLayout("Noms/Pr\351noms conventionnels",
 			  new FieldLayoutElement[] {
 			    new ConditionalField(new CharField("NOM2CV", 20),
-						 new AdultTest(tmpLastName2, tmpLastName3, tmpLastNameC),
+						 new AdultTest(tmpLastName2, tmpLastName3, tmpLastNameC,
+							       tmpFirstName2, tmpFirstName3, tmpFirstNameC),
 						 new ConvNameField("NOM2CV", Conventionalizer.CONV_LAST_NAME,
-								   tmpSexField, tmpLastName1, tmpLastNameC, null),
+								   tmpSexField, tmpLastName1, tmpLastNameC, null, Sex.MALE),
 						 new ConditionalField(new CharField("NOM2CV", 20),
-								      new NonEmptyTest(tmpLastName2),
+								      new NonEmptyTest(tmpLastName2, tmpFirstName2),
 								      new ConvNameField("NOM2CV", Conventionalizer.CONV_LAST_NAME,
 											Sex.MALE, tmpLastName2),
 								      new ConvNameField("NOM2CV", Conventionalizer.CONV_LAST_NAME,
 											Sex.MALE, tmpLastName1))),
 			    new ConditionalField(new CharField("PRN2CV", 20),
-						 new AdultTest(tmpFirstName2, tmpFirstName3, tmpFirstNameC),
+						 new AdultTest(tmpLastName2, tmpLastName3, tmpLastNameC,
+							       tmpFirstName2, tmpFirstName3, tmpFirstNameC),
 						 new ConvNameField("PRN2CV", Conventionalizer.CONV_FIRST_NAME,
-								   tmpSexField, tmpFirstName1, tmpFirstNameC, null),
+								   tmpSexField, tmpFirstName1, tmpFirstNameC, null, Sex.MALE),
 						 new ConvNameField("PRN2CV", Conventionalizer.CONV_FIRST_NAME,
 								   Sex.MALE, tmpFirstName2)),
 			    new ConditionalField(new CharField("NOM3CV", 20),
-						 new AdultTest(tmpLastName2, tmpLastName3, tmpLastNameC),
+						 new AdultTest(tmpLastName2, tmpLastName3, tmpLastNameC,
+							       tmpFirstName2, tmpFirstName3, tmpFirstNameC),
 						 new ConvNameField("NOM3CV", Conventionalizer.CONV_LAST_NAME,
-								   tmpSexField, tmpLastName1, tmpLastNameC, null),
+								   tmpSexField, tmpLastNameC, tmpLastName1, null, Sex.FEMALE),
 						 new ConvNameField("NOM3CV", Conventionalizer.CONV_LAST_NAME,
 								   Sex.FEMALE, tmpLastName3, "?")),
 			    new ConditionalField(new CharField("PRN3CV", 20),
-						 new AdultTest(tmpFirstName2, tmpFirstName3, tmpFirstNameC),
+						 new AdultTest(tmpLastName2, tmpLastName3, tmpLastNameC,
+							       tmpFirstName2, tmpFirstName3, tmpFirstNameC),
 						 new ConvNameField("PRN3CV", Conventionalizer.CONV_FIRST_NAME,
-								   tmpSexField, tmpFirstName1, tmpFirstNameC, null),
+								   tmpSexField, tmpFirstNameC, tmpFirstName1, null, Sex.FEMALE),
 						 new ConvNameField("PRN3CV", Conventionalizer.CONV_FIRST_NAME,
 								   Sex.FEMALE, tmpFirstName3, "?")),
 			  }),
