@@ -106,12 +106,6 @@ public class MainWindow extends JFrame implements ChangeListener {
     JMenuBar menuBar = new JMenuBar();
     JMenu menuFile = new JMenu("Fichier");
 
-    menuFileOpen = new JMenuItem("Ouvrir", IconBox.fileOpen);
-    menuFileOpen.setAccelerator(
-        javax.swing.KeyStroke.getKeyStroke(
-        java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK | java.awt.Event.SHIFT_MASK));
-    menuFileOpen.setEnabled(true);
-
     menuFileSave = new JMenuItem("Enregistrer", IconBox.fileSave);
     menuFileSave.setAccelerator(
         javax.swing.KeyStroke.getKeyStroke(
@@ -130,15 +124,21 @@ public class MainWindow extends JFrame implements ChangeListener {
         java.awt.event.KeyEvent.VK_P, java.awt.Event.CTRL_MASK));
     menuFilePrint.setEnabled(false);
 
+    menuFileOpen = new JMenuItem("A partir d'un fichier ...", IconBox.fileOpen);
+    menuFileOpen.setAccelerator(
+        javax.swing.KeyStroke.getKeyStroke(
+        java.awt.event.KeyEvent.VK_O, java.awt.Event.CTRL_MASK | java.awt.Event.SHIFT_MASK));
+    menuFileOpen.setEnabled(true);
+
     menuFileRestore = new JMenu("Restaurer");
-    menuFileRestore.setEnabled(false);
+    menuFileRestore.setEnabled(true);
+    menuFileRestore.add(menuFileOpen);
 
     menuFileQuit = new JMenuItem("Quitter", IconBox.quit);
     menuFileQuit.setAccelerator(
         javax.swing.KeyStroke.getKeyStroke(
         java.awt.event.KeyEvent.VK_Q, java.awt.Event.CTRL_MASK));
 
-    menuFile.add(menuFileOpen);
     menuFile.add(menuFileSave);
     menuFile.add(menuFileRestore);
     menuFile.add(menuFileSearch);
@@ -181,19 +181,6 @@ public class MainWindow extends JFrame implements ChangeListener {
   public static final DateFormat USER_DATE_FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM);
   private List<AbstractButton> restoreButtons = new Vector<AbstractButton>();
 
-  private void initRestoreMenu() {
-    boolean a = false;
-
-    for (Date d : model.getBackupManager().getAvailableBackups()) {
-      a = true;
-      JMenuItem jmi = new JMenuItem(USER_DATE_FORMAT.format(d));
-      menuFileRestore.add(jmi);
-      restoreButtons.add(jmi);
-    }
-
-    menuFileRestore.setEnabled(a);
-  }
-
   public List<AbstractButton> getRestoreButtons() {
     return restoreButtons;
   }
@@ -201,6 +188,15 @@ public class MainWindow extends JFrame implements ChangeListener {
   public void init() {
     initRestoreMenu();
   }
+
+  private void initRestoreMenu() {
+    for (Date d : model.getBackupManager().getAvailableBackups()) {
+      JMenuItem jmi = new JMenuItem(USER_DATE_FORMAT.format(d));
+      menuFileRestore.add(jmi);
+      restoreButtons.add(jmi);
+    }
+  }
+
 
   private Vector<Viewer> viewers = new Vector<Viewer>();
 

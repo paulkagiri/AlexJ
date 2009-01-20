@@ -39,7 +39,7 @@ public class ActionOpen implements ActionListener
 
   public void open() {
     if (JOptionPane.showConfirmDialog(view.getMainWindow(),
-				      "Attention, l'ouverture remplacera toute votre copie de travail. Etes-vous sur ?",
+				      "Attention, la restauration ecrasera tout vos changements. Etes-vous sur ?",
 				      "Etes-vous sur ?",
 				      JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
       return;
