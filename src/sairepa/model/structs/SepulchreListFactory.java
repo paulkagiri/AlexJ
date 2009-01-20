@@ -16,9 +16,6 @@ import org.xBaseJ.fields.MemoField;
 import org.xBaseJ.fields.NumField;
 import org.xBaseJ.fields.PictureField;
 
-/**
- * if you modify this class, modify also: DeceaseListFactory, NotarialDeceaseListFactory
- */
 public class SepulchreListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;

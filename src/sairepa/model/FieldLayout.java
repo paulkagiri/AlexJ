@@ -89,4 +89,30 @@ public class FieldLayout implements Iterable<ActField>, FieldLayoutElement
     }
     return nmb;
   }
+
+  @Override
+  public int hashCode() {
+    int h = title.hashCode();
+    for (FieldLayoutElement el : elements)
+      h ^= el.hashCode();
+    return h;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || !(o instanceof FieldLayout)) return false;
+
+    FieldLayout fl = (FieldLayout)o;
+
+    if (elements.length != fl.elements.length) {
+      return false;
+    }
+
+    for (int i = 0 ; i < elements.length; i++) {
+      if (!elements[i].equals(fl.elements[i]))
+	return false;
+    }
+
+    return true;
+  }
 }

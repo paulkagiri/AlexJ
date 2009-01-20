@@ -17,8 +17,6 @@ public class ConditionalField extends ActField
   private final ActField ifFalse;
   private ActField current;
 
-  private Field fp;
-
   /**
    * @param fieldPrototype is the same if the test is false or true
    * @param ifTrue can't be null
@@ -27,7 +25,6 @@ public class ConditionalField extends ActField
   public ConditionalField(Field fieldPrototype, Test test, ActField ifTrue,
 			  ActField ifFalse) throws xBaseJException, IOException {
     super(fieldPrototype);
-    this.fp = fieldPrototype;
     this.test = test;
     this.ifTrue = ifTrue;
     this.ifFalse = ifFalse;

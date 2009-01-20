@@ -16,9 +16,6 @@ import org.xBaseJ.fields.MemoField;
 import org.xBaseJ.fields.NumField;
 import org.xBaseJ.fields.PictureField;
 
-/**
- * if you modify this class, modify also: ConfirmationListFactory, BirthListFactory, NotarialConfirmationListFactory
- */
 public class BaptismListFactory extends ActListFactory
 {
   public static FieldLayout fields = null;
@@ -35,7 +32,7 @@ public class BaptismListFactory extends ActListFactory
 	  new NumericField("JOUR", 2, 0, 31),
 	  new NumericField("MOIS", 2, 0, 12),
 	  new NumericField("ANNEE", 4, 1500, 2020),
-	  new FieldLayout("Renseignements concernant le baptis\351",
+	  new FieldLayout("Renseignements concernant le nouveau n\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName1 = new LastNameField("NOM1", Sex.UNKNOWN),
 			    new FirstNameField("PRN1"),
@@ -43,7 +40,7 @@ public class BaptismListFactory extends ActListFactory
 			    new ActField(new CharField("NEE", 7)),
 			    new ActField(new CharField("NOT1", 40)),
 	    }),
-	  new FieldLayout("Informations concernant le p\350re du baptis\351",
+	  new FieldLayout("Informations concernant le p\350re du nouveau n\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName2 = new LastNameField("NOM2", Sex.MALE, tmpLastName1),
 			    new ConvNameField("NOM2CV", Conventionalizer.CONV_LAST_NAME,
@@ -53,7 +50,7 @@ public class BaptismListFactory extends ActListFactory
 					      Sex.MALE, tmpFirstName2),
 			    new ActField(new CharField("NOT2", 40)),
 			  }),
-	  new FieldLayout("Informations concernant la m\350re du baptis\351",
+	  new FieldLayout("Informations concernant la m\350re du nouveau n\351",
 			  new FieldLayoutElement[] {
 			    tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
 			    new ConvNameField("NOM3CV", Conventionalizer.CONV_LAST_NAME,
