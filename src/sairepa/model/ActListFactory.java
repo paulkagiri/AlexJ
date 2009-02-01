@@ -290,61 +290,64 @@ public abstract class ActListFactory
 
       DBF dbfFile = new DBF(dbf.getPath(), (int)DBF.DBASEIII_WITH_MEMO, true, "CP850");
 
-      for (Field field : dbfFields.values()) {
-	dbfFile.addField(field);
-      }
-
-      PreparedStatement st = db.getConnection().prepareStatement(
-          "SELECT fields.name, entries.row, entries.value " +
-	  "FROM fields INNER JOIN entries ON fields.id = entries.field " +
-	  "WHERE fields.file = ? ORDER BY entries.row");
-      st.setInt(1, fileId);
-
-      ResultSet set = st.executeQuery();
-
-      int currentRow = 0;
-
-      while(set.next()) {
-	String fieldName = set.getString(1);
-	int row = set.getInt(2);
-	String value = set.getString(3);
-
-	Field field = dbfFields.get(fieldName);
-	Util.check(field != null);
-
-	if (row != currentRow) {
-	  dbfFile.write();
-	  currentRow = row;
+      try {
+	for (Field field : dbfFields.values()) {
+	  dbfFile.addField(field);
 	}
 
-	if ((!(field instanceof MemoField)) && value.length() > field.Length) {
-	  System.err.println("VALUE TOO LONG : "+ field.getClass().getName() + " : " +
-			     field.getName() + " : " +
-			     Integer.toString(field.Length) +" : '"+ value+"' : " +
-			     Integer.toString(value.length()));
-	}
+	PreparedStatement st = db.getConnection().prepareStatement(
+	    "SELECT fields.name, entries.row, entries.value " +
+	    "FROM fields INNER JOIN entries ON fields.id = entries.field " +
+	    "WHERE fields.file = ? ORDER BY entries.row");
+	st.setInt(1, fileId);
 
-	if (field instanceof MemoField
-	    && ("".equals(value.trim())
-		|| "-".equals(value.trim())))
-	  {
-	    value = "";
+	ResultSet set = st.executeQuery();
+
+	int currentRow = 0;
+
+	while(set.next()) {
+	  String fieldName = set.getString(1);
+	  int row = set.getInt(2);
+	  String value = set.getString(3);
+
+	  Field field = dbfFields.get(fieldName);
+	  Util.check(field != null);
+
+	  if (row != currentRow) {
+	    dbfFile.write();
+	    currentRow = row;
 	  }
 
-	if (!(field instanceof MemoField)) {
-	  int lng = ActField.getMaxLength(field);
-	  value = ActField.pad(value, ' ', lng);
+	  if ((!(field instanceof MemoField)) && value.length() > field.Length) {
+	    System.err.println("VALUE TOO LONG : "+ field.getClass().getName() + " : " +
+			       field.getName() + " : " +
+			       Integer.toString(field.Length) +" : '"+ value+"' : " +
+			       Integer.toString(value.length()));
+	  }
+
+	  if (field instanceof MemoField
+	      && ("".equals(value.trim())
+		  || "-".equals(value.trim())))
+	    {
+	      value = "";
+	    }
+
+	  if (!(field instanceof MemoField)) {
+	    int lng = ActField.getMaxLength(field);
+	    value = ActField.pad(value, ' ', lng);
+	  }
+
+	  field.put(value);
 	}
 
-	field.put(value);
+	dbfFile.write();
+      } finally {
+	dbfFile.close();
       }
-
-      dbfFile.write();
-      dbfFile.close();
 
       set.close();
     } catch (xBaseJException e) {
-	throw new IOException("xBaseJException while reading the dbf file: " + e.toString());
+	throw new RuntimeException("xBaseJException while writing the dbf file: " + e.toString());
     }
 
     return true;
