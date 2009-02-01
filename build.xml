@@ -41,6 +41,14 @@
 	http://sourceforge.net/projects/xbasej/ and to put it in lib/"
 	/>
 
+	<!-- JLHA -->
+	<property name="jlha.location" value="${lib.dir}/jlha.jar" />
+	<available file="${jlha.location}" property="jlha_available" />
+	<fail unless="jlha_available" status="1"
+	message="You need to download jlha.jar from
+	http://homepage1.nifty.com/dangan/en/Content/Program/Java/jLHA/LhaLibrary.html"
+	/>
+
 	<target name="compile">
 		<mkdir dir="${bin.dir}" />
 		<javac srcdir="${src.dir}" destdir="${bin.dir}" debug="true" optimize="true" encoding="UTF8">
@@ -50,6 +58,7 @@
 				<pathelement location="${hsqldb.location}"/>
 				<pathelement location="${xbase.location}"/>
 				<pathelement location="${xercesImpl.location}"/>
+				<pathelement location="${jlha.location}"/>
 			</classpath>
 		</javac>
 		<copy todir="${bin.dir}">
@@ -61,6 +70,7 @@
 			<zipfileset src="${hsqldb.location}" />
 			<zipfileset src="${log4j.location}" />
 			<zipfileset src="${xercesImpl.location}" />
+			<zipfileset src="${jlha.location}" />
 		</copy>
 	</target>
 

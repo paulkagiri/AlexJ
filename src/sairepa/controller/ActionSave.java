@@ -16,6 +16,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
+import jp.gr.java_conf.dangan.util.lha.LhaFile;
+import jp.gr.java_conf.dangan.util.lha.LhaHeader;
+import jp.gr.java_conf.dangan.util.lha.LhaOutputStream;
+
 import sairepa.model.Model;
 import sairepa.view.ErrorMessage;
 import sairepa.view.SplashScreen;
@@ -34,14 +38,16 @@ public class ActionSave implements ActionListener
     this.controller = controller;
   }
 
-  public static class ZipFileFilter extends FileFilter {
-    public ZipFileFilter() { }
+  public static class ZipLhaFileFilter extends FileFilter {
+    public ZipLhaFileFilter() { }
     public boolean accept(File file) {
-      return (file.isDirectory() || file.getName().toLowerCase().endsWith(".zip"));
+      return (file.isDirectory()
+	      || file.getName().toLowerCase().endsWith(".zip")
+	      || file.getName().toLowerCase().endsWith(".lzh"));
     }
 
     public String getDescription() {
-      return "Fichier ZIP";
+      return "Fichier ZIP/LZH";
     }
   }
 
@@ -54,7 +60,7 @@ public class ActionSave implements ActionListener
     }
   }
 
-  public static void zip(ZipOutputStream zout, File f) throws IOException {
+  private static void zip(ZipOutputStream zout, File f) throws IOException {
     zout.putNextEntry(new ZipEntry(f.getName()));
     FileInputStream in = new FileInputStream(f);
 
@@ -69,27 +75,8 @@ public class ActionSave implements ActionListener
     }
   }
 
-  public void save() {
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setFileFilter(new ZipFileFilter());
-    fileChooser.setSelectedFile(new File(model.getProjectDir().getName() + ".zip"));
-    if (fileChooser.showSaveDialog(view.getMainWindow()) != JFileChooser.APPROVE_OPTION)
-      return;
-    File f = fileChooser.getSelectedFile();
-
-    SplashScreen ss = new SplashScreen("Sauvegarde");
-    ss.start();
-    try {
-      model.save(ss);
-    } catch(Exception e) {
-      throw new RuntimeException(e);
-    } finally {
-      ss.stop();
-    }
-    ss.setProgression(90, "Creation du ZIP");
-
+  private void saveZip(File f) {
     ZipOutputStream zout;
-
     try {
       if (f.exists())
 	f.delete();
@@ -107,12 +94,83 @@ public class ActionSave implements ActionListener
     } catch (IOException e) {
       throw new RuntimeException(e);
     } finally {
-      ss.stop();
       try {
 	zout.close();
       } catch (IOException e) {
 	throw new RuntimeException(e);
       }
+    }
+  }
+
+  private static void lha(LhaOutputStream zout, File f) throws IOException {
+    zout.putNextEntry(new LhaHeader(f.getName()));
+    FileInputStream in = new FileInputStream(f);
+
+    try {
+      byte data[] = new byte[32768];
+      int r;
+      while ((r = in.read(data)) >= 0) {
+	zout.write(data, 0, r);
+      }
+    } finally {
+      in.close();
+    }
+  }
+
+  private void saveLha(File f) {
+    LhaOutputStream zout;
+    try {
+      if (f.exists())
+	f.delete();
+
+      FileOutputStream fout = new FileOutputStream(f);
+      zout = new LhaOutputStream(fout);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+    try {
+      for (File file : model.getProjectDir().listFiles(new DbaseFileFilter())) {
+	lha(zout, file);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      try {
+	zout.close();
+      } catch (IOException e) {
+	throw new RuntimeException(e);
+      }
+    }
+  }
+
+  public void save() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setFileFilter(new ZipLhaFileFilter());
+    fileChooser.setSelectedFile(new File(model.getProjectDir().getName() + ".zip"));
+    if (fileChooser.showSaveDialog(view.getMainWindow()) != JFileChooser.APPROVE_OPTION)
+      return;
+    File f = fileChooser.getSelectedFile();
+
+    SplashScreen ss = new SplashScreen("Sauvegarde");
+    ss.start();
+    try {
+      model.save(ss);
+    } catch(Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      ss.stop();
+    }
+    ss.setProgression(90, "Creation du ZIP");
+
+    try {
+      if (f.getName().toLowerCase().endsWith(".lzh")) {
+	saveLha(f);
+      } else {
+	saveZip(f);
+      }
+    } finally {
+      ss.stop();
     }
   }
 
