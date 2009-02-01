@@ -303,49 +303,51 @@ public abstract class ActListFactory
 
 	ResultSet set = st.executeQuery();
 
-	int currentRow = 0;
+	try {
+	  int currentRow = 0;
 
-	while(set.next()) {
-	  String fieldName = set.getString(1);
-	  int row = set.getInt(2);
-	  String value = set.getString(3);
+	  while(set.next()) {
+	    String fieldName = set.getString(1);
+	    int row = set.getInt(2);
+	    String value = set.getString(3);
 
-	  Field field = dbfFields.get(fieldName);
-	  Util.check(field != null);
+	    Field field = dbfFields.get(fieldName);
+	    Util.check(field != null);
 
-	  if (row != currentRow) {
-	    dbfFile.write();
-	    currentRow = row;
-	  }
-
-	  if ((!(field instanceof MemoField)) && value.length() > field.Length) {
-	    System.err.println("VALUE TOO LONG : "+ field.getClass().getName() + " : " +
-			       field.getName() + " : " +
-			       Integer.toString(field.Length) +" : '"+ value+"' : " +
-			       Integer.toString(value.length()));
-	  }
-
-	  if (field instanceof MemoField
-	      && ("".equals(value.trim())
-		  || "-".equals(value.trim())))
-	    {
-	      value = "";
+	    if (row != currentRow) {
+	      dbfFile.write();
+	      currentRow = row;
 	    }
 
-	  if (!(field instanceof MemoField)) {
-	    int lng = ActField.getMaxLength(field);
-	    value = ActField.pad(value, ' ', lng);
-	  }
+	    if ((!(field instanceof MemoField)) && value.length() > field.Length) {
+	      System.err.println("VALUE TOO LONG : "+ field.getClass().getName() + " : " +
+				 field.getName() + " : " +
+				 Integer.toString(field.Length) +" : '"+ value+"' : " +
+				 Integer.toString(value.length()));
+	    }
 
-	  field.put(value);
+	    if (field instanceof MemoField
+		&& ("".equals(value.trim())
+		  || "-".equals(value.trim())))
+	      {
+		value = "";
+	      }
+
+	    if (!(field instanceof MemoField)) {
+	      int lng = ActField.getMaxLength(field);
+	      value = ActField.pad(value, ' ', lng);
+	    }
+
+	    field.put(value);
+	  }
+	} finally {
+	  set.close();
 	}
 
 	dbfFile.write();
       } finally {
 	dbfFile.close();
       }
-
-      set.close();
     } catch (xBaseJException e) {
 	throw new RuntimeException("xBaseJException while writing the dbf file: " + e.toString());
     }

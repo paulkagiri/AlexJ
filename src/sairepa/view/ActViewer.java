@@ -49,6 +49,9 @@ import sairepa.model.Util;
  */
 public class ActViewer extends Viewer implements ActionListener
 {
+  public final static int MAX_LINE_LENGTH = 60;
+  public final static int MAX_FIELD_LENGTH = 30;
+
   public final static long serialVersionUID = 1;
   private ActList actList;
   private ActList.ActListIterator actListIterator;
@@ -102,6 +105,7 @@ public class ActViewer extends Viewer implements ActionListener
     }
 
     private JPanel createPanel(FieldLayout layout) {
+      JPanel omegaPanel = new JPanel(new GridLayout(1, 1));
       JPanel panel = new JPanel(new BorderLayout(5, 5));
       JPanel subPanel = panel;
 
@@ -119,8 +123,11 @@ public class ActViewer extends Viewer implements ActionListener
 	panel.setBorder(BorderFactory.createTitledBorder(layout.getTitle()));
       }
 
-      gp = panel;
-      return panel;
+      omegaPanel.add(panel);
+      omegaPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
+      gp = omegaPanel;
+      return omegaPanel;
     }
 
     private PanelCreationResult createPanel(FieldLayoutElement[] els, int idx) {
@@ -128,10 +135,10 @@ public class ActViewer extends Viewer implements ActionListener
 	return new PanelCreationResult(1, createPanel((FieldLayout)(els[idx])));
       } else if (els[idx] instanceof ActField) {
 	if (((ActField)els[idx]).isMemo()) {
-	  return new PanelCreationResult(1, createPanel((ActField)els[idx]));
+	  return new PanelCreationResult(1, createPanel((ActField)els[idx], true));
 	}
 
-	JPanel bigMess = new JPanel(new FlowLayout(FlowLayout.LEADING, 10, 10));
+	JPanel bigMess = new JPanel(new FlowLayout(FlowLayout.LEADING, 0, 0));
 
 	int i;
 	int nmbChars = 0;
@@ -140,12 +147,12 @@ public class ActViewer extends Viewer implements ActionListener
 	     i < els.length && els[i] instanceof ActField && !((ActField)els[i]).isMemo();
 	     i++) {
 	  ActField field = (ActField)els[i];
-	  int lng = field.getName().length() + 5 + maximizeLength(field.getMaxLength());
+	  int lng =  10 + maximizeLength(field.getMaxLength());
 	  nmbChars += lng;
 	  if (nmbChars > MAX_LINE_LENGTH && lng < MAX_LINE_LENGTH) {
 	    break;
 	  }
-	  bigMess.add(createPanel(field));
+	  bigMess.add(createPanel(field, i == idx));
 	}
 
 	return new PanelCreationResult(i-idx, bigMess);
@@ -155,8 +162,11 @@ public class ActViewer extends Viewer implements ActionListener
       }
     }
 
-    private JPanel createPanel(ActField field) {
+    private JPanel createPanel(ActField field, boolean firstOnLine) {
       JLabel l = new JLabel(field.getName());
+      l.setPreferredSize(new java.awt.Dimension(60, 20));
+      l.setHorizontalAlignment(JLabel.RIGHT);
+
       if (field.isMemo()) {
 	l.setVerticalAlignment(JLabel.TOP);
       }
@@ -385,10 +395,8 @@ public class ActViewer extends Viewer implements ActionListener
     globalPanel.connectUIComponents(actList);
   }
 
-  public final static int MAX_LINE_LENGTH = 60;
-  public final static int MAX_FIELD_LENGTH = 20;
-
   private int maximizeLength(int lng) {
+    lng = lng - (lng % 10);
     return (lng > MAX_FIELD_LENGTH ? MAX_FIELD_LENGTH : lng);
   }
 
