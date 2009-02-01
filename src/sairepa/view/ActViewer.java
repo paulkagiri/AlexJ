@@ -396,7 +396,8 @@ public class ActViewer extends Viewer implements ActionListener
   }
 
   private int maximizeLength(int lng) {
-    lng = lng - (lng % 10);
+    if (lng > 10)
+      lng = lng - (lng % 10);
     return (lng > MAX_FIELD_LENGTH ? MAX_FIELD_LENGTH : lng);
   }
 
@@ -700,6 +701,7 @@ public class ActViewer extends Viewer implements ActionListener
   public JComponent getPrintableComponent() {
     GlobalPanel gp = new GlobalPanel();
     gp.createPanel(actList.getFields());
+    gp.refresh();
     return gp.getPanel();
   }
 
