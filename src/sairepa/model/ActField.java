@@ -129,7 +129,7 @@ public class ActField implements FieldLayoutElement
    * If the user must be warned about something (usually if the field is full).
    */
   public boolean warning(ActEntry entry) {
-    return (getMaxLength() > 5 && entry.getValue().length() >= getMaxLength() - 1);
+    return (getMaxLength() > 5 && entry.getValue().length() >= getMaxLength());
   }
 
   /**
