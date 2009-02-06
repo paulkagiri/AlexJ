@@ -112,6 +112,7 @@ public class ConvNameField extends ActField {
 
   @Override
   public boolean validate(ActEntry e) {
-    return super.validate(e);
+    if (!super.validate(e)) return false;
+    return e.getValue().matches("[\\D]*");
   }
 }

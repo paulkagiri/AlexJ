@@ -73,9 +73,13 @@ public class LastNameField extends ActField {
   }
 
   @Override
+  public boolean warning(ActEntry e) {
+    if (super.warning(e)) return true;
+    return !(e.getValue().matches("[\\D]*"));
+  }
+
+  @Override
   public boolean validate(ActEntry e) {
-    boolean v = super.validate(e);
-    if (v) v = e.getValue().matches("[\\D]*");
-    return v;
+    return super.validate(e);
   }
 }

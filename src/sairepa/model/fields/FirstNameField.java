@@ -42,11 +42,18 @@ public class FirstNameField extends ActField
   }
 
   @Override
+  public boolean warning(ActEntry e) {
+    if (super.warning(e)) return true;
+    if (e.getValue().contains("(")) return true;
+    if (e.getValue().contains(")")) return true;
+    if (e.getValue().contains("+") && !e.getValue().matches(".*\\+")) return true;
+    return false;
+  }
+
+  @Override
   public boolean validate(ActEntry e) {
     boolean v = super.validate(e);
     if (v) v = e.getValue().matches("[\\D]*");
-    if (v) v = !e.getValue().contains("(");
-    if (v) v = !e.getValue().contains(")");
     return v;
   }
 }
