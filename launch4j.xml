@@ -12,6 +12,7 @@
   <jre>
     <path>.\JRE</path>
     <minVersion>1.5.0</minVersion>
+    <maxHeapSize>192</maxHeapSize>
   </jre>
 
 </launch4jConfig>
