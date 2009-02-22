@@ -16,6 +16,11 @@ public class IconBox
   public final static ImageIcon warning     = loadIcon("warning.png");
   public final static ImageIcon fileSave    = loadIcon("filesave.png");
   public final static ImageIcon fileOpen    = loadIcon("fileopen.png");
+  public final static ImageIcon open        = loadIcon("open.png");
+  public final static ImageIcon copy        = loadIcon("copy.png");
+  public final static ImageIcon cut         = loadIcon("cut.png");
+  public final static ImageIcon paste       = loadIcon("paste.png");
+
 
   private IconBox() { }
 
@@ -24,20 +29,12 @@ public class IconBox
     Class daClass;
     ClassLoader classLoader;
 
-    daClass = IconBox.class;
-
-    if (daClass == null) {
-      throw new RuntimeException("Icon '"+fileName+"' not found ! (Class)");
-    }
-
-    classLoader = daClass.getClassLoader();
-
+    classLoader = IconBox.class.getClassLoader();
     if (classLoader == null) {
       throw new RuntimeException("Icon '"+fileName+"' not found ! (ClassLoader)");
     }
 
     url = classLoader.getResource(fileName);
-
     if (url == null) {
       throw new RuntimeException("Icon '"+fileName+"' not found ! (Resource)");
     }
