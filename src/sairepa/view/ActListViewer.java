@@ -57,6 +57,7 @@ public class ActListViewer extends Viewer
     table.setRowSelectionAllowed(true);
     table.setColumnSelectionAllowed(true);
     table.getSelectionModel().addListSelectionListener(this);
+    RightClickMenu.addRightClickMenu(table);
     this.add(new JScrollPane(table), BorderLayout.CENTER);
     this.add(createSearchForm(), BorderLayout.SOUTH);
   }

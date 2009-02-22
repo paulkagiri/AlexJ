@@ -5,6 +5,7 @@
 */
 package sairepa.gui;
 
+import javax.swing.JTable;
 import javax.swing.text.JTextComponent;
 
 public interface TextInjector
@@ -19,6 +20,18 @@ public interface TextInjector
     }
     public void inject(String txt) {
       field.replaceSelection(txt);
+    }
+  }
+
+  public static class TableTextInjector implements TextInjector {
+    public JTable table;
+    public TableTextInjector(JTable table) { this.table = table; }
+    public void inject(String txt) {
+      if (table.getSelectedColumnCount() != 1
+	  || table.getSelectedRowCount() != 1)
+	return;
+
+      table.setValueAt(txt, table.getSelectedRow(), table.getSelectedColumn());
     }
   }
 }

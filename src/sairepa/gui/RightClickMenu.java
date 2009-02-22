@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import javax.swing.text.JTextComponent;
 
 public class RightClickMenu extends JPopupMenu
@@ -30,6 +31,13 @@ public class RightClickMenu extends JPopupMenu
     m.add(new CutActionItem(new TextExtractor.FieldTextExtractor(textField),
 			    new TextInjector.FieldTextInjector(textField)));
     m.add(new PasteActionItem(new TextInjector.FieldTextInjector(textField)));
+    return m;
+  }
+
+  public static RightClickMenu addRightClickMenu(JTable table) {
+    RightClickMenu m = new RightClickMenu(table);
+    m.add(new CopyActionItem(new TextExtractor.TableTextExtractor(table)));
+    m.add(new PasteActionItem(new TextInjector.TableTextInjector(table)));
     return m;
   }
 
