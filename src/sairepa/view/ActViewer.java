@@ -20,6 +20,8 @@ import java.util.Observer;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -34,6 +36,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.JTextComponent;
 
+import sairepa.gui.RightClickMenu;
 import sairepa.model.Act;
 import sairepa.model.ActEntry;
 import sairepa.model.ActField;
@@ -205,7 +208,8 @@ public class ActViewer extends Viewer implements ActionListener
   }
 
   private class VisualActField implements ActionListener, InputMethodListener,
-			       CaretListener, FocusListener, Observer {
+			       CaretListener, FocusListener, Observer,
+			       PopupMenuListener {
     private final long serialVersionUID = 1;
 
     private VisualActField nextField = null;
@@ -267,6 +271,7 @@ public class ActViewer extends Viewer implements ActionListener
       textComponent.addInputMethodListener(this);
       textComponent.addCaretListener(this);
       textComponent.addFocusListener(this);
+      RightClickMenu.addRightClickMenu(textComponent).addPopupMenuListener(this);
 
       initialColor = textComponent.getForeground();
       initialLabelColor = associatedLabel.getForeground();
@@ -296,6 +301,24 @@ public class ActViewer extends Viewer implements ActionListener
 
     public JComponent getComponent() {
       return component;
+    }
+
+    /* crappy work around because of some issue with the focus and the right click menu */
+    private boolean focusManagement = true;
+    public void setFocusManagementEnabled(boolean b) {
+      focusManagement = b;
+    }
+
+    public void popupMenuCanceled(PopupMenuEvent e) {
+      setFocusManagementEnabled(true);
+    }
+
+    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+      setFocusManagementEnabled(true);
+    }
+
+    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+      setFocusManagementEnabled(false);
     }
 
     public void focus() {
@@ -362,16 +385,21 @@ public class ActViewer extends Viewer implements ActionListener
     }
 
     public void	focusGained(FocusEvent e) {
-      field.hasFocus(entry);
-      refresh();
-      textComponent.selectAll();
-      java.awt.Rectangle rect = textComponent.getBounds(null);
-      parentPanel.scrollRectToVisible(rect);
+      if (focusManagement) {
+	updateEntry(false);
+	field.hasFocus(entry);
+	refresh();
+	textComponent.selectAll();
+	java.awt.Rectangle rect = textComponent.getBounds(null);
+	parentPanel.scrollRectToVisible(rect);
+      }
     }
 
     public void focusLost(FocusEvent e) {
-      updateEntry(true);
-      refresh();
+      if (focusManagement) {
+	updateEntry(true);
+	refresh();
+      }
     }
 
     public void update(Observable o, Object param) {
@@ -434,6 +462,7 @@ public class ActViewer extends Viewer implements ActionListener
     previousButton.addActionListener(this);
     smallButtonsPanel.add(currentActField);
     currentActField.addActionListener(this);
+    RightClickMenu.addRightClickMenu(currentActField);
     smallButtonsPanel.add(nextButton);
     nextButton.addActionListener(this);
     smallButtonsPanel.add(endButton);

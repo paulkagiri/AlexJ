@@ -26,6 +26,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import sairepa.gui.IconBox;
+import sairepa.gui.RightClickMenu;
 import sairepa.gui.Table;
 import sairepa.model.Act;
 import sairepa.model.ActEntry;
@@ -205,6 +206,7 @@ public class ActListViewer extends Viewer
     JPanel searchPanel = new JPanel(new BorderLayout());
     searchField.addActionListener(this);
     searchField.addCaretListener(this);
+    RightClickMenu.addRightClickMenu(searchField);
     searchPanel.add(searchLabel, BorderLayout.WEST);
     searchPanel.add(searchField, BorderLayout.CENTER);
 

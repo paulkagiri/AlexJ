@@ -10,18 +10,40 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JPopupMenu;
+import javax.swing.text.JTextComponent;
 
-public class RightClickMenu extends JPopupMenu implements MouseListener
+public class RightClickMenu extends JPopupMenu
+  implements MouseListener
 {
   public final static long serialVersionUID = 1;
+  private Component parent;
 
   public RightClickMenu(Component c) {
     super();
     c.addMouseListener(this);
+    this.parent = c;
   }
 
-  private void popup(Component c, int x, int y) {
-    this.show(c, x, y);
+  public static RightClickMenu addRightClickMenu(JTextComponent textField) {
+    RightClickMenu m = new RightClickMenu(textField);
+    m.add(new CopyActionItem(new TextExtractor.FieldTextExtractor(textField)));
+    m.add(new CutActionItem(new TextExtractor.FieldTextExtractor(textField),
+			    new TextInjector.FieldTextInjector(textField)));
+    m.add(new PasteActionItem(new TextInjector.FieldTextInjector(textField)));
+    return m;
+  }
+
+  public static interface SelfUpdatingItem {
+    public void update();
+  }
+
+  private void popup(Component pparent, int x, int y) {
+    for (Component c : getComponents()) {
+      if (c instanceof SelfUpdatingItem) {
+	((SelfUpdatingItem)c).update();
+      }
+    }
+    this.show(parent, x, y);
   }
 
   public void mouseClicked(MouseEvent e) {
