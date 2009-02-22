@@ -25,8 +25,6 @@ public class CopyActionItem extends JMenuItem
     this.te = te;
   }
 
-  /* Dirty workaround for java bug #4096971 */
-  /* see http://bugs.sun.com/bugdatabase/view_bug.do;jsessionid=9eb99863d85d8464e70ff98cdff4?bug_id=4096971 */
   private String txt;
 
   public void update() {

@@ -14,6 +14,6 @@ public interface TextExtractor
   public static class FieldTextExtractor implements TextExtractor {
     public JTextComponent field;
     public FieldTextExtractor(JTextComponent field) { this.field = field; }
-    public String getText() { return field.getText(); }
+    public String getText() { return field.getSelectedText(); }
   }
 }
