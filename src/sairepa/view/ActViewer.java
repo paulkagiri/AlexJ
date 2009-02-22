@@ -430,7 +430,7 @@ public class ActViewer extends Viewer implements ActionListener
   }
 
   private JLabel positionLabel = new JLabel("x / y");
-  private JButton applyButton = new JButton("Appliquer");
+  private JButton applyButton = new JButton("Valider");
   private JButton deleteButton = new JButton("Effacer");
   private JButton newButton = new JButton("Nouveau");
   private JButton beginningButton = new JButton("<<");
@@ -489,6 +489,7 @@ public class ActViewer extends Viewer implements ActionListener
     endButton.setEnabled(e);
 
     deleteButton.setText(newAct ? "Annuler saisie" : "Effacer");
+    newButton.setText((newAct || !actListIterator.hasNext()) ? "Nouvel acte" : "Inserer nouvel acte");
   }
 
   private boolean hasElements() {
