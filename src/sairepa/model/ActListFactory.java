@@ -251,7 +251,7 @@ public abstract class ActListFactory
 
 	  int fieldId = getFieldId(field.getName());
 	  Util.check(fieldId != -1);
-	  insertEntry(fieldId, row, value.trim());
+	  insertEntry(fieldId, row, Util.trim(value));
 	}
 	row++;
       }

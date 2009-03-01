@@ -94,7 +94,7 @@ public class ConvNameField extends ActField {
       Sex s = sex;
       if (s == Sex.UNKNOWN) s = getSex(e.getAct());
       String str = conventionalizer.conventionalize(src.getValue(), s);
-      str = str.trim();
+      str = Util.trim(str);
       if ("".equals(str) || "-".equals(str)) str = defaultValue;
       e.setValue(str);
     }

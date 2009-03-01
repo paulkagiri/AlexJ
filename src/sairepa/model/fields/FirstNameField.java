@@ -17,9 +17,9 @@ public class FirstNameField extends ActField
   public void notifyUpdate(ActEntry e, String previousValue) {
     super.notifyUpdate(e, previousValue);
 
-    if (" ".equals(e.getValue())) return;
+    if ("".equals(e.getValue().trim()) && e.getValue().length() >= 1) return;
 
-    char[] cars = e.getValue().trim().toLowerCase().toCharArray();
+    char[] cars = Util.trim(e.getValue()).toLowerCase().toCharArray();
 
     for (int i = 0 ; i < cars.length ; i++) {
       if (i == 0

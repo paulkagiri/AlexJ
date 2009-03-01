@@ -216,7 +216,7 @@ public class Util
   }
 
   public static String conventionalizeLastName(String in, Sex sex) {
-    in = in.trim();
+    in = trim(in);
     //if (sex != Sex.FEMALE) { // MALE
     in = extractMalePart(in);
     //}
@@ -225,16 +225,16 @@ public class Util
   }
 
   public static String conventionalizeFirstName(String in, Sex sex) {
-    in = in.trim();
+    in = trim(in);
     in = in.replaceAll("-", " ");
     in = dropEndIfItsThisOne(in, "+");
     in = dropEndIfItsThisOne(in, "?");
-    in = in.trim();
+    in = trim(in);
 
     String[] split = in.split(" ");
     if (split.length <= 0) return "";
     in = split[split.length-1];
-    in = in.trim();
+    in = trim(in);
 
     if (in.startsWith("Chris")) in = in.replaceFirst("Chris", "Cris");
 
@@ -268,5 +268,23 @@ public class Util
     in = conventionalizeReplacements(in);
 
     return in;
+  }
+
+  /**
+   * Custom implementation of String.trim():
+   * Trim trailing white spaces, but not leading ones
+   */
+  public static String trim(String in) {
+    int out;
+    char[] chars = in.toCharArray();
+
+    for (out = chars.length;
+	 out >= 1
+	   && (chars[out-1] == ' '
+	       || chars[out-1] == '\t'
+	       || chars[out-1] == '\n');
+	 out--);
+
+    return new String(chars, 0, out);
   }
 }

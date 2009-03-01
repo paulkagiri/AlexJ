@@ -35,6 +35,7 @@ public class LastNameField extends ActField {
 	|| "-".equals(previousValue.trim())) {
       e.setValue(Util.upperCase(e.getValue(), true, sex), false);
     }
+    e.setValue(Util.trim(e.getValue()), false);
   }
 
   @Override

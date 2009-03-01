@@ -277,7 +277,7 @@ public class ActListViewer extends Viewer
       synchronized(SEARCH_LOCK) {
 	Util.check(move == 1 || move == -1);
 
-	str = str.toLowerCase().trim();
+	str = Util.trim(str.toLowerCase());
 	if ("".equals(str)) {
 	  return;
 	}
@@ -297,7 +297,7 @@ public class ActListViewer extends Viewer
 
 	while (row >= 0 && row < rowCount && targetRow < 0 && running) {
 	  while (col >= 0 && col < colCount && targetCol < 0 && running) {
-	    if (model.getValueAt(row, col).toString().trim().toLowerCase().contains(str)) {
+	    if (Util.trim(model.getValueAt(row, col).toString()).toLowerCase().contains(str)) {
 	      targetRow = row;
 	      targetCol = col;
 	    }
