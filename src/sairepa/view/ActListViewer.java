@@ -57,7 +57,9 @@ public class ActListViewer extends Viewer
     table.setRowSelectionAllowed(true);
     table.setColumnSelectionAllowed(true);
     table.getSelectionModel().addListSelectionListener(this);
-    RightClickMenu.addRightClickMenu(table);
+
+    RightClickMenu.addRightClickMenu(table).add(new OpenActActionItem(this));
+
     this.add(new JScrollPane(table), BorderLayout.CENTER);
     this.add(createSearchForm(), BorderLayout.SOUTH);
   }
@@ -111,6 +113,11 @@ public class ActListViewer extends Viewer
       }
 
       return columns.indexOf(name)+1;
+    }
+
+    public int getActNumber(int row) {
+      Act act = actList.getAct(row);
+      return act.getRow() + 1;
     }
 
     public Object getValueAt(int row, int column) {
@@ -371,5 +378,21 @@ public class ActListViewer extends Viewer
 			col, row, searchColumnOnly.isSelected(), true, -1);
       }
     }
+  }
+
+  public void setSelectedAct(int act) {
+    /* I'm too lazy */
+    throw new UnsupportedOperationException("Nop");
+  }
+
+  public int[] getSelectedActs() {
+    int rows[] = table.getSelectedRows();
+    int acts[] = new int[rows.length];
+
+    for (int i = 0 ; i < rows.length ; i++) {
+      acts[i] = model.getActNumber(rows[i]);
+    }
+
+    return acts;
   }
 }

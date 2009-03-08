@@ -522,12 +522,7 @@ public class ActViewer extends Viewer implements ActionListener
 	refresh();
       }
     } else if (e.getSource() == currentActField) {
-	int i = Integer.valueOf(currentActField.getText()) - 1;
-	if (i >= 0 && i < actList.getRowCount()) {
-	    currentAct = actListIterator.seek(i);
-	    newAct = false;
-	}
-	refresh();
+      setSelectedAct(Integer.valueOf(currentActField.getText()));
     } else if (e.getSource() == nextButton) {
       if (actListIterator.hasNext()) {
 	currentAct = actListIterator.next();
@@ -743,6 +738,19 @@ public class ActViewer extends Viewer implements ActionListener
   @Override
   public void printingDone() {
 
+  }
+
+  public int[] getSelectedActs() {
+    return new int[] { currentAct.getRow() };
+  }
+
+  public void setSelectedAct(int actNmb) {
+    int i = actNmb - 1;
+    if (i >= 0 && i < actList.getRowCount()) {
+      currentAct = actListIterator.seek(i);
+      newAct = false;
+    }
+    refresh();
   }
 }
 

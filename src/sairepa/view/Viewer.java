@@ -13,11 +13,11 @@ import sairepa.gui.CloseableTabbedPane;
 
 public abstract class Viewer extends JPanel implements CloseableTabbedPane.CloseableTab
 {
-  private String factoryName;
-  private String viewerName;
-  private ImageIcon icon;
+  private final String factoryName;
+  private final String viewerName;
+  private final ImageIcon icon;
   private List<ViewerObserver> observers;
-  private ActList actList;
+   private final ActList actList;
 
   public Viewer(ActList actList, String viewerName, ImageIcon icon) {
     this.factoryName = actList.getName();
@@ -51,6 +51,9 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
      * must remove from the main window if ack
      */
     public void viewerClosing(Viewer v);
+
+    public void requestViewerOpening(Viewer v, ViewerFactory vf, ActListFactory af);
+    public void requestViewerOpening(Viewer v, ViewerFactory vf, ActListFactory af, int actNumber);
   }
 
   public ImageIcon getIcon() {
@@ -77,6 +80,9 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
    * @return null if it can, else the reason why not
    */
   public abstract String canClose();
+
+  public abstract int[] getSelectedActs();
+  public abstract void setSelectedAct(int act);
 
   public ActList getActList() {
     return actList;

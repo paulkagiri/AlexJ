@@ -16,6 +16,12 @@ public class Controller
     this.view = view;
   }
 
+  private TabController tabController;
+
+  public TabController getTabController() {
+    return tabController;
+  }
+
   public void init() {
     view.getMainWindow().addWindowListener(
         new ActionQuit(model, view, this));
@@ -29,7 +35,7 @@ public class Controller
 	JFrame.DO_NOTHING_ON_CLOSE);
 
     view.getMainWindow().getTabSelecter().addObserver(
-        new TabController(model, view));
+        tabController = new TabController(model, view, this));
 
     ActionPrint actionPrint = new ActionPrint(model, view, this);
     view.getMainWindow().addTabObserver(actionPrint);

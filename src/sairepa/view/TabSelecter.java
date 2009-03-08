@@ -93,13 +93,13 @@ public class TabSelecter extends JPanel
 
     public void actionPerformed(ActionEvent e) {
       for (TabSelecterObserver obs : observers) {
-	obs.tabSelected(actListFactory, viewerFactory);
+	obs.requestTabOpening(actListFactory, viewerFactory);
       }
     }
   }
 
   public static interface TabSelecterObserver {
-    public void tabSelected(ActListFactory actListFactory, ViewerFactory viewerFactory);
+    public Viewer requestTabOpening(ActListFactory actListFactory, ViewerFactory viewerFactory);
   }
 
   public void addObserver(TabSelecterObserver obs) {

@@ -3,19 +3,24 @@ package sairepa.controller;
 import javax.swing.JOptionPane;
 
 import sairepa.model.Act;
+import sairepa.model.ActListFactory;
 import sairepa.model.Model;
+
 import sairepa.view.ErrorMessage;
 import sairepa.view.View;
 import sairepa.view.Viewer;
+import sairepa.view.ViewerFactory;
 
 public class ViewerController implements Viewer.ViewerObserver
 {
+  private Controller controller;
   private Model model;
   private View view;
 
-  public ViewerController(Model model, View view) {
+  public ViewerController(Model model, View view, Controller controller) {
     this.model = model;
     this.view = view;
+    this.controller = controller;
   }
 
   public boolean creatingAct(Viewer v, Act a) {
@@ -75,5 +80,14 @@ public class ViewerController implements Viewer.ViewerObserver
 	view.getMainWindow().removeViewer(v);
       }
     }
+  }
+
+  public void requestViewerOpening(Viewer v, ViewerFactory vf, ActListFactory af) {
+    controller.getTabController().requestTabOpening(af, vf);
+  }
+
+  public void requestViewerOpening(Viewer v, ViewerFactory vf, ActListFactory af, int actNumber) {
+    Viewer nv = controller.getTabController().requestTabOpening(af, vf);
+    nv.setSelectedAct(actNumber);
   }
 }
