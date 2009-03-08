@@ -18,15 +18,34 @@ public interface TextExtractor
     public String getText() { return field.getSelectedText(); }
   }
 
+
+  public final static String TABLE_CELL_SEPARATOR = "||";
+  public final static String TABLE_CELL_SEPARATOR_BACKQUOTED = "\\|\\|";
+
+  public final static String TABLE_LINE_SEPARATOR = "\n";
+  public final static String TABLE_LINE_SEPARATOR_BACKQUOTED = "\n";
+
   public static class TableTextExtractor implements TextExtractor {
     public JTable table;
     public TableTextExtractor(JTable table) { this.table = table; }
     public String getText() {
-      if (table.getSelectedColumnCount() != 1
-	  || table.getSelectedRowCount() != 1)
-	return null;
+      StringBuilder builder = new StringBuilder();
+      int[] rows = table.getSelectedRows();
+      int[] cols = table.getSelectedColumns();
 
-      return table.getValueAt(table.getSelectedRow(), table.getSelectedColumn()).toString();
+      for (int i = 0 ; i < rows.length ; i++)
+	{
+	  for (int j = 0 ; j < cols.length ; j++)
+	    {
+	      builder.append(table.getValueAt(rows[i], cols[j]));
+	      if (j < cols.length - 1)
+		builder.append(TABLE_CELL_SEPARATOR);
+	    }
+	  if (i < rows.length - 1)
+	    builder.append(TABLE_LINE_SEPARATOR);
+	}
+
+      return builder.toString();
     }
   }
 }

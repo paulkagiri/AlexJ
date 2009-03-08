@@ -8,6 +8,8 @@ package sairepa.gui;
 import javax.swing.JTable;
 import javax.swing.text.JTextComponent;
 
+import sairepa.model.Util;
+
 public interface TextInjector
 {
   public void inject(String txt);
@@ -27,11 +29,28 @@ public interface TextInjector
     public JTable table;
     public TableTextInjector(JTable table) { this.table = table; }
     public void inject(String txt) {
-      if (table.getSelectedColumnCount() != 1
-	  || table.getSelectedRowCount() != 1)
-	return;
+      int[] rows = table.getSelectedRows();
+      int[] cols = table.getSelectedColumns();
 
-      table.setValueAt(txt, table.getSelectedRow(), table.getSelectedColumn());
+      String[] stringRows = txt.split(TextExtractor.TABLE_LINE_SEPARATOR_BACKQUOTED);
+      String[][] stringTable = new String[stringRows.length][];
+
+      for (int i = 0 ; i < stringRows.length ; i++)
+	  stringTable[i] = stringRows[i].split(TextExtractor.TABLE_CELL_SEPARATOR_BACKQUOTED);
+
+      for (int i = 0 ; i < rows.length ; i++)
+	{
+	  for (int j = 0 ; j < cols.length ; j++)
+	    {
+	      if (i < stringTable.length && j < stringTable[i].length)
+		{
+		  Util.check(stringTable[i] != null);
+		  Util.check(stringTable[i][j] != null);
+		  String value = stringTable[i][j];
+		  table.setValueAt(value, rows[i], cols[j]);
+		}
+	    }
+	}
     }
   }
 }

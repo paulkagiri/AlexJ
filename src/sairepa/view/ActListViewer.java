@@ -129,6 +129,9 @@ public class ActListViewer extends Viewer
     }
 
     public void setValueAt(Object value, int row, int column) {
+      if (column == 0) /* first column can't be modified */
+	return;
+
       String val = value.toString();
       Act act = actList.getAct(row);
       ActEntry entry = act.getEntry(getField(column));
