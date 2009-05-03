@@ -31,78 +31,33 @@ import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.Util;
 
-public class VisualActField implements ActionListener, InputMethodListener,
-			     CaretListener, FocusListener, Observer,
-			     PopupMenuListener {
-  private final long serialVersionUID = 1;
+public abstract class VisualActField implements Observer, PopupMenuListener {
 
   private ActViewer parentViewer;
+  private ActField field;
+  private JLabel associatedLabel;
+  private JPanel parentPanel;
+
+  private ActEntry entry = null;
 
   private VisualActField nextField = null;
   private VisualActField previousField = null;
-  private JTextComponent textComponent;
-  private JComponent component;
 
-  private JLabel associatedLabel;
+  private boolean focusManagement;
 
-  private ActField field = null;
-  private ActEntry entry = null;
-
-  private Color initialColor;
-  private Color initialLabelColor;
-
-  private JPanel parentPanel;
-
-  public VisualActField(ActViewer parentViewer, ActField field, JLabel associatedLabel, JPanel parent) {
+  public VisualActField(ActViewer parentViewer, ActField field,
+			JLabel associatedLabel, JPanel parentPanel)
+  {
     Util.check(parentViewer != null);
     Util.check(field != null);
-    Util.check(parent != null);
+    Util.check(associatedLabel != null);
+    Util.check(parentPanel != null);
 
     this.parentViewer = parentViewer;
     this.field = field;
-    this.parentPanel = parent;
     this.associatedLabel = associatedLabel;
-
-    if (!field.isMemo()) {
-      JTextField f = new JTextField(parentViewer.maximizeLength(field.getMaxLength()));
-      f.addActionListener(this);
-      textComponent = f;
-      component = textComponent;
-    } else {
-      JTextArea area = new JTextArea(5, ActViewer.MAX_LINE_LENGTH/2);
-      area.setLineWrap(true);
-      area.setWrapStyleWord(true);
-
-      AbstractAction tabAction = new AbstractAction() {
-	  public final static long serialVersionUID = 1;
-	  public void actionPerformed(ActionEvent e) {
-	    VisualActField.this.actionPerformed(null);
-	  }
-	};
-      KeyStroke tabKey = KeyStroke.getKeyStroke("TAB");
-      area.getInputMap().put(tabKey, tabAction);
-
-      tabAction = new AbstractAction() {
-	  public final static long serialVersionUID = 1;
-	  public void actionPerformed(ActionEvent e) {
-	    goPreviousComponent();
-	  }
-	};
-      tabKey = KeyStroke.getKeyStroke("shift TAB");
-      area.getInputMap().put(tabKey, tabAction);
-
-      textComponent = area;
-      component = new JScrollPane(textComponent);
-      ((JScrollPane)component).getVerticalScrollBar().setUnitIncrement(10);
-    }
-
-    textComponent.addInputMethodListener(this);
-    textComponent.addCaretListener(this);
-    textComponent.addFocusListener(this);
-    RightClickMenu.addRightClickMenu(textComponent).addPopupMenuListener(this);
-
-    initialColor = textComponent.getForeground();
-    initialLabelColor = associatedLabel.getForeground();
+    this.parentPanel = parentPanel;
+    setFocusManagementEnabled(true);
   }
 
   public ActField getField() {
@@ -127,12 +82,7 @@ public class VisualActField implements ActionListener, InputMethodListener,
     refresh();
   }
 
-  public JComponent getComponent() {
-    return component;
-  }
-
   /* crappy work around because of some issue with the focus and the right click menu */
-  private boolean focusManagement = true;
   public void setFocusManagementEnabled(boolean b) {
     focusManagement = b;
   }
@@ -149,26 +99,39 @@ public class VisualActField implements ActionListener, InputMethodListener,
     setFocusManagementEnabled(false);
   }
 
+  protected void focusGained() {
+    if (focusManagement) {
+      updateEntry(false);
+      field.hasFocus(entry);
+      refresh();
+      selectWholeText();
+      java.awt.Rectangle rect = getTextComponent().getBounds(null);
+      parentPanel.scrollRectToVisible(rect);
+    }
+  }
+
+  protected void focusLost() {
+    if (focusManagement) {
+      updateEntry(true);
+      refresh();
+    }
+  }
+
   public void focus() {
-    textComponent.requestFocus();
+    getTextComponent().requestFocus();
   }
 
   public void updateEntry(boolean notify) {
-    entry.setValue(textComponent.getText(), notify);
-    updateColor();
+    entry.setValue(getText(), notify);
+    updateColors();
     parentViewer.updateButtonStates();
   }
 
-  /**
-   * @param e can be null (see the content of the constructor of VisualActField)
-   */
-  public void actionPerformed(ActionEvent e) {
-    updateEntry(true);
-    refresh();
-
+  public void goNextComponent() {
     if (nextField != null) {
       nextField.focus();
     } else {
+      /* ie next act */
       parentViewer.continueTyping();
     }
   }
@@ -179,58 +142,176 @@ public class VisualActField implements ActionListener, InputMethodListener,
     }
   }
 
-  public void updateColor() {
+  /* ie enter pressed */
+  public void inputValidated() {
+    updateEntry(true);
+    refresh();
+    goNextComponent();
+  }
+
+  private Color initialTxtCompColor = null;
+  private Color initialLabelColor = null;
+
+  public void updateColors() {
+    if (initialTxtCompColor == null || initialLabelColor == null) {
+      initialTxtCompColor = getTextComponent().getForeground();
+      initialLabelColor = associatedLabel.getForeground();
+    }
+
     if (!entry.validate()) {
       // RED
-      textComponent.setForeground(new Color(255, 0, 0));
+      getTextComponent().setForeground(new Color(255, 0, 0));
       associatedLabel.setForeground(new Color(255, 0, 0));
     } else if (entry.warning()) {
       // ORANGE
-      textComponent.setForeground(new Color(255, 165, 0));
+      getTextComponent().setForeground(new Color(255, 165, 0));
       associatedLabel.setForeground(new Color(255, 165, 0));
     } else {
-      textComponent.setForeground(initialColor);
-      associatedLabel.setForeground(initialColor);
+      getTextComponent().setForeground(initialTxtCompColor);
+      associatedLabel.setForeground(initialLabelColor);
     }
   }
 
   public void refresh() {
-    textComponent.setText(entry.getValue());
-    updateColor();
-    textComponent.repaint();
-  }
-
-  public void caretPositionChanged(InputMethodEvent event) {
-    //updateEntry(false);
-  }
-
-  public void inputMethodTextChanged(InputMethodEvent event) {
-    //updateEntry(false);
-  }
-
-  public void	caretUpdate(CaretEvent e) {
-    //updateEntry(false);
-  }
-
-  public void	focusGained(FocusEvent e) {
-    if (focusManagement) {
-      updateEntry(false);
-      field.hasFocus(entry);
-      refresh();
-      textComponent.selectAll();
-      java.awt.Rectangle rect = textComponent.getBounds(null);
-      parentPanel.scrollRectToVisible(rect);
-    }
-  }
-
-  public void focusLost(FocusEvent e) {
-    if (focusManagement) {
-      updateEntry(true);
-      refresh();
-    }
+    setText(entry.getValue());
+    updateColors();
+    getTextComponent().repaint();
   }
 
   public void update(Observable o, Object param) {
     refresh();
+  }
+
+  public abstract JComponent getParentComponent();
+  public abstract JComponent getTextComponent();
+  public abstract String getText();
+  public abstract void setText(String text);
+  public abstract void selectWholeText();
+
+  private static class VisualActTextField extends VisualActField implements ActionListener, FocusListener {
+    private JTextField textField;
+
+    public VisualActTextField(ActViewer parentViewer, ActField field,
+			     JLabel associatedLabel, JPanel parentPanel) {
+      super(parentViewer, field, associatedLabel, parentPanel);
+      textField = new JTextField(ActViewer.maximizeLength(field.getMaxLength()));
+      textField.addActionListener(this);
+      textField.addFocusListener(this);
+      RightClickMenu.addRightClickMenu(textField).addPopupMenuListener(this);
+    }
+
+    public JComponent getParentComponent() {
+      return textField;
+    }
+
+    public JComponent getTextComponent() {
+      return textField;
+    }
+
+    public String getText() {
+      return textField.getText();
+    }
+
+    public void setText(String text) {
+      textField.setText(text);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      this.inputValidated();
+    }
+
+    public void focusGained(FocusEvent e) {
+      super.focusGained();
+    }
+
+    public void focusLost(FocusEvent e) {
+      super.focusLost();
+    }
+
+    public void selectWholeText() {
+      textField.selectAll();
+    }
+  }
+
+  private static class VisualActTextArea extends VisualActField implements FocusListener {
+    private JTextArea textArea;
+    private JScrollPane scrollPane;
+
+    public VisualActTextArea(ActViewer parentViewer, ActField field,
+			     JLabel associatedLabel, JPanel parentPanel) {
+      super(parentViewer, field, associatedLabel, parentPanel);
+      textArea = new JTextArea(5, ActViewer.MAX_LINE_LENGTH/2);
+      textArea.setLineWrap(true);
+      textArea.setWrapStyleWord(true);
+
+      textArea.setLineWrap(true);
+      textArea.setWrapStyleWord(true);
+
+      AbstractAction tabAction = new AbstractAction() {
+	  public final static long serialVersionUID = 1;
+	  public void actionPerformed(ActionEvent e) {
+	    inputValidated();
+	  }
+	};
+      KeyStroke tabKey = KeyStroke.getKeyStroke("TAB");
+      textArea.getInputMap().put(tabKey, tabAction);
+
+      tabAction = new AbstractAction() {
+	  public final static long serialVersionUID = 1;
+	  public void actionPerformed(ActionEvent e) {
+	    goPreviousComponent();
+	  }
+	};
+      tabKey = KeyStroke.getKeyStroke("shift TAB");
+      textArea.getInputMap().put(tabKey, tabAction);
+
+      textArea.addFocusListener(this);
+      RightClickMenu.addRightClickMenu(textArea).addPopupMenuListener(this);
+
+      scrollPane = new JScrollPane(textArea);
+      scrollPane.getVerticalScrollBar().setUnitIncrement(10);
+    }
+
+    public JComponent getParentComponent() {
+      return scrollPane;
+    }
+
+    public JComponent getTextComponent() {
+      return textArea;
+    }
+
+    public String getText() {
+      return textArea.getText();
+    }
+
+    public void setText(String text) {
+      textArea.setText(text);
+    }
+
+    public void focusGained(FocusEvent e) {
+      super.focusGained();
+    }
+
+    public void focusLost(FocusEvent e) {
+      super.focusLost();
+    }
+
+    public void selectWholeText() {
+      textArea.selectAll();
+    }
+  }
+
+
+  /**
+   * @param parentPanel provided for automatic scrolling stuff
+   * @param associatedLabel provided for color changes stuff
+   */
+  public static VisualActField createVisualActField(ActViewer parentViewer, ActField field,
+						    JLabel associatedLabel, JPanel parentPanel) {
+    if (field.isMemo()) {
+      return new VisualActTextArea(parentViewer, field, associatedLabel, parentPanel);
+    } else {
+      return new VisualActTextField(parentViewer, field, associatedLabel, parentPanel);
+    }
   }
 }

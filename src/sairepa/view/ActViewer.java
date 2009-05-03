@@ -174,12 +174,12 @@ public class ActViewer extends Viewer implements ActionListener
 	l.setVerticalAlignment(JLabel.TOP);
       }
       JPanel panel = new JPanel(new BorderLayout(5, 5));
-      VisualActField f = new VisualActField(ActViewer.this, field, l, panel);
+      VisualActField f = VisualActField.createVisualActField(ActViewer.this, field, l, panel);
       visualActFields.put(field, f);
       visualActFieldsOrdered.add(f);
 
       panel.add(l, BorderLayout.WEST);
-      panel.add(f.getComponent(), BorderLayout.CENTER);
+      panel.add(f.getParentComponent(), BorderLayout.CENTER);
 
       return panel;
     }
@@ -222,7 +222,7 @@ public class ActViewer extends Viewer implements ActionListener
     globalPanel.connectUIComponents(actList);
   }
 
-  protected int maximizeLength(int lng) {
+  protected static int maximizeLength(int lng) {
     if (lng > 10)
       lng = lng - (lng % 10);
     return (lng > MAX_FIELD_LENGTH ? MAX_FIELD_LENGTH : lng);
