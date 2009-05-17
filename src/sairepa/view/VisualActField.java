@@ -32,12 +32,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import javax.swing.text.JTextComponent;
 
 import sairepa.gui.RightClickMenu;
+import sairepa.model.Act;
 import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.AutoCompleter;
@@ -254,6 +256,7 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
       comboBox.setPopupVisible(false);
     }
 
+    // Dirty hack
     private boolean stopListening = false;
 
     public void actionPerformed(ActionEvent e) {
@@ -262,39 +265,80 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
       inputValidated();
     }
 
-    private class ListUpdater implements Runnable {
+    private class UpdateListView implements Runnable {
+      private boolean stop = false;
       private final String txt;
+      private final List<String> suggestions;
       private final int dot;
       private final int mark;
-      private boolean stop = false;
-      public ListUpdater(String txt, int dot, int mark) {
+
+      public UpdateListView(String txt, List<String> suggestions,
+			    int dot, int mark) {
 	this.txt = txt;
+	this.suggestions = suggestions;
 	this.dot = dot;
 	this.mark = mark;
       }
+
+      public void stop() {
+	stop = true;
+      }
+
       public void run() {
-	AutoCompleter ac = actField.getAutoCompleter();
-	List<String> rs = ac.getSuggestions(getEntry(), txt);
 	if (stop)
 	  return;
+
 	synchronized(VisualActTextFieldAutoCompletable.this) {
 	  stopListening = true;
+
+	  if (focus)
+	    comboBox.setPopupVisible(false);
+
 	  comboBox.removeAllItems();
-	  for (String s : rs)
+	  for (String s : suggestions)
 	    comboBox.addItem(s);
 
 	  txtComp.setText(txt);
 	  txtComp.getCaret().setDot(dot);
-	  if (focus) {
-	    comboBox.setPopupVisible(false);
-	    if (rs.size() > 0)
+
+	  if (focus && suggestions.size() > 0)
 	      comboBox.setPopupVisible(true);
-	  }
+
 	  stopListening = false;
+	}
+      }
+    }
+
+    private class ListUpdater implements Runnable {
+      private final String txt;
+      private final int dot;
+      private final int mark;
+      private final Act act;
+      private boolean stop = false;
+      private UpdateListView upView = null;
+      public ListUpdater(Act act, String txt, int dot, int mark) {
+	this.txt = txt;
+	this.dot = dot;
+	this.mark = mark;
+	this.act = act;
+      }
+      public void run() {
+	AutoCompleter ac = actField.getAutoCompleter(act);
+	List<String> rs = ac.getSuggestions(getEntry(), txt);
+	if (stop)
+	  return;
+	try {
+	  SwingUtilities.invokeAndWait(upView = new UpdateListView(txt, rs, dot, mark));
+	} catch (InterruptedException e) {
+	  throw new RuntimeException(e);
+	} catch (java.lang.reflect.InvocationTargetException e) {
+	  throw new RuntimeException(e);
 	}
       }
       public void stop() {
 	stop = true;
+	if (upView != null)
+	  upView.stop();
       }
     }
 
@@ -310,7 +354,7 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
       oldTxt = txt;
       if (updater != null)
 	updater.stop();
-      updater = new ListUpdater(txt, e.getDot(), e.getMark());
+      updater = new ListUpdater(getEntry().getAct(), txt, e.getDot(), e.getMark());
       new Thread(updater).start();
     }
   }
@@ -439,7 +483,7 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
 						    JLabel associatedLabel, JPanel parentPanel) {
     if (field.isMemo()) {
       return new VisualActTextArea(parentViewer, field, associatedLabel, parentPanel);
-    } else if (field.getAutoCompleter() != null) {
+    } else if (field.hasAutoCompleter()) {
       return new VisualActTextFieldAutoCompletable(parentViewer, field, associatedLabel, parentPanel);
     } else {
       return new VisualActTextField(parentViewer, field, associatedLabel, parentPanel);

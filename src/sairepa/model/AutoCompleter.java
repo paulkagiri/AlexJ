@@ -12,11 +12,12 @@ import sairepa.model.Hsqldb;
 public interface AutoCompleter
 {
   public final static int SUGGESTIONS_LIMIT = 20;
+  public final static int MIN_SRC_LENGTH = 3;
 
   public List<String> getSuggestions(ActEntry entry, String initialString);
 
   /**
-   * DefaultAutoCompleter looks in every files of the DB
+   * DefaultAutoCompleter looks in every similar field of the DB
    */
   public static class DefaultAutoCompleter implements AutoCompleter
   {
@@ -63,6 +64,9 @@ public interface AutoCompleter
     }
 
     public List<String> getSuggestions(ActEntry entry, String initialString) {
+      if (initialString == null || initialString.trim().length() < MIN_SRC_LENGTH)
+	return new ArrayList<String>();
+
       ArrayList<String> suggestions = new ArrayList<String>();
       Model model = entry.getAct().getActList().getFactory().getModel();
       Hsqldb db = model.getDb();

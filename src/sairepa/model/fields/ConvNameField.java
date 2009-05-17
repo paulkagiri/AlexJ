@@ -15,8 +15,6 @@ public class ConvNameField extends ActField {
   private Conventionalizer conventionalizer;
   private ActField[] origins = new ActField[3];
 
-  private AutoCompleter autoCompleter;
-
   public ConvNameField(String fieldName, Conventionalizer conv,
 		       Sex sex, ActField origin) throws xBaseJException, IOException {
     super(new CharField(fieldName, 20));
@@ -25,7 +23,6 @@ public class ConvNameField extends ActField {
     this.sexField = null;
     for (int i = 0 ; i< origins.length ; i++) { origins[i] = null; };
     origins[sex.toInteger()] = origin;
-    autoCompleter = new AutoCompleter.DefaultAutoCompleter(fieldName);
   }
 
   public ConvNameField(String fieldName, Conventionalizer conv,
@@ -45,7 +42,6 @@ public class ConvNameField extends ActField {
     origins[Sex.MALE.toInteger()] = originMale;
     origins[Sex.FEMALE.toInteger()] = originFemale;
     origins[Sex.UNKNOWN.toInteger()] = originUnknown;
-    autoCompleter = new AutoCompleter.DefaultAutoCompleter(fieldName);
   }
 
   public ConvNameField(String fieldName, Conventionalizer conv, SexField sexField,
@@ -86,8 +82,13 @@ public class ConvNameField extends ActField {
   }
 
   @Override
-  public AutoCompleter getAutoCompleter() {
-    return autoCompleter;
+  public boolean hasAutoCompleter() {
+    return true;
+  }
+
+  @Override
+  public AutoCompleter getAutoCompleter(Act a) {
+    return conventionalizer.getAutoCompleter(getName(), getSex(a));
   }
 
   @Override

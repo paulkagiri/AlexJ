@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import sairepa.model.Act;
 import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.AutoCompleter;
@@ -53,7 +54,13 @@ public class SexField extends ActField {
     }
   }
 
-  public AutoCompleter getAutoCompleter() {
+  @Override
+  public boolean hasAutoCompleter() {
+    return true;
+  }
+
+  @Override
+  public AutoCompleter getAutoCompleter(Act a) {
     return sexAutoCompleter;
   }
 

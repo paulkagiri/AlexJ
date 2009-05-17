@@ -100,7 +100,11 @@ public class ActField implements FieldLayoutElement
 
   }
 
-  public AutoCompleter getAutoCompleter() {
+  public boolean hasAutoCompleter() {
+    return false;
+  }
+
+  public AutoCompleter getAutoCompleter(Act a) {
     return null;
   }
 

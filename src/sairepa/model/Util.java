@@ -287,4 +287,28 @@ public class Util
 
     return new String(chars, 0, out);
   }
+
+  /* Levenshtein distance */
+  public static int distance(final String a, final String b, final int maxDistance) {
+    int distance;
+
+    final char[] ar = a.toCharArray();
+    final char[] br = b.toCharArray();
+
+    distance = Math.abs(br.length - ar.length);
+    if (distance >= maxDistance)
+      return distance;
+
+    for (int ai = 0, bi = 0 ;
+	 ai < ar.length
+	   && bi < br.length ;
+	 ai++, bi++) {
+      if (ar[ai] != br[ai])
+	distance++;
+      if (distance >= maxDistance)
+	return distance;
+    }
+
+    return distance;
+  }
 }

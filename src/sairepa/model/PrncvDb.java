@@ -2,7 +2,12 @@ package sairepa.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import sairepa.model.fields.Sex;
@@ -97,5 +102,43 @@ public class PrncvDb
     lu = truncate(lu);
     String cv = (String)prncvs[sex.toInteger()].get(lu);
     return ((cv == null) ? UNKNOWN : cv);
+  }
+
+  public final static int MAX_DISTANCE = 2;
+
+  public List<String> getClosest(String src, Sex sex) {
+    ArrayList<String> rs = new ArrayList<String>();
+
+    if (src == null || src.trim().length() < AutoCompleter.MIN_SRC_LENGTH)
+      return rs;
+
+    HashSet<String> set = new HashSet<String>();
+
+    for (String s : (((Collection<String>)prncvs[sex.toInteger()].values()))) {
+      if (Util.distance(src, s, MAX_DISTANCE+1) <= (MAX_DISTANCE)) {
+	set.add(s);
+      }
+    }
+
+    for (String s : set)
+      rs.add(s);
+    Collections.sort(rs);
+    return rs;
+  }
+
+  public AutoCompleter createAutoCompleter(Sex sex) {
+    return new PrncvDbAutoCompleter(sex);
+  }
+
+  private class PrncvDbAutoCompleter implements AutoCompleter {
+    private Sex sex;
+
+    public PrncvDbAutoCompleter(Sex sex) {
+      this.sex = sex;
+    }
+
+    public List<String> getSuggestions(ActEntry entry, String initialString) {
+      return getClosest(initialString, sex);
+    }
   }
 }
