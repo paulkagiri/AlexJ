@@ -249,11 +249,13 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
     public void focusGained(FocusEvent e) {
       focus = true;
       comboBox.setPopupVisible(true);
+      super.focusGained();
     }
 
     public void focusLost(FocusEvent e) {
       focus = false;
       comboBox.setPopupVisible(false);
+      super.focusLost();
     }
 
     // Dirty hack
