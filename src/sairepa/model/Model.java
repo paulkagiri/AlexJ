@@ -66,6 +66,10 @@ public class Model
     return prncvDb;
   }
 
+  public Hsqldb getDb() {
+    return db;
+  }
+
   public ActListFactoryLayout getFactories() {
     return factories;
   }

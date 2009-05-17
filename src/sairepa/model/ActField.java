@@ -8,7 +8,7 @@ import org.xBaseJ.fields.Field;
 import org.xBaseJ.fields.MemoField;
 
 /**
- * ActField can observe each others
+ * ActField can observe each others (notification will specify the ActEntry modified each time)
  */
 public class ActField implements FieldLayoutElement
 {
@@ -16,7 +16,7 @@ public class ActField implements FieldLayoutElement
   private List<ActField> observers = new ArrayList<ActField>();
 
   /**
-   * fieldPrototype : will be clone()
+   * fieldPrototype : will be clone() later
    */
   public ActField(Field fieldPrototype) {
     this.fieldPrototype = fieldPrototype;
@@ -92,15 +92,16 @@ public class ActField implements FieldLayoutElement
     return getName().equals(((ActField)o).getName());
   }
 
-  /**
-   * Shouldn't be overriden. Used for act validation.
-   */
-  public boolean validate(Act a) {
+  public final boolean validate(Act a) {
     return validate(a.getEntry(this));
   }
 
   public void hasFocus(ActEntry e) {
 
+  }
+
+  public AutoCompleter getAutoCompleter() {
+    return null;
   }
 
   /**

@@ -41,7 +41,7 @@ public class Main {
 
   private Main() throws Exception {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    // we force metal theme to avoid problems with the closeable tabs
+    //// we force metal theme to avoid problems with the closeable tabs
     //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
   }
 

@@ -185,7 +185,7 @@ public abstract class ActListFactory
     }
   }
 
-  private int getFieldId(String name) throws SQLException {
+  protected int getFieldId(String name) throws SQLException {
     PreparedStatement st =
       db.getConnection().prepareStatement("SELECT id FROM fields WHERE file = ? AND name = ? LIMIT 1");
     st.setInt(1, fileId);

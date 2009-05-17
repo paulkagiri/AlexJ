@@ -69,9 +69,9 @@ public class Hsqldb {
     }
 
     if (!b) {
-      throw new RuntimeException("Ce projet semble etre deja utilise par une autre instance de Sairepa. " +
+      throw new RuntimeException("Ce projet semble etre deja utilise par une autre instance de " + sairepa.Main.APPLICATION_NAME + ". " +
 				 "Si ce n'est pas le cas, veuillez effacer le fichier '" + project + ".lock' " +
-				 "du repertoire Sairepa");
+				 "du repertoire " + sairepa.Main.APPLICATION_NAME);
     } else {
       f.deleteOnExit();
     }

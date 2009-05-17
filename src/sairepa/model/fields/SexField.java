@@ -1,16 +1,23 @@
 package sairepa.model.fields;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import sairepa.model.ActEntry;
 import sairepa.model.ActField;
+import sairepa.model.AutoCompleter;
 
 import org.xBaseJ.xBaseJException;
 import org.xBaseJ.fields.CharField;
 
 public class SexField extends ActField {
+  private SexAutoCompleter sexAutoCompleter;
+
   public SexField(String name) throws xBaseJException, IOException {
     super(new CharField(name, 1));
+    this.sexAutoCompleter = new SexAutoCompleter();
   }
 
   public void notifyUpdate(ActEntry e, String previousValue) {
@@ -29,6 +36,25 @@ public class SexField extends ActField {
     }
 
     return true;
+  }
+
+  private static class SexAutoCompleter implements AutoCompleter {
+    private final List<String> suggestions;
+    public SexAutoCompleter() {
+      ArrayList<String> s = new ArrayList<String>();
+      s.add("F");
+      s.add("M");
+      s.add("-");
+      suggestions = Collections.unmodifiableList(s);
+    }
+
+    public List<String> getSuggestions(ActEntry entry, String initialString) {
+      return suggestions;
+    }
+  }
+
+  public AutoCompleter getAutoCompleter() {
+    return sexAutoCompleter;
   }
 
   public static Sex getSex(ActEntry e) {

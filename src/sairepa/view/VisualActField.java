@@ -7,28 +7,40 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import javax.swing.AbstractAction;
+import javax.swing.AbstractListModel;
+import javax.swing.ComboBoxModel;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 import javax.swing.text.JTextComponent;
-
-import java.util.Observable;
-import java.util.Observer;
 
 import sairepa.gui.RightClickMenu;
 import sairepa.model.ActEntry;
 import sairepa.model.ActField;
+import sairepa.model.AutoCompleter;
 import sairepa.model.Util;
 
 public abstract class VisualActField implements Observer, PopupMenuListener {
@@ -80,6 +92,10 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
     this.entry = entry;
     entry.addObserver(this);
     refresh();
+  }
+
+  public ActEntry getEntry() {
+    return entry;
   }
 
   /* crappy work around because of some issue with the focus and the right click menu */
@@ -188,7 +204,120 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
   public abstract void setText(String text);
   public abstract void selectWholeText();
 
-  private static class VisualActTextField extends VisualActField implements ActionListener, FocusListener {
+  private static class VisualActTextFieldAutoCompletable extends VisualActField
+    implements ActionListener, FocusListener, CaretListener {
+
+    private ActField actField;
+    private JComboBox comboBox;
+    private JTextComponent txtComp;
+    private boolean focus = false;
+
+    public VisualActTextFieldAutoCompletable(ActViewer parentViewer, ActField actField,
+					     JLabel associatedLabel, JPanel parentPanel) {
+      super(parentViewer, actField, associatedLabel, parentPanel);
+      this.actField = actField;
+      comboBox = new JComboBox(new Object[] { "testA", "testB" } );
+      comboBox.setEditable(true);
+      txtComp = ((JTextComponent)comboBox.getEditor().getEditorComponent());
+      comboBox.addActionListener(this);
+      txtComp.addFocusListener(this);
+      txtComp.addCaretListener(this);
+    }
+
+    public JComponent getParentComponent() {
+      return comboBox;
+    }
+
+    public JComponent getTextComponent() {
+      return txtComp;
+    }
+
+    public String getText() {
+      return txtComp.getText();
+    }
+
+    public void setText(String str) {
+      txtComp.setText(str);
+    }
+
+    public void selectWholeText() {
+      txtComp.selectAll();
+    }
+
+    public void focusGained(FocusEvent e) {
+      focus = true;
+      comboBox.setPopupVisible(true);
+    }
+
+    public void focusLost(FocusEvent e) {
+      focus = false;
+      comboBox.setPopupVisible(false);
+    }
+
+    private boolean stopListening = false;
+
+    public void actionPerformed(ActionEvent e) {
+      if (stopListening)
+	return;
+      inputValidated();
+    }
+
+    private class ListUpdater implements Runnable {
+      private final String txt;
+      private final int dot;
+      private final int mark;
+      private boolean stop = false;
+      public ListUpdater(String txt, int dot, int mark) {
+	this.txt = txt;
+	this.dot = dot;
+	this.mark = mark;
+      }
+      public void run() {
+	AutoCompleter ac = actField.getAutoCompleter();
+	List<String> rs = ac.getSuggestions(getEntry(), txt);
+	if (stop)
+	  return;
+	synchronized(VisualActTextFieldAutoCompletable.this) {
+	  stopListening = true;
+	  comboBox.removeAllItems();
+	  for (String s : rs)
+	    comboBox.addItem(s);
+
+	  txtComp.setText(txt);
+	  txtComp.getCaret().setDot(dot);
+	  if (focus) {
+	    comboBox.setPopupVisible(false);
+	    if (rs.size() > 0)
+	      comboBox.setPopupVisible(true);
+	  }
+	  stopListening = false;
+	}
+      }
+      public void stop() {
+	stop = true;
+      }
+    }
+
+    private ListUpdater updater = null;
+    private String oldTxt = null;
+
+    public void caretUpdate(CaretEvent e) {
+      if (stopListening)
+	return;
+      String txt = txtComp.getText();
+      if (oldTxt != null && oldTxt.equals(txt))
+	return;
+      oldTxt = txt;
+      if (updater != null)
+	updater.stop();
+      updater = new ListUpdater(txt, e.getDot(), e.getMark());
+      new Thread(updater).start();
+    }
+  }
+
+  private static class VisualActTextField extends VisualActField
+    implements ActionListener, FocusListener {
+
     private JTextField textField;
 
     public VisualActTextField(ActViewer parentViewer, ActField field,
@@ -310,6 +439,8 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
 						    JLabel associatedLabel, JPanel parentPanel) {
     if (field.isMemo()) {
       return new VisualActTextArea(parentViewer, field, associatedLabel, parentPanel);
+    } else if (field.getAutoCompleter() != null) {
+      return new VisualActTextFieldAutoCompletable(parentViewer, field, associatedLabel, parentPanel);
     } else {
       return new VisualActTextField(parentViewer, field, associatedLabel, parentPanel);
     }
