@@ -116,7 +116,7 @@ public class Util
     accents.put('\371' /* ù */, 'u');
     accents.put('\373' /* û */, 'u');
     accents.put('y'    /* y */, 'i'); // no mistake here
-    accents.put('\377' /* ÿ */, 'i');
+    accents.put('\377' /* ÿ */, 'i'); // or here
     accents.put(':',            '.');
     accents.put(';',            '.');
   }
@@ -289,15 +289,17 @@ public class Util
   }
 
   /* Levenshtein distance */
-  public static int distance(final String a, final String b, final int maxDistance) {
+  public static int distance(String a, String b, final int maxDistance) {
     int distance;
 
-    final char[] ar = a.toCharArray();
-    final char[] br = b.toCharArray();
-
-    distance = Math.abs(br.length - ar.length);
+    distance = Math.abs(b.length() - a.length());
     if (distance >= maxDistance)
       return distance;
+
+    a = a.toLowerCase();
+    b = b.toLowerCase();
+    final char[] ar = a.toCharArray();
+    final char[] br = b.toCharArray();
 
     for (int ai = 0, bi = 0 ;
 	 ai < ar.length

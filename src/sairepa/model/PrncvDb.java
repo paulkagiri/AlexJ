@@ -105,11 +105,12 @@ public class PrncvDb
   }
 
   public final static int MAX_DISTANCE = 2;
+  public final static int MIN_SRC_LENGTH = 3;
 
   public List<String> getClosest(String src, Sex sex) {
     ArrayList<String> rs = new ArrayList<String>();
 
-    if (src == null || src.trim().length() < AutoCompleter.MIN_SRC_LENGTH)
+    if (src == null || src.trim().length() < MIN_SRC_LENGTH)
       return rs;
 
     HashSet<String> set = new HashSet<String>();

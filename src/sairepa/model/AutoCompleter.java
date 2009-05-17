@@ -11,8 +11,8 @@ import sairepa.model.Hsqldb;
 
 public interface AutoCompleter
 {
-  public final static int SUGGESTIONS_LIMIT = 20;
-  public final static int MIN_SRC_LENGTH = 3;
+  public final static int DEFAULT_MAX_DISTANCE = 3;
+  public final static int DEFAULT_MIN_SRC_LENGTH = 4;
 
   public List<String> getSuggestions(ActEntry entry, String initialString);
 
@@ -40,9 +40,10 @@ public interface AutoCompleter
 
 	PreparedStatement st =
 	  db.getConnection().prepareStatement("SELECT DISTINCT value FROM entries WHERE field = ? "
-					      + "AND value LIKE ? LIMIT " + SUGGESTIONS_LIMIT);
+					      + "AND \"sairepa.model.Util.distance\"(value, ?, " + Integer.toString(DEFAULT_MAX_DISTANCE+1) + ") "
+					      + "<= " + Integer.toString(DEFAULT_MAX_DISTANCE));
 	st.setInt(1, fieldId);
-	st.setString(2, initialString + "%");
+	st.setString(2, initialString);
 
 	ResultSet set = st.executeQuery();
 
@@ -64,7 +65,7 @@ public interface AutoCompleter
     }
 
     public List<String> getSuggestions(ActEntry entry, String initialString) {
-      if (initialString == null || initialString.trim().length() < MIN_SRC_LENGTH)
+      if (initialString == null || initialString.trim().length() < DEFAULT_MIN_SRC_LENGTH)
 	return new ArrayList<String>();
 
       ArrayList<String> suggestions = new ArrayList<String>();
@@ -76,8 +77,6 @@ public interface AutoCompleter
 	  suggestions.addAll(getSuggestions(db, factory, initialString));
 	  Collections.sort(suggestions);
 	  removeDoubles(suggestions);
-	  if (suggestions.size() >= SUGGESTIONS_LIMIT)
-	    break;
 	}
       } catch (SQLException e) {
 	System.err.println("AutoCompleter: SQLException: " + e.toString());
