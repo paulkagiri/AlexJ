@@ -218,7 +218,8 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
 					     JLabel associatedLabel, JPanel parentPanel) {
       super(parentViewer, actField, associatedLabel, parentPanel);
       this.actField = actField;
-      comboBox = new JComboBox(new Object[] { "testA", "testB" } );
+      comboBox = new JComboBox(new Object[] { "" } );
+      comboBox.setPreferredSize(new java.awt.Dimension(ActViewer.maximizeLength(actField.getMaxLength()) * 10 + 30, 20));
       comboBox.setEditable(true);
       txtComp = ((JTextComponent)comboBox.getEditor().getEditorComponent());
       comboBox.addActionListener(this);

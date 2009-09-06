@@ -56,6 +56,16 @@ public class ConditionalField extends ActField
   }
 
   @Override
+  public boolean hasAutoCompleter() {
+    return ifTrue.hasAutoCompleter();
+  }
+
+  @Override
+  public AutoCompleter getAutoCompleter(Act a) {
+    return test(a).getAutoCompleter(a);
+  }
+
+  @Override
   public boolean validate(ActEntry e) {
     if (!super.validate(e))
       return false;
