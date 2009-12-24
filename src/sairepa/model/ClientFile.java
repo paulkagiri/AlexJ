@@ -11,7 +11,7 @@ import java.io.IOException;
  * this application and to know what he is allowed to do.
  */
 public class ClientFile {
-  public final static String DEFAULT_CLIENT_FILE_NAME = "CLIENT.DAT";
+  public final static String DEFAULT_CLIENT_FILE_NAME = "client.dat";
   private String userName;
   private String zipCode;
   private String commune;

@@ -78,27 +78,6 @@ public class Model
     return backupManager;
   }
 
-  public static Vector<Project> locateProjects(File baseDir) {
-    Vector<Project> projects = new Vector<Project>();
-
-    for (File file : baseDir.listFiles(new Util.ProjectFileFilter())) {
-      try {
-	Project p = new Project(file);
-	projects.add(p);
-      } catch (ClientFile.InvalidClientFileException e) {
-	System.err.println("WARNING - Invalid project: " + file.getPath());
-	System.err.println("Reason: " + e.toString());
-	e.printStackTrace(System.err);
-      } catch (FileNotFoundException e) {
-	System.err.println("WARNING - Invalid project: " + file.getPath());
-	System.err.println("Reason: " + e.toString());
-	e.printStackTrace(System.err);
-      }
-    }
-
-    return projects;
-  }
-
   /**
    * @param obs can't be null ; pass a dumb object if you need to
    */

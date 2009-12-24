@@ -18,11 +18,11 @@ public class LocalityField extends ActField
     super.hasFocus(e);
     if ("".equals(e.getValue().trim())) {
       // yeah, that's kind of violent
-      Act a = e.getAct();
-      ActList al = a.getActList();
-      ActListFactory f = al.getFactory();
-      Model m = f.getModel();
-      ClientFile cf = m.getClientFile();
+      Act            a = e.getAct();
+      ActList        al = a.getActList();
+      ActListFactory f  = al.getFactory();
+      Model          m  = f.getModel();
+      ClientFile     cf = m.getClientFile();
       e.setValue(cf.getZipCode() + " " + cf.getCommune());
     }
   }
