@@ -35,6 +35,8 @@ public interface ActList extends Iterable<Act>
   }
 
   public Act getAct(int row);
+  public List<Act> getAllActs();
+
   /**
    * @param sortedBy field name ; can be null
    * @return beware: can return this !

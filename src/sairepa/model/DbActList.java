@@ -85,6 +85,17 @@ public class DbActList implements ActList
     }
   }
 
+    public List<Act> getAllActs() {
+	Vector<Act> acts = new Vector<Act>();
+	try {
+	    for ( int i = 0 ; i < rowCount ; i++ )
+		acts.add(new Act(db.getConnection(), this, fileId, fields, i));
+	} catch (SQLException e) {
+	    throw new RuntimeException("SQLException", e);
+	}
+	return acts;
+    }
+
   public void insert(Act act) {
     insert(act, rowCount);
   }
@@ -239,6 +250,29 @@ public class DbActList implements ActList
 	return a;
       }
     }
+
+      public List<Act> getAllActs()
+      {
+	  Vector<Act> acts;
+	  synchronized(db.getConnection()) {
+	      try {
+		  PreparedStatement rowGetter = db.getConnection().prepareStatement(
+		       "SELECT row from entries WHERE field = ? ORDER BY LOWER(value)"
+		       + (desc ? " DESC" : ""));
+		  rowGetter.setInt(1, sortingFieldId);
+		  ResultSet set = rowGetter.executeQuery();
+		  acts = new Vector<Act>();
+		  while(set.next()) {
+		      int row = set.getInt(1);
+		      Act a = DbActList.this.getAct(row);
+		      acts.add(a);
+		  }
+	      } catch (SQLException e) {
+		  throw new RuntimeException("SQLException", e);
+	      }
+	  }
+	  return acts;
+      }
 
     /**
      * @return beware: can return this !

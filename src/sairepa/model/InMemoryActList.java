@@ -9,6 +9,7 @@ public class InMemoryActList implements ActList
     private List<Act> acts;
 
     protected InMemoryActList(ActList dbActList) {
+	assert(dbActList != null && !(dbActList instanceof InMemoryActList));
 	this.dbActList = dbActList;
 	refresh();
     }
@@ -33,6 +34,10 @@ public class InMemoryActList implements ActList
 	return acts.get(row);
     }
 
+    public List<Act> getAllActs() {
+	return acts;
+    }
+
     /**
      * Returns an InMemoryActList if possible (== if enought memory is available), otherwise,
      * returns actList
@@ -40,6 +45,7 @@ public class InMemoryActList implements ActList
     public static ActList encapsulate(ActList actList)
     {
 	try {
+	    assert(!(actList instanceof InMemoryActList));
 	    return new InMemoryActList(actList);
 	} catch (OutOfMemoryError e) {
 	    System.err.println("OutOfMemoryError: Woops! JVM probably screwed up because " +
@@ -99,11 +105,8 @@ public class InMemoryActList implements ActList
 
 	// reload the content of the act list in memory
 	int current = 0;
-	acts = new Vector<Act>();
-	for (Act act : dbActList) {
-	    acts.add(act);
-	    current++;
-	}
+	int total = dbActList.getRowCount();
+	acts = dbActList.getAllActs();
 
 	if (acts.size() != dbActList.getRowCount()) {
 	    System.err.println("WARNING: Row count invalid ! ("
