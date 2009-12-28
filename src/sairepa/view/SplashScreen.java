@@ -51,6 +51,8 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 
   public void start() {
     setVisible(true);
+    repaint();
+    p.paintImmediately(0,0, p.getWidth(), p.getHeight());
   }
 
   public void setProgression(int progression, String txt) {

@@ -59,6 +59,8 @@ public class NumericField extends ActField {
 
   public boolean validate(ActEntry e) {
     int i;
+    if ( e == null || e.getValue() == null )
+	return false;
     try {
 	i = Integer.valueOf(e.getValue().trim());
     } catch (NumberFormatException exception) {

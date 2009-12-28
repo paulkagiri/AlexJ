@@ -5,6 +5,7 @@ import javax.swing.ImageIcon;
 import sairepa.gui.IconBox;
 import sairepa.model.ActList;
 import sairepa.model.ActListFactory;
+import sairepa.model.InMemoryActList;
 
 public class ActListViewerFactory implements ViewerFactory
 {
@@ -26,6 +27,6 @@ public class ActListViewerFactory implements ViewerFactory
   }
 
   public Viewer createViewer(MainWindow mainWindow, ActList list) {
-    return new ActListViewer(list);
+      return new ActListViewer(InMemoryActList.encapsulate(list));
   }
 }
