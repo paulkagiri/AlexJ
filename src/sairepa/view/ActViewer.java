@@ -127,7 +127,7 @@ public class ActViewer extends Viewer implements ActionListener
       }
 
       omegaPanel.add(panel);
-      omegaPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+      omegaPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
       gp = omegaPanel;
       return omegaPanel;
