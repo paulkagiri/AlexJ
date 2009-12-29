@@ -40,7 +40,7 @@ public class Hsqldb {
 	executeQuery("SET CHECKPOINT DEFRAG 50;");
 	executeQuery("SET PROPERTY \"hsqldb.nio_data_file\" FALSE");
 	executeQuery("SET PROPERTY \"hsqldb.cache_size_scale\" 8");
-	executeQuery("SET PROPERTY \"hsqldb.cache_scale\" 18");
+	executeQuery("SET PROPERTY \"hsqldb.cache_scale\" 17");
       }
     }
   }
