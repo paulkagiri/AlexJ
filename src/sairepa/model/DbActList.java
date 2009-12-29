@@ -127,8 +127,9 @@ public class DbActList implements ActList
 			String value = set.getString(3);
 
 			if ( row != currentRow ) {
+			    Util.check( row == currentRow + 1 );
 			    if ( entries != null ) {
-				acts.add(new Act(db.getConnection(), this, fileId, fields, entries));
+				acts.add(new Act(db.getConnection(), this, fileId, fields, entries, currentRow));
 			    }
 			    entries = new HashMap<ActField, String>();
 			    currentRow = row;
@@ -138,7 +139,7 @@ public class DbActList implements ActList
 		    }
 
 		    if ( entries != null ) {
-			acts.add(new Act(db.getConnection(), this, fileId, fields, entries));
+			acts.add(new Act(db.getConnection(), this, fileId, fields, entries, currentRow));
 		    }
 		} finally {
 		    set.close();
