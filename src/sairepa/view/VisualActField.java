@@ -187,7 +187,7 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
   }
 
 
-  public void goPreviousComponent(boolean loop) {
+  public void gotoPreviousComponent(boolean loop) {
     if (previousField != null) {
       previousField.focus();
     } else {
@@ -207,6 +207,14 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
     goNextComponent(fieldLoop);
   }
 
+    public void gotoNextAct() {
+	parentViewer.continueTyping();
+    }
+
+    public void gotoPreviousAct() {
+	parentViewer.gotoPreviousAct();
+    }
+
     final AbstractAction inputValidationNoLoopAction = new AbstractAction() {
 	  public final static long serialVersionUID = 1;
 	  public void actionPerformed(ActionEvent e) {
@@ -221,17 +229,31 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
 	  }
 	};
 
-    final AbstractAction goPreviousComponentLoopAction = new AbstractAction() {
+    final AbstractAction gotoPreviousComponentLoopAction = new AbstractAction() {
 	  public final static long serialVersionUID = 1;
 	  public void actionPerformed(ActionEvent e) {
-	    goPreviousComponent(true);
+	    gotoPreviousComponent(true);
 	  }
 	};
 
-    final AbstractAction goPreviousComponentNoLoopAction = new AbstractAction() {
+    final AbstractAction gotoPreviousComponentNoLoopAction = new AbstractAction() {
 	  public final static long serialVersionUID = 1;
 	  public void actionPerformed(ActionEvent e) {
-	    goPreviousComponent(false);
+	    gotoPreviousComponent(false);
+	  }
+	};
+
+    final AbstractAction gotoNextActAction = new AbstractAction() {
+	  public final static long serialVersionUID = 1;
+	  public void actionPerformed(ActionEvent e) {
+	      gotoNextAct();
+	  }
+	};
+
+    final AbstractAction gotoPreviousActAction = new AbstractAction() {
+	  public final static long serialVersionUID = 1;
+	  public void actionPerformed(ActionEvent e) {
+	      gotoPreviousAct();
 	  }
 	};
 
@@ -296,7 +318,11 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
       KeyStroke tabKey = KeyStroke.getKeyStroke("DOWN");
       txtComp.getInputMap().put(tabKey, inputValidationLoopAction);
       tabKey = KeyStroke.getKeyStroke("UP");
-      txtComp.getInputMap().put(tabKey, goPreviousComponentLoopAction);
+      txtComp.getInputMap().put(tabKey, gotoPreviousComponentLoopAction);
+      tabKey = KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0);
+      txtComp.getInputMap().put(tabKey, gotoPreviousActAction);
+      tabKey = KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0);
+      txtComp.getInputMap().put(tabKey, gotoNextActAction);
     }
 
     public JComponent getParentComponent() {
@@ -456,7 +482,11 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
       KeyStroke tabKey = KeyStroke.getKeyStroke("DOWN");
       textField.getInputMap().put(tabKey, inputValidationLoopAction);
       tabKey = KeyStroke.getKeyStroke("UP");
-      textField.getInputMap().put(tabKey, goPreviousComponentLoopAction);
+      textField.getInputMap().put(tabKey, gotoPreviousComponentLoopAction);
+      tabKey = KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0);
+      textField.getInputMap().put(tabKey, gotoPreviousActAction);
+      tabKey = KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0);
+      textField.getInputMap().put(tabKey, gotoNextActAction);
     }
 
     public JComponent getParentComponent() {
@@ -509,7 +539,11 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
       KeyStroke tabKey = KeyStroke.getKeyStroke("TAB");
       textArea.getInputMap().put(tabKey, inputValidationNoLoopAction);
       tabKey = KeyStroke.getKeyStroke("shift TAB");
-      textArea.getInputMap().put(tabKey, goPreviousComponentNoLoopAction);
+      textArea.getInputMap().put(tabKey, gotoPreviousComponentNoLoopAction);
+      tabKey = KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0);
+      textArea.getInputMap().put(tabKey, gotoPreviousActAction);
+      tabKey = KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0);
+      textArea.getInputMap().put(tabKey, gotoNextActAction);
 
       textArea.addFocusListener(this);
       RightClickMenu.addRightClickMenu(textArea).addPopupMenuListener(this);
