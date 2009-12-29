@@ -322,8 +322,11 @@ public class ActListViewer extends Viewer
 			if ( o == null ) {
 			    System.out.println("WARNING: Act " + Integer.toString(row) + " has a missing value "
 					       + "(" + Integer.toString(row) + "," + Integer.toString(col) + ")");
-			    col += move;
-			    continue;
+			    if ( !colOnly ) {
+				col += move;
+				continue;
+			    } else
+				break;
 			}
 			String s = o.toString();
 			s = Util.trim(s);
@@ -377,9 +380,12 @@ public class ActListViewer extends Viewer
   public void caretUpdate(CaretEvent e) {
     if (e.getSource() == searchField) {
       if (!"".equals(searchField.getText().trim())) {
-	searchAndSelect(searchField.getText(), 0, 0, searchColumnOnly.isSelected(), false, 1);
-      } else {
-	selectCell(0, 0);
+	  int row = table.getSelectedRow();
+	  int col = table.getSelectedColumn();
+	  if (row < 0) row = 0;
+	  if (col < 0) col = 0;
+
+	  searchAndSelect(searchField.getText(), col, row, searchColumnOnly.isSelected(), false, 1);
       }
     }
   }
@@ -387,21 +393,19 @@ public class ActListViewer extends Viewer
   public void actionPerformed(ActionEvent e) {
     if (model.getRowCount() <= 0) return;
 
-    if (e.getSource() == searchField) {
-      searchAndSelect(searchField.getText(), 0, 0, searchColumnOnly.isSelected(), false, 1);
-    } else {
-      int row = table.getSelectedRow();
-      int col = table.getSelectedColumn();
-      if (row < 0) row = 0;
-      if (col < 0) col = 0;
+    int row = table.getSelectedRow();
+    int col = table.getSelectedColumn();
+    if (row < 0) row = 0;
+    if (col < 0) col = 0;
 
-      if (e.getSource() == nextSearchButton) {
+    if (e.getSource() == searchField) {
+      searchAndSelect(searchField.getText(), col, row, searchColumnOnly.isSelected(), false, 1);
+    } else if (e.getSource() == nextSearchButton) {
 	searchAndSelect(searchField.getText(),
 			col, row, searchColumnOnly.isSelected(), true, 1);
-      } else if (e.getSource() == previousSearchButton) {
+    } else if (e.getSource() == previousSearchButton) {
 	searchAndSelect(searchField.getText(),
 			col, row, searchColumnOnly.isSelected(), true, -1);
-      }
     }
   }
 
