@@ -31,8 +31,10 @@ public class LastNameField extends ActField {
   @Override
   public void notifyUpdate(ActEntry e, String previousValue) {
     super.notifyUpdate(e, previousValue);
-    if ("".equals(previousValue.trim())
-	|| "-".equals(previousValue.trim())) {
+
+    if ( ("".equals(previousValue.trim())
+	  || "-".equals(previousValue.trim()))
+	 && !Util.isMixedCase(e.getValue()) ) {
       e.setValue(Util.upperCase(e.getValue(), true, sex), false);
     }
     e.setValue(Util.trim(e.getValue()), false);

@@ -187,8 +187,26 @@ public class Util
 	return in;
     }
 
+    public static boolean isMixedCase(String str) {
+	char[] chars = str.toCharArray();
+	boolean lowCase = false;
+	boolean highCase = false;
+	for (int i = 0 ; i < chars.length ; i++) {
+	    if ( !Character.isLetter(chars[i]) )
+		continue;
+	    if ( Character.isLowerCase(chars[i]) )
+		lowCase = true;
+	    else
+		highCase = true;
+	    if ( lowCase && highCase )
+		return true;
+	}
+	return false;
+    }
+
     public static String upperCase(String str, boolean lastName, Sex sex) {
 	char[] chars = str.toCharArray();
+
 	int max = chars.length;
 
 	if (lastName && sex != Sex.MALE && str.toLowerCase().endsWith("in")) {
