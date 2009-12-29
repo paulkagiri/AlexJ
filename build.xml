@@ -33,7 +33,7 @@
 	http://sourceforge.net/projects/xbasej/ and to put it in lib/"
 	/>
 
-	<!-- xercesImpl -->
+	<!-- xercesImpl (xbasej dependency) -->
 	<property name="xercesImpl.location" value="${lib.dir}/xercesImpl.jar" />
 	<available file="${xercesImpl.location}" property="xercesImpl_available" />
 	<fail unless="xercesImpl_available" status="1"
@@ -96,9 +96,26 @@
 		</javadoc>
 	</target>
 
+	<target name="scanner" depends="compile">
+	  <mkdir dir="${final.dir}" />
+	  <jar jarfile="${final.dir}/DbfScanner.jar" basedir="${bin.dir}">
+	    <manifest>
+	      <attribute name="Main-Class" value="sairepa.DbfScanner" />
+	      <attribute name="Class-Path" value="." />
+	    </manifest>
+	    <fileset dir="${bin.dir}">
+	      <include name="**" />
+	    </fileset>
+	    <fileset dir="${data.dir}">
+	      <include name="**" />
+	    </fileset>
+	  </jar>
+	</target>
+
 	<target name="clean">
 		<delete dir="${bin.dir}"/>
 		<delete file="${final.dir}/AlexJ.jar"/>
+		<delete file="${final.dir}/DbfScanner.jar" />
 		<delete>
 		  <fileset dir="${final.dir}">
 		    <include name="*.db.*" />
