@@ -371,6 +371,33 @@ public class ActViewer extends Viewer implements ActionListener
     subContinueTyping();
   }
 
+  protected void gotoPreviousAct() {
+      if (!saveAct())
+	  return;
+      if (actListIterator.hasPrevious()) {
+	currentAct = actListIterator.previous();
+	newAct = false;
+	refresh();
+      }
+  }
+
+  protected void gotoFirstField() {
+      int i = 0;
+      while (i < globalPanel.getVisualActFieldsOrdered().size()
+	     && !globalPanel.getVisualActFieldsOrdered().get(i).includeInFieldLoop())
+	  i++;
+      if ( i < globalPanel.getVisualActFieldsOrdered().size() )
+	  globalPanel.getVisualActFieldsOrdered().get(i).focus();
+  }
+
+  protected void gotoLastField() {
+      int i = globalPanel.getVisualActFieldsOrdered().size() - 1;
+      while (i >= 0 && !globalPanel.getVisualActFieldsOrdered().get(i).includeInFieldLoop())
+	  i--;
+      if ( i>= 0 )
+	  globalPanel.getVisualActFieldsOrdered().get(i).focus();
+  }
+
   private void subContinueTyping() {
     if (!currentAct.validate()) {
       return;

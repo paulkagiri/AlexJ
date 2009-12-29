@@ -161,18 +161,21 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
       }
       _previousLength = txt.length();
       if ( txt.length() >= field.getMaxLength() ) {
-	  goNextComponent();
+	  goNextComponent(false);
 	  return true;
       }
       return false;
   }
 
-  public void goNextComponent() {
+  public void goNextComponent(boolean loop) {
     if (nextField != null) {
       nextField.focus();
     } else {
       /* ie next act */
-      parentViewer.continueTyping();
+	if (!loop)
+	    parentViewer.continueTyping();
+	else
+	    parentViewer.gotoFirstField();
     }
   }
 
@@ -184,30 +187,51 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
   }
 
 
-  public void goPreviousComponent() {
+  public void goPreviousComponent(boolean loop) {
     if (previousField != null) {
       previousField.focus();
+    } else {
+	if (loop)
+	    parentViewer.gotoLastField();
     }
   }
 
-  /* ie enter pressed */
-  public void inputValidated() {
-    updateEntry(true);
-    refresh();
-    goNextComponent();
+  public boolean includeInFieldLoop() {
+      return true;
   }
 
-    final AbstractAction inputValidationAction = new AbstractAction() {
+  /* ie enter pressed */
+  public void inputValidated(boolean fieldLoop) {
+    updateEntry(true);
+    refresh();
+    goNextComponent(fieldLoop);
+  }
+
+    final AbstractAction inputValidationNoLoopAction = new AbstractAction() {
 	  public final static long serialVersionUID = 1;
 	  public void actionPerformed(ActionEvent e) {
-	    inputValidated();
+	    inputValidated(false);
 	  }
 	};
 
-    final AbstractAction goPreviousComponentAction = new AbstractAction() {
+    final AbstractAction inputValidationLoopAction = new AbstractAction() {
 	  public final static long serialVersionUID = 1;
 	  public void actionPerformed(ActionEvent e) {
-	    goPreviousComponent();
+	    inputValidated(true);
+	  }
+	};
+
+    final AbstractAction goPreviousComponentLoopAction = new AbstractAction() {
+	  public final static long serialVersionUID = 1;
+	  public void actionPerformed(ActionEvent e) {
+	    goPreviousComponent(true);
+	  }
+	};
+
+    final AbstractAction goPreviousComponentNoLoopAction = new AbstractAction() {
+	  public final static long serialVersionUID = 1;
+	  public void actionPerformed(ActionEvent e) {
+	    goPreviousComponent(false);
 	  }
 	};
 
@@ -270,9 +294,9 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
       txtComp.addFocusListener(this);
       txtComp.addCaretListener(this);
       KeyStroke tabKey = KeyStroke.getKeyStroke("DOWN");
-      txtComp.getInputMap().put(tabKey, inputValidationAction);
+      txtComp.getInputMap().put(tabKey, inputValidationLoopAction);
       tabKey = KeyStroke.getKeyStroke("UP");
-      txtComp.getInputMap().put(tabKey, goPreviousComponentAction);
+      txtComp.getInputMap().put(tabKey, goPreviousComponentLoopAction);
     }
 
     public JComponent getParentComponent() {
@@ -313,7 +337,7 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
     public void actionPerformed(ActionEvent e) {
       if (stopListening)
 	return;
-      inputValidated();
+      inputValidated(false);
     }
 
     private class UpdateListView implements Runnable {
@@ -430,9 +454,9 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
       textField.addCaretListener(this);
       RightClickMenu.addRightClickMenu(textField).addPopupMenuListener(this);
       KeyStroke tabKey = KeyStroke.getKeyStroke("DOWN");
-      textField.getInputMap().put(tabKey, inputValidationAction);
+      textField.getInputMap().put(tabKey, inputValidationLoopAction);
       tabKey = KeyStroke.getKeyStroke("UP");
-      textField.getInputMap().put(tabKey, goPreviousComponentAction);
+      textField.getInputMap().put(tabKey, goPreviousComponentLoopAction);
     }
 
     public JComponent getParentComponent() {
@@ -452,7 +476,7 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
     }
 
     public void actionPerformed(ActionEvent e) {
-      this.inputValidated();
+      this.inputValidated(false);
     }
 
     public void focusGained(FocusEvent e) {
@@ -483,9 +507,9 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
       textArea.setWrapStyleWord(true);
 
       KeyStroke tabKey = KeyStroke.getKeyStroke("TAB");
-      textArea.getInputMap().put(tabKey, inputValidationAction);
+      textArea.getInputMap().put(tabKey, inputValidationNoLoopAction);
       tabKey = KeyStroke.getKeyStroke("shift TAB");
-      textArea.getInputMap().put(tabKey, goPreviousComponentAction);
+      textArea.getInputMap().put(tabKey, goPreviousComponentNoLoopAction);
 
       textArea.addFocusListener(this);
       RightClickMenu.addRightClickMenu(textArea).addPopupMenuListener(this);
@@ -520,6 +544,11 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
 
     public void selectWholeText() {
       textArea.selectAll();
+    }
+
+    @Override
+    public boolean includeInFieldLoop() {
+	return false;
     }
   }
 

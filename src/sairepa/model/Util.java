@@ -100,7 +100,7 @@ public class Util
     public static String extractMalePart(String in) {
 	char[] chars = in.toCharArray();
 	int i;
-	for (i = chars.length-1; Character.isLowerCase(chars[i]) && i > 0 ; i--);
+	for (i = chars.length-1; i > 0 && Character.isLowerCase(chars[i]) ; i--);
 	if (i < 0) return in;
 	return in.substring(0, i+1);
     }
