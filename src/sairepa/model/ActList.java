@@ -35,6 +35,7 @@ public interface ActList extends Iterable<Act>
   }
 
   public Act getAct(int row);
+  public int getActVisualRow(Act a);
   public List<Act> getAllActs();
 
   /**
@@ -49,4 +50,5 @@ public interface ActList extends Iterable<Act>
   public ActListIterator iterator();
   public Act createAct();
   public void refresh();
+  public void refresh(Act a);
 }

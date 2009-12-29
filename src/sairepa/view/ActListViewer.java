@@ -173,6 +173,16 @@ public class ActListViewer extends Viewer
     model.fireTableDataChanged();
   }
 
+  @Override
+  public void refresh(Act a) {
+      int row = actList.getActVisualRow(a);
+      if ( row < 0 ) {
+	  refresh();
+	  return;
+      }
+      model.fireTableRowsUpdated(row, row);
+  }
+
   public void reorder(int columnIndex, boolean desc) {
     if (columnIndex == 0) {
       actList = actList.getSortedActList(null, desc);
@@ -284,49 +294,64 @@ public class ActListViewer extends Viewer
     }
 
     public void run() {
-      synchronized(SEARCH_LOCK) {
-	Util.check(move == 1 || move == -1);
+	try {
+	    synchronized(SEARCH_LOCK) {
+		Util.check(move == 1 || move == -1);
 
-	str = Util.trim(str.toLowerCase());
-	if ("".equals(str)) {
-	  return;
-	}
+		str = Util.trim(str.toLowerCase());
+		if ("".equals(str)) {
+		    return;
+		}
 
-	if (cont) {
-	  if (colOnly) {
-	    row += move;
-	  } else {
-	    col += move;
-	  }
-	}
+		if (cont) {
+		    if (colOnly) {
+			row += move;
+		    } else {
+			col += move;
+		    }
+		}
 
-	int rowCount = model.getRowCount();
-	int colCount = model.getColumnCount();
-	int targetRow = -1;
-	int targetCol = -1;
+		int rowCount = model.getRowCount();
+		int colCount = model.getColumnCount();
+		int targetRow = -1;
+		int targetCol = -1;
 
-	while (row >= 0 && row < rowCount && targetRow < 0 && running) {
-	  while (col >= 0 && col < colCount && targetCol < 0 && running) {
-	    if (Util.trim(model.getValueAt(row, col).toString()).toLowerCase().contains(str)) {
-	      targetRow = row;
-	      targetCol = col;
+		while (row >= 0 && row < rowCount && targetRow < 0 && running) {
+		    while (col >= 0 && col < colCount && targetCol < 0 && running) {
+			Object o = model.getValueAt(row, col);
+			if ( o == null ) {
+			    System.out.println("WARNING: Act " + Integer.toString(row) + " has a missing value "
+					       + "(" + Integer.toString(row) + "," + Integer.toString(col) + ")");
+			    col += move;
+			    continue;
+			}
+			String s = o.toString();
+			s = Util.trim(s);
+			s = s.toLowerCase();
+			if (s.contains(str)) {
+			    targetRow = row;
+			    targetCol = col;
+			}
+			if (!colOnly) col += move;
+			else break;
+		    }
+		    row += move;
+		    if (!colOnly)
+			col = 0;
+		}
+
+		if (targetRow < 0 || targetCol < 0) {
+		    if (defaultFieldBackColor == null) defaultFieldBackColor = searchField.getBackground();
+		    searchField.setBackground(notFoundBackColor);
+		} else {
+		    searchField.setBackground(defaultFieldBackColor);
+		    selectCell(targetRow, targetCol);
+		}
 	    }
-	    if (!colOnly) col += move;
-	    else break;
-	  }
-	  row += move;
-	  if (!colOnly)
-	    col = 0;
+	} catch (Exception e) {
+	    System.err.println("Exception while searching: " + e.toString());
+	    e.printStackTrace();
 	}
-
-	if (targetRow < 0 || targetCol < 0) {
-	  if (defaultFieldBackColor == null) defaultFieldBackColor = searchField.getBackground();
-	  searchField.setBackground(notFoundBackColor);
-	} else {
-	  searchField.setBackground(defaultFieldBackColor);
-	  selectCell(targetRow, targetCol);
-	}
-      }
     }
   }
 

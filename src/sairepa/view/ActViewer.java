@@ -492,6 +492,12 @@ public class ActViewer extends Viewer implements ActionListener
   }
 
   @Override
+  public void refresh(Act a) {
+      if ( a.getRow() == currentAct.getRow() )
+	  refresh();
+  }
+
+  @Override
   public void close() {
     if (currentAct.validate()) {
       saveAct();

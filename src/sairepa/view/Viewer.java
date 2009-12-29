@@ -75,6 +75,7 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
   }
 
   public abstract void refresh();
+  public abstract void refresh(Act a);
 
   /**
    * @return null if it can, else the reason why not

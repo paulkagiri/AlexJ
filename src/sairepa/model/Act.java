@@ -43,7 +43,7 @@ public class Act
      * Instanciate fully an act (no db call)
      */
     public Act(Connection db, ActList actList, int fileId, FieldLayout fields,
-	       Map<ActField, String> entryValues) {
+	       Map<ActField, String> entryValues, int row) {
 	Util.check(db != null);
 	Util.check(actList != null);
 	Util.check(fields != null);
@@ -53,6 +53,7 @@ public class Act
 	this.fields = fields;
 	this.fileId = fileId;
 	this.entries = new HashMap<ActField, ActEntry>();
+	this.row = row;
 
 	for ( Map.Entry<ActField, String> entryVal : entryValues.entrySet() ) {
 	    this.entries.put(entryVal.getKey(),
@@ -112,95 +113,111 @@ public class Act
     public void reload() {
 	Util.check(fields != null);
 
-	synchronized(db) {
-	    try {
-		entries = new HashMap<ActField, ActEntry>();
+	synchronized(this) {
+	    synchronized(db) {
+		try {
+		    entries = new HashMap<ActField, ActEntry>();
 
-		PreparedStatement fieldGetter
-		    = db.prepareStatement("SELECT fields.id FROM fields WHERE fields.name = ? AND fields.file = ? LIMIT 1");
-		PreparedStatement st
-		    = db.prepareStatement("SELECT value FROM entries WHERE field = ? AND row = ? LIMIT 1");
-
-		for (ActField field : fields) {
-		    fieldGetter.setString(1, field.getName());
-		    fieldGetter.setInt(2, fileId);
-		    ResultSet set = fieldGetter.executeQuery();
-		    Util.check(set.next());
-		    int fieldId = set.getInt(1);
-		    set.close();
-
-		    st.setInt(1, fieldId);
+		    PreparedStatement st
+			= db.prepareStatement("SELECT fields.name, entries.value"
+					      + " FROM fields INNER JOIN entries ON fields.id = entries.field"
+					      + " WHERE fields.file = ? AND entries.row = ?");
+		    st.setInt(1, fileId);
 		    st.setInt(2, row);
-
-		    set = st.executeQuery();
-		    Util.check(set.next());
-
-		    String value = set.getString(1);
-		    entries.put(field, new ActEntry(this, field, value));
+		    ResultSet set = st.executeQuery();
+		    try {
+			while (set.next()) {
+			    ActField field = fields.getField(set.getString(1));
+			    ActEntry entry = new ActEntry(this, field, set.getString(2));
+			    entries.put(field, entry);
+			}
+		    } finally {
+			set.close();
+		    }
+		} catch (SQLException e) {
+		    throw new RuntimeException("SQLException", e);
 		}
-	    } catch (SQLException e) {
-		throw new RuntimeException("SQLException", e);
 	    }
 	}
     }
 
     public void update() {
-	synchronized(db) {
-	    Util.check(row >= 0);
-	    Util.check(entries != null);
-	    delete();
+	synchronized(this) {
+	    synchronized(db) {
+		Util.check(row >= 0);
+		Util.check(entries != null);
+		delete();
 
-	    try {
-		PreparedStatement fieldIdGetter = db.prepareStatement(
-								      "SELECT id FROM fields WHERE name = ? AND file = ? LIMIT 1");
-		PreparedStatement insert = db.prepareStatement(
-							       "INSERT INTO entries (field, row, value) VALUES (?, ?, ?)");
+		try {
+		    Map<ActEntry, Integer> fieldIds = new HashMap<ActEntry, Integer>();
 
-		for (ActEntry entry : entries.values()) {
-		    fieldIdGetter.setString(1, entry.getField().getName());
-		    fieldIdGetter.setInt(2, fileId);
+		    PreparedStatement fieldIdGetter
+			= db.prepareStatement("SELECT id, name FROM fields WHERE file = ?");
+		    fieldIdGetter.setInt(1, fileId);
 		    ResultSet set = fieldIdGetter.executeQuery();
-		    Util.check(set.next());
-		    int fieldId = set.getInt(1);
-		    set.close();
+		    try {
+			while(set.next()) {
+			    Integer fieldId = set.getInt(1);
+			    String fieldName = set.getString(2);
+			    for (ActEntry entry : entries.values()) {
+				if ( entry.getField().getName().equals(fieldName) ) {
+				    fieldIds.put(entry, fieldId);
+				    break;
+				}
+			    }
+			}
+		    } finally {
+			set.close();
+		    }
 
-		    insert.setInt(1, fieldId);
-		    insert.setInt(2, row);
-		    insert.setString(3, entry.getValue());
-		    insert.execute();
+		    PreparedStatement insert
+			= db.prepareStatement("INSERT INTO entries (field, row, value) VALUES (?, ?, ?)");
+
+		    for (ActEntry entry : entries.values()) {
+			insert.setInt(1, fieldIds.get(entry));
+			insert.setInt(2, row);
+			insert.setString(3, entry.getValue());
+			insert.execute();
+		    }
+		} catch (SQLException e) {
+		    throw new RuntimeException("SQLException", e);
 		}
-	    } catch (SQLException e) {
-		throw new RuntimeException("SQLException", e);
 	    }
 	}
     }
 
     protected void delete() {
-	synchronized(db) {
-	    try {
-		Util.check(row >= 0);
-		Util.check(fields != null);
+	synchronized(this) {
+	    synchronized(db) {
+		try {
+		    Util.check(row >= 0);
 
-		PreparedStatement fieldIdGetter = db.prepareStatement(
-								      "SELECT id FROM fields WHERE name = ? AND file = ? LIMIT 1");
-		PreparedStatement delete = db.prepareStatement(
-							       "DELETE FROM entries WHERE field = ? AND ROW = ?");
+		    Vector<Integer> fieldIds = new Vector<Integer>();
 
-		for (ActField field : fields) {
-		    fieldIdGetter.setString(1, field.getName());
-		    fieldIdGetter.setInt(2, fileId);
+		    PreparedStatement fieldIdGetter
+			= db.prepareStatement("SELECT id FROM fields WHERE file = ?");
+		    fieldIdGetter.setInt(1, fileId);
 		    ResultSet set = fieldIdGetter.executeQuery();
-		    Util.check(set.next(),
-			       "Can't find the field '" + field.getName() + "' / '" + fileId + "'");
-		    int fieldId = set.getInt(1);
-		    set.close();
+		    try {
+			while(set.next()) {
+			    Integer fieldId = set.getInt(1);
+			    fieldIds.add(fieldId);
+			}
+		    } finally {
+			set.close();
+		    }
 
-		    delete.setInt(1, fieldId);
-		    delete.setInt(2, row);
-		    delete.execute();
+		    for ( Integer fieldId : fieldIds ) {
+			PreparedStatement delete
+			    = db.prepareStatement("DELETE FROM entries"
+						  + " WHERE field = ? AND row = ?");
+			delete.setInt(1, fieldId);
+			delete.setInt(2, row);
+			delete.execute();
+		    }
+		} catch (SQLException e) {
+		    throw new RuntimeException("SQLException", e);
 		}
-	    } catch (SQLException e) {
-		throw new RuntimeException("SQLException", e);
 	    }
 	}
     }

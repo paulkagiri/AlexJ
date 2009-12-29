@@ -34,6 +34,16 @@ public class InMemoryActList implements ActList
 	return acts.get(row);
     }
 
+    public int getActVisualRow(Act a) {
+	int i = 0;
+	for ( Act ourAct : acts ) {
+	    if (ourAct.getRow() == a.getRow() )
+		return i;
+	    i++;
+	}
+	return -1;
+    }
+
     public List<Act> getAllActs() {
 	return acts;
     }
@@ -115,5 +125,18 @@ public class InMemoryActList implements ActList
 	}
 
 	Util.check(acts.size() == dbActList.getRowCount());
+    }
+
+    public void refresh(Act a) {
+	try {
+	    Act ourAct = getAct(a.getRow());
+	    if ( ourAct == null ) {
+		refresh();
+		return;
+	    }
+	    ourAct.reload();
+	} catch (ArrayIndexOutOfBoundsException e) {
+	    refresh();
+	}
     }
 }

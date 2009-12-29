@@ -85,6 +85,11 @@ public class DbActList implements ActList
 	}
     }
 
+    public int getActVisualRow(Act a) {
+	/* not sorted, so no problem here */
+	return a.getRow();
+    }
+
     public List<Act> getAllActs() {
 	java.util.Date start, stop;
 	start = new java.util.Date();
@@ -229,6 +234,15 @@ public class DbActList implements ActList
 	}
     }
 
+    public void refresh(Act a) {
+	synchronized(db.getConnection()) {
+	    if ( a.getRow() == lastRowReturned ) {
+		lastRowReturned = -1;
+		lastActReturned = null;
+	    }
+	}
+    }
+
     protected class SortedActList implements ActList {
 	private boolean desc;
 	private int sortingFieldId = -1;
@@ -273,6 +287,24 @@ public class DbActList implements ActList
 
 	private int lastPositionReturned = -1;
 	private Act lastActReturned = null;
+
+	public int getActVisualRow(Act a) {
+	    try {
+		int i = 0;
+		List<Act> acts = getAllActs();
+		for ( Act ourAct : acts ) {
+		    if ( ourAct.getRow() == a.getRow() )
+			return i;
+		    i++;
+		}
+		return -1;
+	    } catch (Exception e) {
+		System.out.println("SortedActList.getActRow(), Exception : " + e.toString());
+		System.out.println("Assuming not enough memory");
+		e.printStackTrace();
+		return -1;
+	    }
+	}
 
 	public Act getAct(int position) {
 	    synchronized(db.getConnection()) {
@@ -365,6 +397,15 @@ public class DbActList implements ActList
 		lastActReturned = null;
 		lastPositionReturned = -1;
 		DbActList.this.refresh();
+	    }
+	}
+
+	public void refresh(Act a) {
+	    synchronized(db.getConnection()) {
+		if ( a.getRow() == lastPositionReturned ) {
+		    lastActReturned = null;
+		    lastPositionReturned = -1;
+		}
 	    }
 	}
     }
