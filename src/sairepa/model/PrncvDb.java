@@ -104,8 +104,7 @@ public class PrncvDb
     return ((cv == null) ? UNKNOWN : cv);
   }
 
-  public final static int MAX_DISTANCE = 2;
-  public final static int MIN_SRC_LENGTH = 3;
+  public final static int MIN_SRC_LENGTH = 1;
 
   public List<String> getClosest(String src, Sex sex) {
     ArrayList<String> rs = new ArrayList<String>();
@@ -115,10 +114,12 @@ public class PrncvDb
 
     HashSet<String> set = new HashSet<String>();
 
+    src = src.trim().toLowerCase();
+
     for (String s : (((Collection<String>)prncvs[sex.toInteger()].values()))) {
-      if (Util.distance(src, s, MAX_DISTANCE+1) <= (MAX_DISTANCE)) {
-	set.add(s);
-      }
+	String simple = s.trim().toLowerCase();
+	if ( simple.startsWith(src) )
+	    set.add(s);
     }
 
     for (String s : set)

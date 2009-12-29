@@ -11,8 +11,8 @@ import sairepa.model.Hsqldb;
 
 public interface AutoCompleter
 {
-  public final static int DEFAULT_MAX_DISTANCE = 3;
-  public final static int DEFAULT_MIN_SRC_LENGTH = 4;
+  public final static int DEFAULT_MAX_DISTANCE = 10;
+  public final static int DEFAULT_MIN_SRC_LENGTH = 2;
 
   public List<String> getSuggestions(ActEntry entry, String initialString);
 
@@ -39,11 +39,15 @@ public interface AutoCompleter
 	}
 
 	PreparedStatement st =
-	  db.getConnection().prepareStatement("SELECT DISTINCT value FROM entries WHERE field = ? "
-					      + "AND \"sairepa.model.Util.distance\"(value, ?, " + Integer.toString(DEFAULT_MAX_DISTANCE+1) + ") "
-					      + "<= " + Integer.toString(DEFAULT_MAX_DISTANCE));
+	  db.getConnection().prepareStatement("SELECT DISTINCT value FROM entries WHERE field = ?"
+					      + " AND LOWER(LTRIM(SUBSTRING(value, 0, ?))) = ?"
+					      + " AND LENGTH(LTRIM(value)) <= ?");
+	initialString = initialString.toLowerCase();
+	initialString = initialString.trim();
 	st.setInt(1, fieldId);
-	st.setString(2, initialString);
+	st.setInt(2, initialString.length());
+	st.setString(3, initialString);
+	st.setInt(4, initialString.length() + DEFAULT_MAX_DISTANCE);
 
 	ResultSet set = st.executeQuery();
 
