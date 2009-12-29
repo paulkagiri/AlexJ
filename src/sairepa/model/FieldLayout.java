@@ -115,4 +115,12 @@ public class FieldLayout implements Iterable<ActField>, FieldLayoutElement
 
     return true;
   }
+
+  public ActField getField(String name) {
+      for (ActField f : this) {
+	  if ( f.getName().equals(name) )
+	      return f;
+      }
+      return null;
+  }
 }

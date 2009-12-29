@@ -39,6 +39,8 @@ public class Hsqldb {
 	executeQuery("SET LOGSIZE 50;");
 	executeQuery("SET CHECKPOINT DEFRAG 50;");
 	executeQuery("SET PROPERTY \"hsqldb.nio_data_file\" FALSE");
+	executeQuery("SET PROPERTY \"hsqldb.cache_size_scale\" 8");
+	executeQuery("SET PROPERTY \"hsqldb.cache_scale\" 18");
       }
     }
   }
@@ -65,10 +67,12 @@ public class Hsqldb {
     try {
       b = f.createNewFile();
     } catch (IOException e) {
+	/* TODO(Jflesch): l10n */
       throw new RuntimeException("Erreur lors de la verification du verrou du projet '" + project + "'.", e);
     }
 
     if (!b) {
+	/* TODO(Jflesch): l10n */
       throw new RuntimeException("Ce projet semble etre deja utilise par une autre instance de " + sairepa.Main.APPLICATION_NAME + ". " +
 				 "Si ce n'est pas le cas, veuillez effacer le fichier '" + project + ".lock' " +
 				 "du repertoire " + sairepa.Main.APPLICATION_NAME);

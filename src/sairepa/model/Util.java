@@ -82,7 +82,7 @@ public class Util
     }
 
     /**
-     * Assertion
+     * Strong assertion (can't be disabled)
      */
     public static void check(boolean b) {
 	if (!b) {
