@@ -117,7 +117,10 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
     setFocusManagementEnabled(false);
   }
 
+    private boolean hasFocus = false;
+
   protected void focusGained() {
+      hasFocus = true;
     if (focusManagement) {
       updateEntry(false);
       field.hasFocus(entry);
@@ -129,6 +132,7 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
   }
 
   protected void focusLost() {
+      hasFocus = false;
     if (focusManagement) {
       updateEntry(true);
       refresh();
@@ -145,7 +149,17 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
     parentViewer.updateButtonStates();
   }
 
+  private int _previousLength = -1;
   public boolean checkMaxSize(String txt) {
+      if (!hasFocus || txt.length() == 0 )
+	  return false;
+      if ( _previousLength == -1 )
+	  _previousLength = txt.length();
+      if ( _previousLength >= txt.length() ) {
+	  _previousLength = txt.length();
+	  return false;
+      }
+      _previousLength = txt.length();
       if ( txt.length() >= field.getMaxLength() ) {
 	  goNextComponent();
 	  return true;
@@ -182,6 +196,20 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
     refresh();
     goNextComponent();
   }
+
+    final AbstractAction inputValidationAction = new AbstractAction() {
+	  public final static long serialVersionUID = 1;
+	  public void actionPerformed(ActionEvent e) {
+	    inputValidated();
+	  }
+	};
+
+    final AbstractAction goPreviousComponentAction = new AbstractAction() {
+	  public final static long serialVersionUID = 1;
+	  public void actionPerformed(ActionEvent e) {
+	    goPreviousComponent();
+	  }
+	};
 
   private Color initialTxtCompColor = null;
   private Color initialLabelColor = null;
@@ -241,6 +269,10 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
       comboBox.addActionListener(this);
       txtComp.addFocusListener(this);
       txtComp.addCaretListener(this);
+      KeyStroke tabKey = KeyStroke.getKeyStroke("DOWN");
+      txtComp.getInputMap().put(tabKey, inputValidationAction);
+      tabKey = KeyStroke.getKeyStroke("UP");
+      txtComp.getInputMap().put(tabKey, goPreviousComponentAction);
     }
 
     public JComponent getParentComponent() {
@@ -366,18 +398,21 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
 
     @Override
     public void caretUpdate(CaretEvent e) {
-      if (stopListening)
-	return;
-      String txt = txtComp.getText();
-      if (oldTxt != null && oldTxt.equals(txt))
-	return;
-      oldTxt = txt;
-      if (updater != null)
-	updater.stop();
-      if (checkMaxSize(txt))
-	  return;
-      updater = new ListUpdater(getEntry().getAct(), txt, e.getDot(), e.getMark());
-      new Thread(updater).start();
+	String txt = txtComp.getText();
+	if (checkMaxSize(txt)) {
+	    if ( updater != null )
+		updater.stop();
+	    return;
+	}
+	if (stopListening)
+	    return;
+	if (oldTxt != null && oldTxt.equals(txt))
+	    return;
+	oldTxt = txt;
+	if (updater != null)
+	    updater.stop();
+	updater = new ListUpdater(getEntry().getAct(), txt, e.getDot(), e.getMark());
+	new Thread(updater).start();
     }
   }
 
@@ -394,6 +429,10 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
       textField.addFocusListener(this);
       textField.addCaretListener(this);
       RightClickMenu.addRightClickMenu(textField).addPopupMenuListener(this);
+      KeyStroke tabKey = KeyStroke.getKeyStroke("DOWN");
+      textField.getInputMap().put(tabKey, inputValidationAction);
+      tabKey = KeyStroke.getKeyStroke("UP");
+      textField.getInputMap().put(tabKey, goPreviousComponentAction);
     }
 
     public JComponent getParentComponent() {
@@ -443,23 +482,10 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
       textArea.setLineWrap(true);
       textArea.setWrapStyleWord(true);
 
-      AbstractAction tabAction = new AbstractAction() {
-	  public final static long serialVersionUID = 1;
-	  public void actionPerformed(ActionEvent e) {
-	    inputValidated();
-	  }
-	};
       KeyStroke tabKey = KeyStroke.getKeyStroke("TAB");
-      textArea.getInputMap().put(tabKey, tabAction);
-
-      tabAction = new AbstractAction() {
-	  public final static long serialVersionUID = 1;
-	  public void actionPerformed(ActionEvent e) {
-	    goPreviousComponent();
-	  }
-	};
+      textArea.getInputMap().put(tabKey, inputValidationAction);
       tabKey = KeyStroke.getKeyStroke("shift TAB");
-      textArea.getInputMap().put(tabKey, tabAction);
+      textArea.getInputMap().put(tabKey, goPreviousComponentAction);
 
       textArea.addFocusListener(this);
       RightClickMenu.addRightClickMenu(textArea).addPopupMenuListener(this);
