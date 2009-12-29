@@ -147,7 +147,7 @@ public abstract class VisualActField implements Observer, PopupMenuListener, Car
 
   public boolean checkMaxSize(String txt) {
       if ( txt.length() >= field.getMaxLength() ) {
-	  goNextComponent();
+	  inputValidated();
 	  return true;
       }
       return false;
