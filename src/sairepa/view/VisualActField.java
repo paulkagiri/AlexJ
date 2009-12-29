@@ -45,7 +45,7 @@ import sairepa.model.ActField;
 import sairepa.model.AutoCompleter;
 import sairepa.model.Util;
 
-public abstract class VisualActField implements Observer, PopupMenuListener {
+public abstract class VisualActField implements Observer, PopupMenuListener, CaretListener {
 
   private ActViewer parentViewer;
   private ActField field;
@@ -145,6 +145,14 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
     parentViewer.updateButtonStates();
   }
 
+  public boolean checkMaxSize(String txt) {
+      if ( txt.length() >= field.getMaxLength() ) {
+	  goNextComponent();
+	  return true;
+      }
+      return false;
+  }
+
   public void goNextComponent() {
     if (nextField != null) {
       nextField.focus();
@@ -153,6 +161,14 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
       parentViewer.continueTyping();
     }
   }
+
+  public void caretUpdate(CaretEvent e) {
+      Util.check(e.getSource() instanceof JTextComponent);
+      JTextComponent txtComp = (JTextComponent)e.getSource();
+      String txt = txtComp.getText();
+      checkMaxSize(txt);
+  }
+
 
   public void goPreviousComponent() {
     if (previousField != null) {
@@ -348,6 +364,7 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
     private ListUpdater updater = null;
     private String oldTxt = null;
 
+    @Override
     public void caretUpdate(CaretEvent e) {
       if (stopListening)
 	return;
@@ -357,6 +374,8 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
       oldTxt = txt;
       if (updater != null)
 	updater.stop();
+      if (checkMaxSize(txt))
+	  return;
       updater = new ListUpdater(getEntry().getAct(), txt, e.getDot(), e.getMark());
       new Thread(updater).start();
     }
@@ -373,6 +392,7 @@ public abstract class VisualActField implements Observer, PopupMenuListener {
       textField = new JTextField(ActViewer.maximizeLength(field.getMaxLength()));
       textField.addActionListener(this);
       textField.addFocusListener(this);
+      textField.addCaretListener(this);
       RightClickMenu.addRightClickMenu(textField).addPopupMenuListener(this);
     }
 
