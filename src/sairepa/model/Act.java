@@ -113,111 +113,105 @@ public class Act
     public void reload() {
 	Util.check(fields != null);
 
-	synchronized(this) {
-	    synchronized(db) {
-		try {
-		    entries = new HashMap<ActField, ActEntry>();
+	synchronized(db) {
+	    try {
+		entries = new HashMap<ActField, ActEntry>();
 
-		    PreparedStatement st
-			= db.prepareStatement("SELECT fields.name, entries.value"
-					      + " FROM fields INNER JOIN entries ON fields.id = entries.field"
-					      + " WHERE fields.file = ? AND entries.row = ?");
-		    st.setInt(1, fileId);
-		    st.setInt(2, row);
-		    ResultSet set = st.executeQuery();
-		    try {
-			while (set.next()) {
-			    ActField field = fields.getField(set.getString(1));
-			    ActEntry entry = new ActEntry(this, field, set.getString(2));
-			    entries.put(field, entry);
-			}
-		    } finally {
-			set.close();
+		PreparedStatement st
+		    = db.prepareStatement("SELECT fields.name, entries.value"
+					  + " FROM fields INNER JOIN entries ON fields.id = entries.field"
+					  + " WHERE fields.file = ? AND entries.row = ?");
+		st.setInt(1, fileId);
+		st.setInt(2, row);
+		ResultSet set = st.executeQuery();
+		try {
+		    while (set.next()) {
+			ActField field = fields.getField(set.getString(1));
+			ActEntry entry = new ActEntry(this, field, set.getString(2));
+			entries.put(field, entry);
 		    }
-		} catch (SQLException e) {
-		    throw new RuntimeException("SQLException", e);
+		} finally {
+		    set.close();
 		}
+	    } catch (SQLException e) {
+		throw new RuntimeException("SQLException", e);
 	    }
 	}
     }
 
     public void update() {
-	synchronized(this) {
-	    synchronized(db) {
-		Util.check(row >= 0);
-		Util.check(entries != null);
-		delete();
+	synchronized(db) {
+	    Util.check(row >= 0);
+	    Util.check(entries != null);
+	    delete();
 
+	    try {
+		Map<ActEntry, Integer> fieldIds = new HashMap<ActEntry, Integer>();
+
+		PreparedStatement fieldIdGetter
+		    = db.prepareStatement("SELECT id, name FROM fields WHERE file = ?");
+		fieldIdGetter.setInt(1, fileId);
+		ResultSet set = fieldIdGetter.executeQuery();
 		try {
-		    Map<ActEntry, Integer> fieldIds = new HashMap<ActEntry, Integer>();
-
-		    PreparedStatement fieldIdGetter
-			= db.prepareStatement("SELECT id, name FROM fields WHERE file = ?");
-		    fieldIdGetter.setInt(1, fileId);
-		    ResultSet set = fieldIdGetter.executeQuery();
-		    try {
-			while(set.next()) {
-			    Integer fieldId = set.getInt(1);
-			    String fieldName = set.getString(2);
-			    for (ActEntry entry : entries.values()) {
-				if ( entry.getField().getName().equals(fieldName) ) {
-				    fieldIds.put(entry, fieldId);
-				    break;
-				}
+		    while(set.next()) {
+			Integer fieldId = set.getInt(1);
+			String fieldName = set.getString(2);
+			for (ActEntry entry : entries.values()) {
+			    if ( entry.getField().getName().equals(fieldName) ) {
+				fieldIds.put(entry, fieldId);
+				break;
 			    }
 			}
-		    } finally {
-			set.close();
 		    }
-
-		    PreparedStatement insert
-			= db.prepareStatement("INSERT INTO entries (field, row, value) VALUES (?, ?, ?)");
-
-		    for (ActEntry entry : entries.values()) {
-			insert.setInt(1, fieldIds.get(entry));
-			insert.setInt(2, row);
-			insert.setString(3, entry.getValue());
-			insert.execute();
-		    }
-		} catch (SQLException e) {
-		    throw new RuntimeException("SQLException", e);
+		} finally {
+		    set.close();
 		}
+
+		PreparedStatement insert
+		    = db.prepareStatement("INSERT INTO entries (field, row, value) VALUES (?, ?, ?)");
+
+		for (ActEntry entry : entries.values()) {
+		    insert.setInt(1, fieldIds.get(entry));
+		    insert.setInt(2, row);
+		    insert.setString(3, entry.getValue());
+		    insert.execute();
+		}
+	    } catch (SQLException e) {
+		throw new RuntimeException("SQLException", e);
 	    }
 	}
     }
 
     protected void delete() {
-	synchronized(this) {
-	    synchronized(db) {
+	synchronized(db) {
+	    try {
+		Util.check(row >= 0);
+
+		Vector<Integer> fieldIds = new Vector<Integer>();
+
+		PreparedStatement fieldIdGetter
+		    = db.prepareStatement("SELECT id FROM fields WHERE file = ?");
+		fieldIdGetter.setInt(1, fileId);
+		ResultSet set = fieldIdGetter.executeQuery();
 		try {
-		    Util.check(row >= 0);
-
-		    Vector<Integer> fieldIds = new Vector<Integer>();
-
-		    PreparedStatement fieldIdGetter
-			= db.prepareStatement("SELECT id FROM fields WHERE file = ?");
-		    fieldIdGetter.setInt(1, fileId);
-		    ResultSet set = fieldIdGetter.executeQuery();
-		    try {
-			while(set.next()) {
-			    Integer fieldId = set.getInt(1);
-			    fieldIds.add(fieldId);
-			}
-		    } finally {
-			set.close();
+		    while(set.next()) {
+			Integer fieldId = set.getInt(1);
+			fieldIds.add(fieldId);
 		    }
-
-		    for ( Integer fieldId : fieldIds ) {
-			PreparedStatement delete
-			    = db.prepareStatement("DELETE FROM entries"
-						  + " WHERE field = ? AND row = ?");
-			delete.setInt(1, fieldId);
-			delete.setInt(2, row);
-			delete.execute();
-		    }
-		} catch (SQLException e) {
-		    throw new RuntimeException("SQLException", e);
+		} finally {
+		    set.close();
 		}
+
+		for ( Integer fieldId : fieldIds ) {
+		    PreparedStatement delete
+			= db.prepareStatement("DELETE FROM entries"
+					      + " WHERE field = ? AND row = ?");
+		    delete.setInt(1, fieldId);
+		    delete.setInt(2, row);
+		    delete.execute();
+		}
+	    } catch (SQLException e) {
+		throw new RuntimeException("SQLException", e);
 	    }
 	}
     }

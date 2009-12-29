@@ -511,7 +511,7 @@ public class ActViewer extends Viewer implements ActionListener
   }
 
   @Override
-  public void refresh() {
+  public synchronized void refresh() {
     reloadAct();
     updatePositionLabel();
     globalPanel.refresh();
