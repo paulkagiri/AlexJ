@@ -344,25 +344,32 @@ public class DbActList implements ActList
 
 	public List<Act> getAllActs()
 	{
-	    Vector<Act> acts;
+	    java.util.Date start, stop;
+	    start = new java.util.Date();
+
+	    List<Act> unsortedActs = DbActList.this.getAllActs();
+	    Vector<Act> sortedActs = new Vector<Act>(unsortedActs.size());
+
 	    synchronized(db.getConnection()) {
 		try {
 		    PreparedStatement rowGetter
-			= db.getConnection().prepareStatement("SELECT row from entries WHERE field = ? ORDER BY LOWER(value)"
+			= db.getConnection().prepareStatement("SELECT row from entries WHERE field = ? ORDER BY LOWER(LTRIM(value))"
 							      + (desc ? " DESC" : ""));
 		    rowGetter.setInt(1, sortingFieldId);
 		    ResultSet set = rowGetter.executeQuery();
-		    acts = new Vector<Act>();
 		    while(set.next()) {
 			int row = set.getInt(1);
-			Act a = DbActList.this.getAct(row);
-			acts.add(a);
+			sortedActs.add(unsortedActs.get(row));
 		    }
 		} catch (SQLException e) {
 		    throw new RuntimeException("SQLException", e);
 		}
 	    }
-	    return acts;
+
+	    stop = new java.util.Date();
+	    System.out.println("Took " + Long.toString((stop.getTime() - start.getTime()) / 1000) + " seconds to load sorted list");
+
+	    return sortedActs;
 	}
 
 	/**
