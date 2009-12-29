@@ -233,7 +233,14 @@ public class Util
 
     public static String conventionalizeFirstName(String in, Sex sex) {
 	in = trim(in);
-	in = in.replaceAll("-", " ");
+
+	/* all separators are considered equivalents to ' ' */
+	in = in.replaceAll("\\-", " ");
+	in = in.replaceAll("\\: ", " ");
+	in = in.replaceAll("\\:", " ");
+	in = in.replaceAll("\\. ", " ");
+	in = in.replaceAll("\\.", " ");
+
 	in = dropEndIfItsThisOne(in, "+");
 	in = dropEndIfItsThisOne(in, "?");
 	in = trim(in);

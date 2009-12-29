@@ -24,7 +24,9 @@ public class FirstNameField extends ActField
     for (int i = 0 ; i < cars.length ; i++) {
       if (i == 0
 	  || cars[i-1] == ' '
-	  || cars[i-1] == '-')
+	  || cars[i-1] == '-'
+	  || cars[i-1] == ':'
+	  || cars[i-1] == '.')
 	cars[i] = Character.toUpperCase(cars[i]);
     }
 
