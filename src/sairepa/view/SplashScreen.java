@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
 
+import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -40,6 +41,7 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 	appNameLabel.setHorizontalAlignment(JLabel.CENTER);
 	p.add(appNameLabel, BorderLayout.CENTER);
 	p.add(bar, BorderLayout.SOUTH);
+	p.setBorder(BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 	getContentPane().add(p);
 
 	setUndecorated(true);
