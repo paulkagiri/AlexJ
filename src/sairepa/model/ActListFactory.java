@@ -382,8 +382,6 @@ public abstract class ActListFactory
 	start = new java.util.Date();
 
 	actList.refresh();
-	dbf.delete();
-	dbt.delete();
 	if ( actList.getRowCount() <= 0 ) {
 	    System.out.println("Nothing to write in '" + dbf.getPath() + "'");
 	    return false;

@@ -21,6 +21,7 @@ public class DbActList implements ActList
     private FieldLayout fields;
     private int rowCount;
     private String name;
+    private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
 
     protected DbActList(ActListFactory factory, Hsqldb db,
 			int fileId, FieldLayout fields, String name)
@@ -43,6 +44,17 @@ public class DbActList implements ActList
 
     public FieldLayout getFields() {
 	return fields;
+    }
+
+    public static class DumbDbObserver implements ActList.ActListDbObserver {
+	public DumbDbObserver() { }
+	public void startOfJobBatch(int nmbJob) { }
+	public void jobUpdate(DbHandling job, int currentPosition, int endOfJobPosition) { }
+	public void endOfJobBatch() { }
+    }
+
+    public void setActListDbObserver(ActList.ActListDbObserver obs) {
+	this.dbObserver = obs;
     }
 
     public int computeRowCount() throws SQLException {
@@ -102,9 +114,13 @@ public class DbActList implements ActList
 		PreparedStatement st;
 		ResultSet set;
 
+		dbObserver.startOfJobBatch(2);
+		dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 0, 1);
+
 		st = db.getConnection().prepareStatement("SELECT fields.id, fields.name FROM fields WHERE fields.file = ?");
 		st.setInt(1, fileId);
 		set = st.executeQuery();
+
 		try {
 		    while(set.next()) {
 			Integer i = set.getInt(1);
@@ -122,9 +138,13 @@ public class DbActList implements ActList
 							 + " WHERE fields.file = ? ORDER by entries.row");
 		st.setInt(1, fileId);
 		set = st.executeQuery();
+
+		dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 1, 1);
+
 		try {
 		    Map<ActField, String> entries = null;
 		    int currentRow = -1;
+		    int total = getRowCount();
 
 		    while(set.next()) {
 			ActField field = idToFields.get(set.getInt(1));
@@ -132,6 +152,10 @@ public class DbActList implements ActList
 			String value = set.getString(3);
 
 			if ( row != currentRow ) {
+			    if ( row % (total > 3000 ? 1000 : 100) == 0 ) {
+				dbObserver.jobUpdate(ActList.DbHandling.DB_FETCH, row, total);
+			    }
+
 			    Util.check( row == currentRow + 1 );
 			    if ( entries != null ) {
 				acts.add(new Act(db.getConnection(), this, fileId, fields, entries, currentRow));
@@ -147,6 +171,7 @@ public class DbActList implements ActList
 			acts.add(new Act(db.getConnection(), this, fileId, fields, entries, currentRow));
 		    }
 		} finally {
+		    dbObserver.endOfJobBatch();
 		    set.close();
 		}
 	    } catch (SQLException e) {
@@ -254,6 +279,7 @@ public class DbActList implements ActList
     protected class SortedActList implements ActList {
 	private boolean desc;
 	private int sortingFieldId = -1;
+	private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
 
 	public SortedActList(String sortedBy, boolean desc) {
 	    this.desc = desc;
@@ -275,6 +301,11 @@ public class DbActList implements ActList
 		    sortingFieldId = -1;
 		}
 	    }
+	}
+
+	public void setActListDbObserver(ActList.ActListDbObserver obs) {
+	    DbActList.this.setActListDbObserver(obs);
+	    this.dbObserver = obs;
 	}
 
 	public ActListFactory getFactory() {
@@ -330,6 +361,7 @@ public class DbActList implements ActList
 			rowGetter.setInt(1, sortingFieldId);
 			rowGetter.setInt(2, position);
 			ResultSet set = rowGetter.executeQuery();
+
 			Util.check(set.next());
 			row = set.getInt(1);
 		    } catch(SQLException e) {
@@ -360,17 +392,28 @@ public class DbActList implements ActList
 
 	    synchronized(db.getConnection()) {
 		try {
+		    dbObserver.startOfJobBatch(2);
+		    dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 0, 1);
 		    PreparedStatement rowGetter
 			= db.getConnection().prepareStatement("SELECT row from entries WHERE field = ? ORDER BY LOWER(LTRIM(value))"
 							      + (desc ? " DESC" : ""));
 		    rowGetter.setInt(1, sortingFieldId);
 		    ResultSet set = rowGetter.executeQuery();
+		    dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 1, 1);
+		    int i = 0, total;
+		    total = getRowCount();
 		    while(set.next()) {
+			if ( i % (total > 3000 ? 1000 : 100) == 0 ) {
+			    dbObserver.jobUpdate(ActList.DbHandling.DB_FETCH, i, total);
+			}
 			int row = set.getInt(1);
 			sortedActs.add(unsortedActs.get(row));
+			i++;
 		    }
 		} catch (SQLException e) {
 		    throw new RuntimeException("SQLException", e);
+		} finally {
+		    dbObserver.endOfJobBatch();
 		}
 	    }
 

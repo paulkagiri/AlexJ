@@ -20,6 +20,23 @@ public interface ActList extends Iterable<Act>
   public FieldLayout getFields();
   public int getRowCount();
 
+  public enum DbHandling {
+      DB_QUERY(),
+	  DB_FETCH(),
+	  DB_SORT(),
+  }
+
+  /**
+   * the obserser is notified each time a long db query
+   * or manipulation is started
+   */
+  public static interface ActListDbObserver {
+      public void startOfJobBatch(int nmbJob);
+      public void jobUpdate(DbHandling job, int currentPosition, int endOfJobPosition);
+      public void endOfJobBatch();
+  }
+  public void setActListDbObserver(ActListDbObserver obs);
+
   public static interface ActListIterator extends ListIterator<Act> {
     public void add(Act a);
     public boolean hasNext();
