@@ -141,11 +141,13 @@ public class Act
 
     public void update() {
 	synchronized(db) {
-	    Util.check(row >= 0);
-	    Util.check(entries != null);
-	    delete();
-
 	    try {
+		db.setAutoCommit(false);
+
+		Util.check(row >= 0);
+		Util.check(entries != null);
+		delete();
+
 		Map<ActEntry, Integer> fieldIds = new HashMap<ActEntry, Integer>();
 
 		PreparedStatement fieldIdGetter
@@ -176,8 +178,16 @@ public class Act
 		    insert.setString(3, entry.getValue());
 		    insert.execute();
 		}
+
+		db.commit();
 	    } catch (SQLException e) {
 		throw new RuntimeException("SQLException", e);
+	    } finally {
+		try {
+		    db.setAutoCommit(true);
+		} catch(SQLException e) {
+		    throw new RuntimeException("SQLExeption", e);
+		}
 	    }
 	}
     }

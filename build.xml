@@ -18,11 +18,11 @@
 	message="You need to download fxie.jar from kwain.net and to put it in lib/"
 	/>
 
-	<!-- HSQLDB -->
-	<property name="hsqldb.location" value="${lib.dir}/hsqldb.jar" />
-	<available file="${hsqldb.location}" property="hsqldb_available" />
-	<fail unless="hsqldb_available" status="1"
-	message="You need to download hsqldb.jar from http://sourceforge.net/projects/hsqldb/ and to put it in lib/ or set the ant property 'hsqldb.location' to the correct path (filename included)" />
+	<!-- Sqlite -->
+	<property name="sqlite.location" value="${lib.dir}/sqlitejdbc.jar" />
+	<available file="${sqlite.location}" property="sqlite_available" />
+	<fail unless="sqlite_available" status="1"
+	message="You need to download sqlitejdbc.jar from http://www.zentus.com/sqlitejdbc/ and to put it in lib/" />
 
 	<!-- JLHA -->
 	<property name="jlha.location" value="${lib.dir}/jlha.jar" />
@@ -37,7 +37,7 @@
 		<javac srcdir="${src.dir}" destdir="${bin.dir}" debug="true" optimize="true" encoding="UTF8">
 			<compilerarg value="-Xlint" />
 			<classpath>
-				<pathelement location="${hsqldb.location}"/>
+				<pathelement location="${sqlite.location}"/>
 				<pathelement location="${fxie.location}"/>
 				<pathelement location="${jlha.location}"/>
 			</classpath>
@@ -48,7 +48,7 @@
 				<include name="**/*.properties" />
 			</fileset>
 			<zipfileset src="${fxie.location}" />
-			<zipfileset src="${hsqldb.location}" />
+			<zipfileset src="${sqlite.location}" />
 			<zipfileset src="${jlha.location}" />
 		</copy>
 	</target>

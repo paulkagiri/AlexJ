@@ -89,12 +89,15 @@ public class Model
     int nmb = factories.getNumberOfFactories() + 1;
     int i = 1;
 
+    db.getConnection().setAutoCommit(false);
     for (ActListFactory factory : factories) {
       obs.setProgression(i * 90 / nmb,
           "Chargement de '" + factory.getDbf().getName() + "' ...");
       factory.init(db);
       i++;
     }
+    db.getConnection().commit();
+    db.getConnection().setAutoCommit(true);
 
     obs.setProgression(95, "Recherche de sauvegardes ...");
     backupManager.init();
@@ -128,26 +131,24 @@ public class Model
 
   private void createTables() throws SQLException {
     try {
-      executeQuery("CREATE CACHED TABLE files ("
-		   + "id INTEGER NOT NULL IDENTITY, "
+      executeQuery("CREATE TABLE IF NOT EXISTS files ("
+		   + "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
 		   + "file VARCHAR NOT NULL, " // "dir/file.dbf"
 		   + "lastDbfSync TIMESTAMP NULL, "
-		   + "PRIMARY KEY (id), UNIQUE (file)"
+		   + "UNIQUE (file)"
 		   + ");");
-      executeQuery("CREATE CACHED TABLE fields ("
-		   + "id INTEGER NOT NULL IDENTITY, "
+      executeQuery("CREATE TABLE IF NOT EXISTS fields ("
+		   + "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
 		   + "file INTEGER NOT NULL, "
 		   + "name VARCHAR NOT NULL, "
-		   + "PRIMARY KEY (id), "
 		   + "UNIQUE (file, name), "
 		   + "FOREIGN KEY (file) REFERENCES files (id)"
 		   + ");");
-      executeQuery("CREATE CACHED TABLE entries ("
-		   + "id INTEGER NOT NULL IDENTITY, "
+      executeQuery("CREATE TABLE IF NOT EXISTS entries ("
+		   + "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
 		   + "field INTEGER NOT NULL, "
 		   + "row INTEGER NOT NULL, "
 		   + "value VARCHAR NOT NULL, "
-		   + "PRIMARY KEY (id), "
 		   + "UNIQUE (field, row), "
 		   + "FOREIGN KEY (field) REFERENCES fields (id)"
 		   + ");");

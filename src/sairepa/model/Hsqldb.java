@@ -15,7 +15,7 @@ public class Hsqldb {
 
   public Hsqldb() throws SQLException {
     try {
-      Class.forName("org.hsqldb.jdbcDriver");
+      Class.forName("org.sqlite.JDBC");
     } catch (ClassNotFoundException e) {
       System.err.println("ClassNotFoundException: " + e.toString());
       e.printStackTrace(System.err);
@@ -33,15 +33,8 @@ public class Hsqldb {
       project = projectName;
       lockProject(project); // throw a runtime exception if can't
 
-      connection = DriverManager.getConnection(
-          "jdbc:hsqldb:file:" + sairepa.Main.APPLICATION_NAME + "_" + projectName + ".db;shutdown=true", "sa", "");
-      synchronized(connection) {
-	executeQuery("SET LOGSIZE 50;");
-	executeQuery("SET CHECKPOINT DEFRAG 50;");
-	executeQuery("SET PROPERTY \"hsqldb.nio_data_file\" FALSE");
-	executeQuery("SET PROPERTY \"hsqldb.cache_size_scale\" 8");
-	executeQuery("SET PROPERTY \"hsqldb.cache_scale\" 18");
-      }
+      connection = DriverManager.getConnection("jdbc:sqlite:" + sairepa.Main.APPLICATION_NAME + "_" + projectName + ".db");
+      connection.setAutoCommit(true);
     }
   }
 
@@ -51,8 +44,6 @@ public class Hsqldb {
 
     synchronized(dbLock) {
       synchronized (connection) {
-	connection.commit();
-	executeQuery("SHUTDOWN");
 	connection.close();
 	connection = null;
 	unlockProject(project);

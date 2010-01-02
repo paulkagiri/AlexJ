@@ -167,12 +167,20 @@ public class DbActList implements ActList
     public void insert(Act act, int row) {
 	synchronized(db.getConnection()) {
 	    try {
+		db.getConnection().setAutoCommit(false);
 		act.setRow(row, false);
 		shiftAfter(row, 1);
 		act.update();
 		rowCount++;
+		db.getConnection().commit();
 	    } catch (SQLException e) {
 		throw new RuntimeException("SQLException", e);
+	    } finally {
+		try {
+		    db.getConnection().setAutoCommit(true);
+		} catch (SQLException e) {
+		    throw new RuntimeException("SQLException", e);
+		}
 	    }
 	}
     }

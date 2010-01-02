@@ -226,17 +226,6 @@ public abstract class ActListFactory
 	}
     }
 
-    private void insertEntry(int fieldId, int row, String value)
-	throws SQLException {
-	PreparedStatement st =
-	    db.getConnection().prepareStatement("INSERT INTO entries (field, row, value) " +
-						"VALUES (?, ?, ?)");
-	st.setInt(1, fieldId);
-	st.setInt(2, row);
-	st.setString(3, value);
-	st.execute();
-    }
-
     private void rereadDbf() throws SQLException, IOException {
 	java.util.Date start, stop;
 	start = new java.util.Date();
@@ -247,6 +236,10 @@ public abstract class ActListFactory
 
 	try {
 	    XBaseImport dbfImport = new XBaseImport(dbf, dbt);
+
+	    PreparedStatement st =
+	    db.getConnection().prepareStatement("INSERT INTO entries (field, row, value) " +
+						"VALUES (?, ?, ?)");
 
 	    int row = 0;
 	    while(dbfImport.available() > 0) {
@@ -264,7 +257,11 @@ public abstract class ActListFactory
 		    Util.check( (fieldName = xValue.getField().getName()) != null );
 		    int fieldId = getFieldId(fieldName);
 		    Util.check(fieldId != -1);
-		    insertEntry(fieldId, row, value);
+
+		    st.setInt(1, fieldId);
+		    st.setInt(2, row);
+		    st.setString(3, value);
+		    st.execute();
 		}
 		row++;
 	    }
@@ -397,7 +394,7 @@ public abstract class ActListFactory
 						 XBaseHeader.XBaseVersion.XBASE_VERSION_DBASE_IIIP_MEMO,
 						 XBaseHeader.XBaseCharset.CHARSET_DOS_USA,
 						 getDbfFields(),
-						 provider);
+						 provider, ' ');
 	    export.write();
 	} catch (XBaseException e) {
 	    throw new RuntimeException("XBaseException while writing the dbf file: " + e.toString(), e);

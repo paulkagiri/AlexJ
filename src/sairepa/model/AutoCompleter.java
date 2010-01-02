@@ -40,7 +40,7 @@ public interface AutoCompleter
 
 	PreparedStatement st =
 	  db.getConnection().prepareStatement("SELECT DISTINCT value FROM entries WHERE field = ?"
-					      + " AND LOWER(LTRIM(SUBSTRING(value, 0, ?))) = ?"
+					      + " AND LOWER(LTRIM(SUBSTR(value, 0, ?))) = ?"
 					      + " AND LENGTH(LTRIM(value)) <= ?");
 	initialString = initialString.toLowerCase();
 	initialString = initialString.trim();
