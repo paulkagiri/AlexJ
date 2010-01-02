@@ -61,8 +61,7 @@ public class InMemoryActList implements ActList
 	    assert(!(actList instanceof InMemoryActList));
 	    return new InMemoryActList(actList, obs);
 	} catch (OutOfMemoryError e) {
-	    System.err.println("OutOfMemoryError: Woops! JVM probably screwed up because " +
-			       "it's unexpected here ; anyway let's fall back on direct DB " +
+	    System.err.println("OutOfMemoryError: Woops! Let's fall back on direct DB " +
 			       "access");
 	    return actList;
 	} catch (Exception e) {
