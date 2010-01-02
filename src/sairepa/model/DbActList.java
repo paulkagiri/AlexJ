@@ -356,7 +356,7 @@ public class DbActList implements ActList
 		if (sortingFieldId >= 0) {
 		    try {
 			PreparedStatement rowGetter
-			    = db.getConnection().prepareStatement("SELECT row FROM entries WHERE field = ? ORDER BY LOWER(value)"
+			    = db.getConnection().prepareStatement("SELECT row FROM entries WHERE field = ? ORDER BY LOWER(LTRIM(value))"
 								  + (desc ? " DESC" : "") + " LIMIT 1 OFFSET ?");
 			rowGetter.setInt(1, sortingFieldId);
 			rowGetter.setInt(2, position);
