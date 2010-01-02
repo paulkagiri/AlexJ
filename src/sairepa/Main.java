@@ -40,7 +40,7 @@ public class Main {
     private Controller controller = null;
 
     private Main() throws Exception {
-	//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 	//// we force metal theme to avoid problems with the closeable tabs
 	//UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
     }
