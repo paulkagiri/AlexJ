@@ -313,14 +313,15 @@ public abstract class ActListFactory
 	    }
 
 	    st = db.getConnection().prepareStatement("SELECT entries.field, entries.row, entries.value " +
-						      "FROM fields INNER JOIN entries ON fields.id = entries.field " +
-						      "WHERE fields.file = ? ORDER BY entries.row");
+						     "FROM fields INNER JOIN entries ON fields.id = entries.field " +
+						     "WHERE fields.file = ? ORDER BY entries.row");
 	    st.setInt(1, fileId);
 	    data = st.executeQuery();
 	}
 
 	public boolean hasRow(int row) {
-	    System.out.println("Writing: " + Integer.toString(row) + "/" + Integer.toString(nmbRow));
+	    if ( row % 100 == 0 )
+		System.out.println("Writing: " + Integer.toString(row) + "/" + Integer.toString(nmbRow));
 	    return (row < nmbRow);
 	}
 
@@ -383,11 +384,15 @@ public abstract class ActListFactory
 	java.util.Date start, stop;
 	start = new java.util.Date();
 
+	actList.refresh();
+	dbf.delete();
+	dbt.delete();
+	if ( actList.getRowCount() <= 0 ) {
+	    System.out.println("Nothing to write in '" + dbf.getPath() + "'");
+	    return false;
+	}
 	try {
-	    actList.refresh();
 	    XBaseProvider provider = new XBaseProvider();
-	    dbf.delete();
-	    dbt.delete();
 	    XBaseExport export = new XBaseExport(dbf, dbt,
 						 XBaseHeader.XBaseVersion.XBASE_VERSION_DBASE_IIIP_MEMO,
 						 XBaseHeader.XBaseCharset.CHARSET_DOS_USA,
