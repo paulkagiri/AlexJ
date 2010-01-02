@@ -11,12 +11,11 @@
 
 	<property name="final.dir" value="bin" />
 
-	<!-- xbase -->
-	<property name="xbase.location" value="${lib.dir}/xBaseJ.jar" />
-	<available file="${xbase.location}" property="xbase_available" />
-	<fail unless="xbase_available" status="1"
-	message="You need to download xBaseJ.jar from
-	http://sourceforge.net/projects/xbasej/ and to put it in lib/"
+	<!-- fxie -->
+	<property name="fxie.location" value="${lib.dir}/fxie.jar" />
+	<available file="${fxie.location}" property="fxie_available" />
+	<fail unless="fxie_available" status="1"
+	message="You need to download fxie.jar from kwain.net and to put it in lib/"
 	/>
 
 	<!-- HSQLDB -->
@@ -24,22 +23,6 @@
 	<available file="${hsqldb.location}" property="hsqldb_available" />
 	<fail unless="hsqldb_available" status="1"
 	message="You need to download hsqldb.jar from http://sourceforge.net/projects/hsqldb/ and to put it in lib/ or set the ant property 'hsqldb.location' to the correct path (filename included)" />
-
-	<!-- log4j -->
-	<property name="log4j.location" value="${lib.dir}/log4j.jar" />
-	<available file="${log4j.location}" property="log4j_available" />
-	<fail unless="log4j_available" status="1"
-	message="You need to download log4j.jar from
-	http://sourceforge.net/projects/xbasej/ and to put it in lib/"
-	/>
-
-	<!-- xercesImpl (xbasej dependency) -->
-	<property name="xercesImpl.location" value="${lib.dir}/xercesImpl.jar" />
-	<available file="${xercesImpl.location}" property="xercesImpl_available" />
-	<fail unless="xercesImpl_available" status="1"
-	message="You need to download xercesImpl.jar from
-	http://sourceforge.net/projects/xbasej/ and to put it in lib/"
-	/>
 
 	<!-- JLHA -->
 	<property name="jlha.location" value="${lib.dir}/jlha.jar" />
@@ -54,10 +37,8 @@
 		<javac srcdir="${src.dir}" destdir="${bin.dir}" debug="true" optimize="true" encoding="UTF8">
 			<compilerarg value="-Xlint" />
 			<classpath>
-				<pathelement location="${log4j.location}"/>
 				<pathelement location="${hsqldb.location}"/>
-				<pathelement location="${xbase.location}"/>
-				<pathelement location="${xercesImpl.location}"/>
+				<pathelement location="${fxie.location}"/>
 				<pathelement location="${jlha.location}"/>
 			</classpath>
 		</javac>
@@ -66,10 +47,8 @@
 			<fileset dir="${src.dir}">
 				<include name="**/*.properties" />
 			</fileset>
-			<zipfileset src="${xbase.location}" />
+			<zipfileset src="${fxie.location}" />
 			<zipfileset src="${hsqldb.location}" />
-			<zipfileset src="${log4j.location}" />
-			<zipfileset src="${xercesImpl.location}" />
 			<zipfileset src="${jlha.location}" />
 		</copy>
 	</target>
@@ -91,9 +70,7 @@
 	</target>
 
 	<target name="javadoc">
-		<javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}">
-			<fileset dir="${src.dir}" includes="**/*.java" />
-		</javadoc>
+		<javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}" />
 	</target>
 
 	<target name="scanner" depends="compile">

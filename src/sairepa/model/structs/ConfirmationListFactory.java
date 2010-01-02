@@ -7,27 +7,18 @@ import java.sql.Connection;
 import sairepa.model.*;
 import sairepa.model.fields.*;
 
-import org.xBaseJ.xBaseJException;
-import org.xBaseJ.fields.CharField;
-import org.xBaseJ.fields.DateField;
-import org.xBaseJ.fields.FloatField;
-import org.xBaseJ.fields.LogicalField;
-import org.xBaseJ.fields.MemoField;
-import org.xBaseJ.fields.NumField;
-import org.xBaseJ.fields.PictureField;
-
 public class ConfirmationListFactory extends ActListFactory
 {
   public static FieldLayout fields = BaptismListFactory.fields;
 
-  protected ConfirmationListFactory(Model m, File projectDir, String filename)
+    protected ConfirmationListFactory(Model m, File projectDir, String dbf, String dbt)
       throws java.io.FileNotFoundException {
-    super(m, Util.getFile(projectDir, filename), fields);
+	super(m, Util.getFile(projectDir, dbf), Util.getFile(projectDir, dbt), fields);
   }
 
   public ConfirmationListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    this(m, projectDir, "confirm5.dbf");
+      this(m, projectDir, "confirm5.dbf", "confirm5.dbt");
   }
 
   public String toString() {

@@ -4,13 +4,12 @@ import java.io.IOException;
 
 import sairepa.model.*;
 
-import org.xBaseJ.xBaseJException;
-import org.xBaseJ.fields.CharField;
+import net.kwain.fxie.XBaseFieldType;
 
 public class LocalityField extends ActField
 {
-  public LocalityField(String name) throws xBaseJException, IOException {
-    super(new CharField(name, 38));
+  public LocalityField(String name) throws IOException {
+      super(name, 38, new XBaseFieldType.XBaseFieldTypeString());
   }
 
   @Override

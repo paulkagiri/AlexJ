@@ -1,16 +1,9 @@
 package sairepa;
 
-import org.xBaseJ.DBF;
-import org.xBaseJ.xBaseJException;
+import java.io.File;
+import java.util.List;
 
-import org.xBaseJ.fields.CharField;
-import org.xBaseJ.fields.DateField;
-import org.xBaseJ.fields.Field;
-import org.xBaseJ.fields.FloatField;
-import org.xBaseJ.fields.LogicalField;
-import org.xBaseJ.fields.MemoField;
-import org.xBaseJ.fields.NumField;
-import org.xBaseJ.fields.PictureField;
+import net.kwain.fxie.*;
 
 /**
  * Simple main() class/function to scan quickly a dbf file
@@ -19,32 +12,29 @@ public class DbfScanner
 {
     public static void main(String args[]) throws Exception
     {
-      DBF dbfFile = new DBF(args[0], DBF.READ_ONLY, "CP850");
+	XBaseImport imp = new XBaseImport(new File(args[0]),
+					  new File(args[0].replaceAll(".dbf", ".dbt")));
 
-      try {
-	for (int i = 1 ; i <= dbfFile.getFieldCount() ; i++) {
-	  Field field = dbfFile.getField(i);
-
-	  System.out.println("====================");
-	  System.out.println("Name: " + field.getName());
-	  System.out.println("Type: " + field.getClass().getName());
-	  System.out.println("Length: " + field.Length);
-
-	  System.out.println("");
-	}
-
-	if (args.length >= 2) {
-	  while(true) {
-	    dbfFile.read();
-	    System.out.println("\n=====================");
-	    for (int i = 1 ; i <= dbfFile.getFieldCount() ; i++) {
-	    Field field = dbfFile.getField(i);
-	    System.out.println(field.getName() + " : " + field.get());
+	try {
+	    for (XBaseHeader.XBaseField field : imp.getHeader().getFields()) {
+		System.out.println("====================");
+		System.out.println("Name: " + field.getName());
+		System.out.println("Type: " + field.getFieldType().toString());
+		System.out.println("Length: " + field.getLength());
+		System.out.println("");
 	    }
-	  }
+
+	    if (args.length >= 2) {
+		while(true) {
+		    List<XBaseValue> values = imp.read();
+		    System.out.println("\n=====================");
+		    for (XBaseValue value : values) {
+			System.out.println(value.getField().getName() + " : " + value.getHumanReadableValue());
+		    }
+		}
+	    }
+	} finally {
+	    imp.close();
 	}
-      } finally {
-	dbfFile.close();
-      }
     }
 }

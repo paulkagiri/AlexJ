@@ -66,8 +66,7 @@ public class Util
      */
     public static File getFile(File dirPath, String filename)
 	throws FileNotFoundException {
-	File[] files = dirPath.listFiles(
-					 new FileFilterIgnoringCase(filename));
+	File[] files = dirPath.listFiles(new FileFilterIgnoringCase(filename));
 
 	if (files.length < 1) {
 	    return new File(dirPath, filename);

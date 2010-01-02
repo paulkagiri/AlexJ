@@ -7,22 +7,13 @@ import java.sql.Connection;
 import sairepa.model.*;
 import sairepa.model.fields.*;
 
-import org.xBaseJ.xBaseJException;
-import org.xBaseJ.fields.CharField;
-import org.xBaseJ.fields.DateField;
-import org.xBaseJ.fields.FloatField;
-import org.xBaseJ.fields.LogicalField;
-import org.xBaseJ.fields.MemoField;
-import org.xBaseJ.fields.NumField;
-import org.xBaseJ.fields.PictureField;
-
 public class NotarialDeceaseListFactory extends ActListFactory
 {
   public static FieldLayout fields = SepulchreListFactory.fields;
 
   public NotarialDeceaseListFactory(Model m, File projectDir)
       throws java.io.FileNotFoundException {
-    super(m, Util.getFile(projectDir, "dec_inv5.dbf"), fields);
+      super(m, Util.getFile(projectDir, "dec_inv5.dbf"), Util.getFile(projectDir, "dec_inv5.dbt"), fields);
   }
 
   public String toString() {

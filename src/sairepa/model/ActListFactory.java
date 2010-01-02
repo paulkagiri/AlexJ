@@ -9,14 +9,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
-import org.xBaseJ.DBF;
-import org.xBaseJ.xBaseJException;
-import org.xBaseJ.fields.Field;
-import org.xBaseJ.fields.MemoField;
-
-import sairepa.model.*;
+import net.kwain.fxie.*;
 
 /**
  * Do the work about importing/exporting DBF files into Hsqldb
@@ -28,13 +25,15 @@ public abstract class ActListFactory
     private Model model;
 
     private File dbf;
+    private File dbt;
     private int fileId; // db specific
 
     private Hsqldb db;
 
-    public ActListFactory(Model m, File dbf, FieldLayout fields) {
+    public ActListFactory(Model m, File dbf, File dbt, FieldLayout fields) {
 	this.fields = fields;
 	this.dbf = dbf;
+	this.dbt = dbt;
 	this.model = m;
     }
 
@@ -44,6 +43,10 @@ public abstract class ActListFactory
 
     public File getDbf() {
 	return dbf;
+    }
+
+    public File getDbt() {
+	return dbt;
     }
 
     public void init(Hsqldb db) throws SQLException, IOException {
@@ -185,19 +188,28 @@ public abstract class ActListFactory
 	}
     }
 
-    protected int getFieldId(String name) throws SQLException {
-	PreparedStatement st =
-	    db.getConnection().prepareStatement("SELECT id FROM fields WHERE file = ? AND name = ? LIMIT 1");
-	st.setInt(1, fileId);
-	st.setString(2, name);
+    private Map<String, Integer> _fieldNameToId = null;
+    private void _loadFileId() {
+	try {
+	    _fieldNameToId = new HashMap<String, Integer>();
+	    PreparedStatement st =
+		db.getConnection().prepareStatement("SELECT id, name FROM fields WHERE file = ?");
+	    st.setInt(1, fileId);
+	    ResultSet set = st.executeQuery();
+	    while(set.next()) {
+		int id = set.getInt(1);
+		String name = set.getString(2);
+		_fieldNameToId.put(name, id);
+	    }
+	} catch (SQLException e) {
+	    throw new RuntimeException("SQLException", e);
+	}
+    }
 
-	ResultSet set = st.executeQuery();
-
-	int fieldId = (set.next()) ? set.getInt(1) : -1;
-
-	set.close();
-
-	return fieldId;
+    protected int getFieldId(String name) {
+	if ( _fieldNameToId == null )
+	    _loadFileId();
+	return _fieldNameToId.get(name);
     }
 
     private void createField(String name) throws SQLException {
@@ -233,39 +245,34 @@ public abstract class ActListFactory
 
 	updateFieldTable();
 
-	DBF dbfFile;
-
 	try {
-	    dbfFile = new DBF(dbf.getPath(), DBF.READ_ONLY, "CP850");
-	} catch (xBaseJException e) {
-	    throw new IOException("xBaseJException while opening the DBF file: " + e.toString());
-	}
+	    XBaseImport dbfImport = new XBaseImport(dbf, dbt);
 
-	int row = 0;
-
-	try {
-	    while(true) {
+	    int row = 0;
+	    while(dbfImport.available() > 0) {
 		if ( row % 100 == 0 )
-		    System.out.println(toString() + ": DBF reading: " + Integer.toString(row));
+		    System.out.println(toString() + ": DBF reading: " + Integer.toString(row)
+				       + " / " + Integer.toString(row + dbfImport.available()));
 
-		dbfFile.read();
-		for (int i = 1 ; i <= dbfFile.getFieldCount() ; i++) {
-		    Field field = dbfFile.getField(i);
-
+		List<XBaseValue> record = dbfImport.read();
+		if ( record == null )
+		    break;
+		for (XBaseValue xValue : record) {
 		    String value;
-		    Util.check((value = field.get()) != null);
-
-		    int fieldId = getFieldId(field.getName());
+		    Util.check( (value = xValue.getHumanReadableValue()) != null );
+		    String fieldName;
+		    Util.check( (fieldName = xValue.getField().getName()) != null );
+		    int fieldId = getFieldId(fieldName);
 		    Util.check(fieldId != -1);
-		    insertEntry(fieldId, row, Util.trim(value));
+		    insertEntry(fieldId, row, value);
 		}
 		row++;
 	    }
-	} catch (xBaseJException e) {
-	    // most ugly way ever to signal EOF
-	}
 
-	dbfFile.close();
+	    dbfImport.close();
+	} catch(XBaseException e) {
+	    throw new RuntimeException("Fichiers DBT/DBF invalides !", e);
+	}
 
 	stop = new java.util.Date();
 	System.out.println("Took " + Long.toString((stop.getTime() - start.getTime()) / 1000) + " seconds to read '" + toString() + "'");
@@ -282,91 +289,113 @@ public abstract class ActListFactory
 	st.execute();
     }
 
+    private class XBaseProvider implements XBaseExport.DataProvider {
+	private int nmbRow;
+	private ResultSet data;
+	private Map<String, Integer> dbfFields; /* name -> id */
+
+	public XBaseProvider() throws SQLException, XBaseException {
+	    this.nmbRow = actList.getRowCount();
+
+	    PreparedStatement st;
+
+	    st = db.getConnection().prepareStatement("SELECT fields.id, fields.name " +
+						     "FROM fields " +
+						     "WHERE fields.file = ?");
+	    st.setInt(1, fileId);
+
+	    ResultSet set = st.executeQuery();
+	    dbfFields = new HashMap<String, Integer>();
+	    while(set.next()) {
+		int fieldId = set.getInt(1);
+		String name = set.getString(2);
+		dbfFields.put(name, fieldId);
+	    }
+
+	    st = db.getConnection().prepareStatement("SELECT entries.field, entries.row, entries.value " +
+						      "FROM fields INNER JOIN entries ON fields.id = entries.field " +
+						      "WHERE fields.file = ? ORDER BY entries.row");
+	    st.setInt(1, fileId);
+	    data = st.executeQuery();
+	}
+
+	public boolean hasRow(int row) {
+	    System.out.println("Writing: " + Integer.toString(row) + "/" + Integer.toString(nmbRow));
+	    return (row < nmbRow);
+	}
+
+	private int lastRow = -1;
+	private Map<Integer, String> rowValues = null; /* fieldId -> String */
+
+	/* DIRTY: (but avoid a call to data.previous()) */
+	private int _previousDataRow = -1;
+	private int _previousFieldId = -1;
+	private String _previousValue = null;
+
+	public String getValue(int row, XBaseHeader.XBaseField field) {
+	    if ( row != lastRow || rowValues == null ) {
+		lastRow = row;
+		/* reading next results */
+		rowValues = new HashMap<Integer, String>();
+		try {
+		    if ( _previousDataRow == row ) {
+			rowValues.put(_previousFieldId, _previousValue);
+		    }
+		    while(data.next()) {
+			int dataRow = data.getInt(2);
+			int fieldId = data.getInt(1);
+			String value = data.getString(3);
+			if ( dataRow != row ) {
+			    _previousDataRow = dataRow;
+			    _previousFieldId = fieldId;
+			    _previousValue = value;
+			    break;
+			}
+			rowValues.put(fieldId, value);
+		    }
+		} catch(SQLException e) {
+		    throw new RuntimeException("SQLException", e);
+		}
+	    }
+
+	    int fieldId = dbfFields.get(field.getName());
+	    String value = rowValues.get(fieldId);
+
+	    Util.check(value != null);
+
+	    if (field.getFieldType() instanceof XBaseFieldType.XBaseFieldTypeMemo
+		&& ("".equals(value.trim())
+		    || "-".equals(value.trim())))
+		value = "";
+	    return value;
+	}
+    }
+
+    private List<XBaseHeader.XBaseField> getDbfFields() throws XBaseException {
+	List<XBaseHeader.XBaseField> dbfFields = new Vector<XBaseHeader.XBaseField>();
+	for (ActField field : fields) {
+	    dbfFields.add(field.createDBFField());
+	}
+	return dbfFields;
+    }
+
     private boolean rewriteDbf() throws SQLException, IOException {
 	java.util.Date start, stop;
 	start = new java.util.Date();
 
 	try {
 	    actList.refresh();
-	    if (actList.getRowCount() <= 0) {
-		System.out.println("NOTICE: '" + dbf.getPath() + "' is empty ; not rewritten");
-		dbf.delete();
-		return false;
-	    }
-
-	    Map<String, Field> dbfFields = new HashMap<String, Field>();
-
-	    for (ActField field : fields) {
-		dbfFields.put(field.getName(), field.createDBFField());
-	    }
-
-	    int total = actList.getRowCount();
-	    DBF dbfFile = new DBF(dbf.getPath(), (int)DBF.DBASEIII_WITH_MEMO, true, "CP850");
-
-	    try {
-		for (Field field : dbfFields.values()) {
-		    dbfFile.addField(field);
-		}
-
-		PreparedStatement st
-		    = db.getConnection().prepareStatement("SELECT fields.name, entries.row, entries.value " +
-							  "FROM fields INNER JOIN entries ON fields.id = entries.field " +
-							  "WHERE fields.file = ? ORDER BY entries.row");
-		st.setInt(1, fileId);
-
-		ResultSet set = st.executeQuery();
-
-		try {
-		    int currentRow = 0;
-
-		    while(set.next()) {
-			String fieldName = set.getString(1);
-			int row = set.getInt(2);
-			String value = set.getString(3);
-
-			Field field = dbfFields.get(fieldName);
-			Util.check(field != null);
-
-			if (row != currentRow) {
-			    if ( row % 100 == 0 ) {
-				System.out.println(toString() + ": DBF rewriting: " +
-						   Integer.toString(row) + " / " + Integer.toString(total));
-			    }
-			    dbfFile.write();
-			    currentRow = row;
-			}
-
-			if ((!(field instanceof MemoField)) && value.length() > field.Length) {
-			    System.err.println("VALUE TOO LONG : "+ field.getClass().getName() + " : " +
-					       field.getName() + " : " +
-					       Integer.toString(field.Length) +" : '"+ value+"' : " +
-					       Integer.toString(value.length()));
-			}
-
-			if (field instanceof MemoField
-			    && ("".equals(value.trim())
-				|| "-".equals(value.trim())))
-			    {
-				value = "";
-			    }
-
-			if (!(field instanceof MemoField)) {
-			    int lng = ActField.getMaxLength(field);
-			    value = ActField.pad(value, ' ', lng);
-			}
-
-			field.put(value);
-		    }
-		} finally {
-		    set.close();
-		}
-
-		dbfFile.write();
-	    } finally {
-		dbfFile.close();
-	    }
-	} catch (xBaseJException e) {
-	    throw new RuntimeException("xBaseJException while writing the dbf file: " + e.toString());
+	    XBaseProvider provider = new XBaseProvider();
+	    dbf.delete();
+	    dbt.delete();
+	    XBaseExport export = new XBaseExport(dbf, dbt,
+						 XBaseHeader.XBaseVersion.XBASE_VERSION_DBASE_IIIP_MEMO,
+						 XBaseHeader.XBaseCharset.CHARSET_DOS_USA,
+						 getDbfFields(),
+						 provider);
+	    export.write();
+	} catch (XBaseException e) {
+	    throw new RuntimeException("XBaseException while writing the dbf file: " + e.toString(), e);
 	}
 
 	stop = new java.util.Date();

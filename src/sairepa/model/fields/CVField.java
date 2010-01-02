@@ -10,12 +10,11 @@ import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.AutoCompleter;
 
-import org.xBaseJ.xBaseJException;
-import org.xBaseJ.fields.CharField;
+import net.kwain.fxie.*;
 
 public class CVField extends ActField {
-  public CVField(String name) throws xBaseJException, IOException {
-    super(new CharField(name, 1));
+  public CVField(String name) throws IOException {
+      super(name, 1, new XBaseFieldType.XBaseFieldTypeString());
   }
 
   public void notifyUpdate(ActEntry e, String previousValue) {
