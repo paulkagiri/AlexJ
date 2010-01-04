@@ -71,10 +71,16 @@ public class ClientFile {
       }
     }
 
+    if ( userName == null || communeAndZip == null ) {
+	throw new InvalidClientFileException("Error while parsing client field. Missing field");
+    }
+
     checkCode(userName, userNameCode, 49724, 28971);
     checkCode(communeAndZip, communeAndZipCode, 64939, 62656);
 
     String[] split = communeAndZip.split(" ");
+    if ( split.length != 2 )
+	throw new InvalidClientFileException("Error while parsing client field: Can't separate properly commune and zip code");
     this.zipCode = split[0];
     this.commune = split[1];
   }
