@@ -155,20 +155,17 @@ public class ActionSave implements ActionListener
     SplashScreen ss = new SplashScreen("Sauvegarde");
     ss.start();
     try {
-      model.save(ss);
-    } catch(Exception e) {
-      throw new RuntimeException(e);
-    } finally {
-      ss.stop();
-    }
-    ss.setProgression(90, "Creation du ZIP");
+	ss.start();
+	model.save(ss);
 
-    try {
-      if (f.getName().toLowerCase().endsWith(".lzh")) {
-	saveLha(f);
-      } else {
-	saveZip(f);
-      }
+	ss.setProgression(90, "Creation du ZIP");
+	if (f.getName().toLowerCase().endsWith(".lzh")) {
+	    saveLha(f);
+	} else {
+	    saveZip(f);
+	}
+    } catch(Exception e) {
+	throw new RuntimeException(e);
     } finally {
       ss.stop();
     }
