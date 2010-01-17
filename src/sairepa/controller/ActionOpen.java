@@ -120,22 +120,20 @@ public class ActionOpen implements ActionListener
     ss.start();
     ss.setProgression(0, "Unziping");
     try {
-	try {
-	    model.close(ProgressionObserver.DUMB_OBSERVER);
+	model.close(ProgressionObserver.DUMB_OBSERVER);
 
-	    if (f.getName().toLowerCase().endsWith(".lzh")) {
-		openLha(f);
-	    } else {
-		openZip(f);
-	    }
-
-	    model.init(ss);
-	} finally {
-	    ss.stop();
+	if (f.getName().toLowerCase().endsWith(".lzh")) {
+	    openLha(f);
+	} else {
+	    openZip(f);
 	}
+
+	model.init(ss);
     } catch(Exception e) { /* wouldn't miss the runtime ones also */
 	ErrorMessage.displayError(e);
 	throw new RuntimeException(e);
+    } finally {
+	ss.stop();
     }
 
     view.getMainWindow().setVisible(true);

@@ -52,6 +52,10 @@ public abstract class ActListFactory
     public void init(Hsqldb db) throws SQLException, IOException {
 	this.db = db;
 
+	/* Workaround: when restoring files, the case may have changed ... */
+	dbf = Util.getFile(dbf.getParentFile(), dbf.getName());
+	dbt = Util.getFile(dbt.getParentFile(), dbt.getName());
+
 	synchronized(db.getConnection()) {
 	    if ((fileId = getFileId()) < 0) {
 		createFileEntry();
@@ -268,7 +272,7 @@ public abstract class ActListFactory
 
 	    dbfImport.close();
 	} catch(XBaseException e) {
-	    throw new RuntimeException("Fichiers DBT/DBF invalides !", e);
+	    throw new RuntimeException("Fichiers DBT/DBF invalides ! (" + dbf.getPath() + " ; " + dbt.getPath() + ")", e);
 	}
 
 	stop = new java.util.Date();

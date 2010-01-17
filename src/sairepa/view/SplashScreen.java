@@ -107,6 +107,7 @@ public class SplashScreen extends JDialog implements ProgressionObserver
      * @param progression in pourcent
      */
     public void setProgression(int progression, String txt) {
+	System.out.println("SplashScreen: progression: " + Integer.toString(progression) + " : " + txt);
 	thread.updateData(progression, txt);
 	rth.interrupt();
     }
