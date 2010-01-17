@@ -22,6 +22,7 @@ import jp.gr.java_conf.dangan.util.lha.LhaHeader;
 
 import sairepa.model.Model;
 import sairepa.model.ProgressionObserver;
+import sairepa.model.Util;
 import sairepa.view.ErrorMessage;
 import sairepa.view.SplashScreen;
 import sairepa.view.View;
@@ -49,7 +50,7 @@ public class ActionOpen implements ActionListener
 	ZipEntry entry = entries.nextElement();
 	InputStream in = zip.getInputStream(entry);
 	try {
-	  FileOutputStream out = new FileOutputStream(new File(model.getProjectDir(), entry.getName()));
+	  FileOutputStream out = new FileOutputStream(Util.getFile(model.getProjectDir(), entry.getName()));
 	  try {
 	    byte[] buffer = new byte[32768];
 	    int nBytes;
@@ -79,7 +80,7 @@ public class ActionOpen implements ActionListener
 	LhaHeader entry = ((LhaHeader)entries.nextElement());
 	InputStream in = lha.getInputStream(entry);
 	try {
-	  FileOutputStream out = new FileOutputStream(new File(model.getProjectDir(), entry.getPath()));
+	  FileOutputStream out = new FileOutputStream(Util.getFile(model.getProjectDir(), entry.getPath()));
 	  try {
 	    byte[] buffer = new byte[32768];
 	    int nBytes;

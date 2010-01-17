@@ -1,6 +1,7 @@
 package sairepa.model;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,7 +25,13 @@ public class BackupManager
 
   public BackupManager(File projectDir) {
     this.projectDir = projectDir;
-    this.backupDir = new File(projectDir, BACKUP_DIR_NAME);
+    File bDir; /* to make the compiler happy (because of the 'final' on backupDir) */
+    try {
+	bDir = Util.getFile(projectDir, BACKUP_DIR_NAME);
+    } catch (FileNotFoundException e /* used here to say there many file with the same name but a different case */) {
+	bDir = new File(projectDir, BACKUP_DIR_NAME);
+    }
+    this.backupDir = bDir;
     if ( (backupDir.exists() && !backupDir.isDirectory())
 	 || (!backupDir.exists() && !backupDir.mkdir()) )
       throw new RuntimeException("Ne peut pas creer le repertoire pour les sauvegardes '" + backupDir.getPath() + "'");
@@ -48,7 +55,11 @@ public class BackupManager
 
     while(availableBackups.size() > NMB_BACKUPS) {
       Date d = availableBackups.get(0);
-      delete(new File(backupDir, FILE_DATE_FORMAT.format(d)));
+      try {
+	  delete(Util.getFile(backupDir, FILE_DATE_FORMAT.format(d)));
+      } catch (FileNotFoundException e) {
+	  delete(new File(backupDir, FILE_DATE_FORMAT.format(d)));
+      }
       availableBackups.remove(d);
     }
   }
@@ -89,7 +100,12 @@ public class BackupManager
 
   public void doBackup() {
     String backupName = FILE_DATE_FORMAT.format(new Date());
-    File bDir = new File(backupDir, backupName);
+    File bDir;
+    try {
+	bDir = Util.getFile(backupDir, backupName);
+    } catch (FileNotFoundException e) {
+	bDir = new File(backupDir, backupName);
+    }
 
     if (bDir.exists()) {
       System.err.println("WARNING: Erasing a previous backup made today");
@@ -102,7 +118,13 @@ public class BackupManager
     File[] srcFiles = projectDir.listFiles(new Util.NonDirectoryFilter());
     for (int i = 0 ; i < srcFiles.length ; i++) {
       System.out.println("Backuping '" + srcFiles[i].getPath() + "'");
-      copy(srcFiles[i], new File(bDir, srcFiles[i].getName()));
+      File out;
+      try {
+	  out = Util.getFile(bDir, srcFiles[i].getName());
+      } catch (FileNotFoundException e) {
+	  out = new File(bDir, srcFiles[i].getName());
+      }
+      copy(srcFiles[i], out);
     }
   }
 
@@ -113,13 +135,24 @@ public class BackupManager
     System.out.println("Restoring from backup: " + d.toString());
     obs.setProgression(0, "Restauration de: " + d.toString());
     String backupName = FILE_DATE_FORMAT.format(d);
-    File bDir = new File(backupDir, backupName);
+    File bDir;
+
+    try {
+	bDir = Util.getFile(backupDir, backupName);
+    } catch (FileNotFoundException e) {
+	bDir = new File(backupDir, backupName);
+    }
 
     File[] input = bDir.listFiles(new Util.NonDirectoryFilter());
     for (int i = 0 ; i < input.length ; i++) {
       obs.setProgression(i * 99 / input.length,
 			 "Restauration de: " + input[i].getName());
-      File output = new File(projectDir, input[i].getName());
+      File output;
+      try {
+	  output = Util.getFile(projectDir, input[i].getName());
+      } catch (FileNotFoundException e) {
+	  output = new File(projectDir, input[i].getName());
+      }
       if (output.exists())
 	delete(output);
       copy(input[i], output);
