@@ -175,6 +175,8 @@ public class ActListViewer extends Viewer
 
   @Override
   public void refresh(Act a) {
+      if ( a.getActList().getFactory() != actList.getFactory() ) /* means it's none of our busineess */
+	  return;
       int row = actList.getActVisualRow(a);
       if ( row < 0 ) {
 	  refresh();

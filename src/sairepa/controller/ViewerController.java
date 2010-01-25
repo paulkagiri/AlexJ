@@ -3,6 +3,7 @@ package sairepa.controller;
 import javax.swing.JOptionPane;
 
 import sairepa.model.Act;
+import sairepa.model.ActList;
 import sairepa.model.ActListFactory;
 import sairepa.model.Model;
 
@@ -28,7 +29,7 @@ public class ViewerController implements Viewer.ViewerObserver
       return false;
     }
     v.getActList().insert(a);
-    refreshAllViewers(v, a);
+    refreshAllViewers(v, null, a);
     return true;
   }
 
@@ -37,7 +38,7 @@ public class ViewerController implements Viewer.ViewerObserver
       return false;
     }
     v.getActList().insert(a, row);
-    refreshAllViewers(v, null);
+    refreshAllViewers(v, a.getActList(), null);
     return true;
   }
 
@@ -46,25 +47,32 @@ public class ViewerController implements Viewer.ViewerObserver
       return false;
     }
     a.update();
-    refreshAllViewers(v, a);
+    refreshAllViewers(v, null, a);
     return true;
   }
 
   public boolean deletingAct(Viewer v, Act a) {
+      ActList actList = a.getActList();
     v.getActList().delete(a);
-    refreshAllViewers(v, null);
+    refreshAllViewers(v, actList, null);
     return true;
   }
 
-    private void refreshAllViewers(Viewer exception, Act a) {
+    private void refreshAllViewers(Viewer exception, ActList actList, Act a) {
     for (Viewer v : view.getMainWindow().getViewers()) {
       if (v != exception) {
-	  if ( a == null ) {
-	      v.getActList().refresh();
-	      v.refresh();
-	  } else {
-	      v.getActList().refresh(a);
-	      v.refresh(a);
+	  if ( a == null && actList == null ) {
+	      assert(false); /* should not happen */
+	  } else if ( a != null ) {
+	      if ( v.getActList().getFactory() == a.getActList().getFactory() ) {
+		  v.getActList().refresh(a);
+		  v.refresh(a);
+	      }
+	  } else if ( actList != null ) {
+	      if ( v.getActList().getFactory() == actList.getFactory() ) {
+		  v.getActList().refresh();
+		  v.refresh();
+	      }
 	  }
       }
     }

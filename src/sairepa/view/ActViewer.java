@@ -520,6 +520,8 @@ public class ActViewer extends Viewer implements ActionListener
 
   @Override
   public void refresh(Act a) {
+      if ( a.getActList().getFactory() != currentAct.getActList().getFactory() )
+	  return;
       if ( a.getRow() == currentAct.getRow() )
 	  refresh();
   }
