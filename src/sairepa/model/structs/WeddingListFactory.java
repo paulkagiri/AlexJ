@@ -49,7 +49,7 @@ public class WeddingListFactory extends ActListFactory
 					tmpFirstName3 = new FirstNameField("PRN3"),
 					tmpLastName3 = new LastNameField("NOM3", Sex.FEMALE),
 					new ActField("LOC3", 50, new XBaseFieldType.XBaseFieldTypeString()),
-					new ActField("LOC3ID", 38, new XBaseFieldType.XBaseFieldTypeString()),
+					new LocalityField("LOC3ID"),
 					new CVField("CVF3"),
 					new ActField("NOT3", 40, new XBaseFieldType.XBaseFieldTypeString()),
 					new FieldLayout("P\350re de l'\351pouse",
