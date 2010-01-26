@@ -466,7 +466,90 @@ public class DbActList implements ActList
 	}
     }
 
+    protected class ReverseActList implements ActList {
+	private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
+
+	public ReverseActList() {
+	}
+
+	public void setActListDbObserver(ActList.ActListDbObserver obs) {
+	    DbActList.this.setActListDbObserver(obs);
+	    this.dbObserver = obs;
+	}
+
+	public ActListFactory getFactory() {
+	    return DbActList.this.getFactory();
+	}
+
+	public String getName() {
+	    return DbActList.this.getName();
+	}
+
+	public FieldLayout getFields() {
+	    return DbActList.this.getFields();
+	}
+
+	public int getRowCount() {
+	    return DbActList.this.getRowCount();
+	}
+
+	public int getActVisualRow(Act a) {
+	    return (getRowCount()-1) - DbActList.this.getActVisualRow(a);
+	}
+
+	public Act getAct(int position) {
+	    return DbActList.this.getAct((getRowCount()-1) - position);
+	}
+
+	public List<Act> getAllActs()
+	{
+	    List<Act> acts = DbActList.this.getAllActs();
+	    java.util.Collections.reverse(acts);
+	    return acts;
+	}
+
+	/**
+	 * @return beware: can return this !
+	 */
+	public ActList getSortedActList(String sortedBy, boolean desc) {
+	    return DbActList.this.getSortedActList(sortedBy, desc);
+	}
+
+	public void insert(Act act) {
+	    DbActList.this.insert(act);
+	}
+
+	public void insert(Act act, int row) {
+	    /* row definition is not clear here, better not do anything */
+	    throw new UnsupportedOperationException("Can't do");
+	}
+
+	public void delete(Act act) {
+	    DbActList.this.delete(act);
+	}
+
+	public ActListIterator iterator() {
+	    return new GenericActListIterator(db.getConnection(), ReverseActList.this);
+	}
+
+	public Act createAct() {
+	    return DbActList.this.createAct();
+	}
+
+	public void refresh() {
+	    DbActList.this.refresh();
+	}
+
+	public void refresh(Act a) {
+	}
+    }
+
+
     public ActList getSortedActList(String sortedBy, boolean desc) {
+	if ( sortedBy == null && !desc )
+	    return this;
+	else if ( sortedBy == null )
+	    return new ReverseActList();
 	return new SortedActList(sortedBy, desc);
     }
 }
