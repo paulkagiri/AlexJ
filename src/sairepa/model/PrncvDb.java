@@ -68,6 +68,11 @@ public class PrncvDb
 	}
 
 	try {
+	    Map shortTtToFullTt[] = new HashMap[2];  /* for debug purpose */
+	    for (int i = 0 ; i < shortTtToFullTt.length ; i++) {
+		shortTtToFullTt[i] = new HashMap();
+	    }
+
 	    while (imp.available() > 0) {
 		List<XBaseValue> values = imp.read();
 		if (values == null)
@@ -92,14 +97,17 @@ public class PrncvDb
 		Util.check(out != null);
 		if ( prncvs[sex.toInteger()].containsKey(in) ) {
 		    System.out.println("---");
-		    System.out.println("Integrity error in PrncvDb: PRN_TT: '" + realIn
-				       + "' (short version: '" + in + "')");
-		    System.out.println("Current value: PRN_CV: " + prncvs[sex.toInteger()].get(in));
-		    System.out.println("New value: PRN_CV: " + out);
-		    System.out.println("---");
+		    System.out.println("Integrity error in PrncvDb");
+		    System.out.println("Got PRN_TT = '" + realIn + "' (short version: '" + in + "')");
+		    System.out.println("With PRN_CV = " + out);
+		    String otherRealIn = (String)shortTtToFullTt[sex.toInteger()].get(in);
+		    System.out.println("But got also PRN_TT = '" + otherRealIn + "' (short version: '" + in + "')");
+		    System.out.println("With PRN_CV = " + prncvs[sex.toInteger()].get(in));
 		}
+		shortTtToFullTt[sex.toInteger()].put(in, realIn);
 		prncvs[sex.toInteger()].put(in, out);
 	    }
+	    System.out.println("---");
 	} catch(XBaseException e) {
 	    throw new RuntimeException("Invalid Prncvdb file !", e);
 	} finally {
