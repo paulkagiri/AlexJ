@@ -276,7 +276,8 @@ public abstract class ActListFactory
 	}
 
 	stop = new java.util.Date();
-	System.out.println("Took " + Long.toString((stop.getTime() - start.getTime()) / 1000) + " seconds to read '" + toString() + "'");
+	System.out.println("Took " + Long.toString((stop.getTime() - start.getTime()) / 1000) + " seconds to read '"
+			   + toString() + "'");
     }
 
     private void updateDbfSyncTimestamp() throws SQLException {

@@ -38,8 +38,7 @@ public class PrncvDb
     public String truncate(String str) {
 	for (String exception : EXCEPTIONS) {
 	    if (str.startsWith(exception)) {
-		if (str.length() == exception.length()) return str;
-		return str.substring(0, exception.length() + 1);
+		return str;
 	    }
 	}
 	if (str.length() > NMB_CARS)
@@ -74,20 +73,31 @@ public class PrncvDb
 		if (values == null)
 		    break;
 		Sex sex = Sex.UNKNOWN;
+		String realIn = null;
 		String in = null;
 		String out = null;
 		for (XBaseValue value : values) {
 		    if ( "MFA".equals(value.getField().getName()) )
 			sex = Sex.getSex(value.getHumanReadableValue());
-		    else if ( "PRN_TT".equals(value.getField().getName()) )
-			in = Util.trim(value.getHumanReadableValue());
+		    else if ( "PRN_TT".equals(value.getField().getName()) ) {
+			realIn = Util.trim(value.getHumanReadableValue());
+			in = truncate(realIn);
+		    }
 		    else if ( "PRN_CV".equals(value.getField().getName()) )
 			out = Util.trim(value.getHumanReadableValue());
 		}
+
 		Util.check(sex != Sex.UNKNOWN);
 		Util.check(in != null);
 		Util.check(out != null);
-
+		if ( prncvs[sex.toInteger()].containsKey(in) ) {
+		    System.out.println("---");
+		    System.out.println("Integrity error in PrncvDb: PRN_TT: '" + realIn
+				       + "' (short version: '" + in + "')");
+		    System.out.println("Current value: PRN_CV: " + prncvs[sex.toInteger()].get(in));
+		    System.out.println("New value: PRN_CV: " + out);
+		    System.out.println("---");
+		}
 		prncvs[sex.toInteger()].put(in, out);
 	    }
 	} catch(XBaseException e) {
@@ -99,10 +109,11 @@ public class PrncvDb
 
     public String getPrncv(String lu, Sex sex) {
 	Util.check(sex != Sex.UNKNOWN);
-	System.out.println("Prncv: '" + lu + "' / " +sex.toString());
 	if ("-".equals(lu.trim())) return "-";
+	System.out.println("(1) Prncv: '" + lu + "' / " +sex.toString());
 	lu = Util.trim(lu);
 	lu = truncate(lu);
+	System.out.println("(2) Prncv: '" + lu + "' / " +sex.toString());
 	String cv = (String)prncvs[sex.toInteger()].get(lu);
 	return ((cv == null) ? UNKNOWN : cv);
     }
