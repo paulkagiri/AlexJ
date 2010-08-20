@@ -1,6 +1,7 @@
 package sairepa.view;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -51,6 +52,8 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 			Toolkit.getDefaultToolkit().getScreenSize();
 		setLocation(screenSize.width/2  - (SIZE_X/2),
 				screenSize.height/2 - (SIZE_Y/2));
+
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	}
 
 	protected class SplashScreenThread implements Runnable {
@@ -82,6 +85,7 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 				}
 			}
 
+			setCursor(Cursor.getDefaultCursor());
 			setVisible(false);
 			dispose();
 		}

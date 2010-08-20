@@ -2,6 +2,7 @@ package sairepa.view;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -300,42 +301,49 @@ public class ActViewer extends Viewer implements ActionListener
 	 * immediatly if can't save
 	 */
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() != deleteButton) {
-			if (!saveAct()) {
-				return;
-			}
-		}
+		try
+		{
+			mainWindow.getContentPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-		if (e.getSource() == beginningButton) {
-			if (!hasElements()) {
+			if (e.getSource() != deleteButton) {
+				if (!saveAct()) {
+					return;
+				}
+			}
+
+			if (e.getSource() == beginningButton) {
+				if (!hasElements()) {
+					subStartNewAct();
+				} else {
+					currentAct = actListIterator.seek(0);
+					newAct = false;
+					refresh();
+				}
+			} else if (e.getSource() == previousButton) {
+				if (actListIterator.hasPrevious()) {
+					currentAct = actListIterator.previous();
+					newAct = false;
+					refresh();
+				}
+			} else if (e.getSource() == currentActField) {
+				setSelectedAct(Integer.valueOf(currentActField.getText()));
+			} else if (e.getSource() == nextButton) {
+				if (actListIterator.hasNext()) {
+					currentAct = actListIterator.next();
+					newAct = false;
+					refresh();
+				}
+			} else if (e.getSource() == endButton) {
+				subGoToLastAct();
+			} else if (e.getSource() == applyButton) {
+				subContinueTyping();
+			} else if (e.getSource() == deleteButton) {
+				subDeleteAct();
+			} else if (e.getSource() == newButton) {
 				subStartNewAct();
-			} else {
-				currentAct = actListIterator.seek(0);
-				newAct = false;
-				refresh();
 			}
-		} else if (e.getSource() == previousButton) {
-			if (actListIterator.hasPrevious()) {
-				currentAct = actListIterator.previous();
-				newAct = false;
-				refresh();
-			}
-		} else if (e.getSource() == currentActField) {
-			setSelectedAct(Integer.valueOf(currentActField.getText()));
-		} else if (e.getSource() == nextButton) {
-			if (actListIterator.hasNext()) {
-				currentAct = actListIterator.next();
-				newAct = false;
-				refresh();
-			}
-		} else if (e.getSource() == endButton) {
-			subGoToLastAct();
-		} else if (e.getSource() == applyButton) {
-			subContinueTyping();
-		} else if (e.getSource() == deleteButton) {
-			subDeleteAct();
-		} else if (e.getSource() == newButton) {
-			subStartNewAct();
+		} finally {
+			mainWindow.getContentPane().setCursor(Cursor.getDefaultCursor());
 		}
 	}
 

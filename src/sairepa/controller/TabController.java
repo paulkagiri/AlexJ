@@ -1,5 +1,7 @@
 package sairepa.controller;
 
+import java.awt.Cursor;
+
 import sairepa.model.ActListFactory;
 import sairepa.model.Model;
 import sairepa.model.Util;
@@ -24,13 +26,19 @@ public class TabController implements TabSelecter.TabSelecterObserver
 	}
 
 	public Viewer requestTabOpening(ActListFactory actListFactory, ViewerFactory viewerFactory) {
-		Viewer v = viewerFactory.createViewer(view.getMainWindow(),
-				viewerFactory.extractActList(actListFactory));
-		Util.check(v != null);
-		v.addObserver(new ViewerController(model, view, controller));
-		view.getMainWindow().addViewer(v);
-		view.getMainWindow().selectViewer(v);
-		v.init();
-		return v;
+		try {
+			/* TODO(Jflesch): swing thingies shouldn't be done here */
+			view.getMainWindow().getContentPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			Viewer v = viewerFactory.createViewer(view.getMainWindow(),
+					viewerFactory.extractActList(actListFactory));
+			Util.check(v != null);
+			v.addObserver(new ViewerController(model, view, controller));
+			view.getMainWindow().addViewer(v);
+			view.getMainWindow().selectViewer(v);
+			v.init();
+			return v;
+		} finally {
+			view.getMainWindow().getContentPane().setCursor(Cursor.getDefaultCursor());
+		}
 	}
 }
