@@ -195,7 +195,6 @@ public class DbActList implements ActList
 				act.setRow(row, false);
 				shiftAfter(row, 1);
 				act.update();
-				rowCount++;
 			} catch (SQLException e) {
 				throw new RuntimeException("SQLException", e);
 			} finally {
@@ -213,7 +212,6 @@ public class DbActList implements ActList
 			try {
 				act.delete();
 				shiftAfter(act.getRow() + 1, -1);
-				rowCount--;
 			} catch (SQLException e) {
 				throw new RuntimeException("SQLException", e);
 			}
@@ -260,6 +258,8 @@ public class DbActList implements ActList
 			}
 		}
 		fieldSet.close();
+		
+		rowCount = computeRowCount();
 	}
 
 	/**
