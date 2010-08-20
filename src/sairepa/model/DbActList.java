@@ -29,9 +29,9 @@ public class DbActList implements ActList
 		this.db = db;
 		this.fileId = fileId;
 		this.fields = fields;
-		this.rowCount = computeRowCount();
 		this.name = name;
 		this.factory = factory;
+		computeRowCount();
 	}
 
 	public ActListFactory getFactory() {
@@ -57,7 +57,7 @@ public class DbActList implements ActList
 		this.dbObserver = obs;
 	}
 
-	public int computeRowCount() throws SQLException {
+	public void computeRowCount() throws SQLException {
 		synchronized(db.getConnection()) {
 			PreparedStatement st
 				= db.getConnection().prepareStatement("SELECT entries.row " +
@@ -66,9 +66,9 @@ public class DbActList implements ActList
 			st.setInt(1, fileId);
 
 			ResultSet set = st.executeQuery();
-			rowCount = ((set.next()) ? set.getInt(1) + 1 : 0);
+			this.rowCount = ((set.next()) ? set.getInt(1) + 1 : 0);
+			System.out.println("computeRowCount(): row count: " + this.rowCount);
 			set.close();
-			return rowCount;
 		}
 	}
 
@@ -259,7 +259,7 @@ public class DbActList implements ActList
 		}
 		fieldSet.close();
 		
-		rowCount = computeRowCount();
+		computeRowCount();
 	}
 
 	/**
