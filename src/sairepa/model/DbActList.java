@@ -212,7 +212,7 @@ public class DbActList implements ActList
 		synchronized(db.getConnection()) {
 			try {
 				act.delete();
-				shiftAfter(act.getRow(), -1);
+				shiftAfter(act.getRow() + 1, -1);
 				rowCount--;
 			} catch (SQLException e) {
 				throw new RuntimeException("SQLException", e);
@@ -228,18 +228,38 @@ public class DbActList implements ActList
 		PreparedStatement selectFields
 			= db.getConnection().prepareStatement("SELECT fields.id FROM fields WHERE fields.file = ?");
 		selectFields.setInt(1, fileId);
-		ResultSet set = selectFields.executeQuery();
+		ResultSet fieldSet = selectFields.executeQuery();
+
+		PreparedStatement selectRows
+			= db.getConnection().prepareStatement("SELECT row FROM entries WHERE field = ? ORDER BY row DESC LIMIT 1");
 
 		PreparedStatement update
-			= db.getConnection().prepareStatement("UPDATE entries SET row = row + ? " +
-					"WHERE row >= ? AND field = ?");
+			= db.getConnection().prepareStatement("UPDATE entries SET row = ? " +
+					"WHERE row = ? AND field = ?");
 
-		while(set.next()) {
-			update.setInt(1, shift);
-			update.setInt(2, position);
-			update.setInt(3, set.getInt(1));
-			update.execute();
+		while(fieldSet.next()) {
+			int fieldId = fieldSet.getInt(1);
+
+			selectRows.setInt(1, fieldId);
+			ResultSet rowSet = selectRows.executeQuery();
+			int lastRow;
+			if (rowSet.next())
+				lastRow = rowSet.getInt(1);
+			else
+				lastRow = position-1;
+			rowSet.close();
+
+			int start = (shift >= 0 ? lastRow : position);
+			int move = (shift >= 0 ? -1 : 1);
+
+			for ( int row = start ; row <= lastRow && row >= position ; row += shift ) {
+				update.setInt(1, row + shift);
+				update.setInt(2, row);
+				update.setInt(3, fieldId);
+				update.execute();
+			}
 		}
+		fieldSet.close();
 	}
 
 	/**
