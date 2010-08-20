@@ -33,122 +33,122 @@ import sairepa.view.View;
  * @author jflesch
  */
 public class Main {
-    public final static String APPLICATION_NAME = "AlexJ";
+	public final static String APPLICATION_NAME = "AlexJ";
 
-    private Model model = null;
-    private View view = null;
-    private Controller controller = null;
+	private Model model = null;
+	private View view = null;
+	private Controller controller = null;
 
-    private Main() throws Exception {
-	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-	//// we force metal theme to avoid problems with the closeable tabs
-	//UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-    }
-
-    public Project promptForProject() {
-	Project.initProjectDirs(new File("."));
-	Vector<Project> projects = Project.locateProjects(new File("."));
-
-	if (projects.size() <= 0) {
-	    throw new IllegalStateException("Aucun fichier client. Ne peut continuer.");
+	private Main() throws Exception {
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		//// we force metal theme to avoid problems with the closeable tabs
+		//UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
 	}
 
-	if (projects.size() == 1) {
-	    return projects.get(0);
+	public Project promptForProject() {
+		Project.initProjectDirs(new File("."));
+		Vector<Project> projects = Project.locateProjects(new File("."));
+
+		if (projects.size() <= 0) {
+			throw new IllegalStateException("Aucun fichier client. Ne peut continuer.");
+		}
+
+		if (projects.size() == 1) {
+			return projects.get(0);
+		}
+
+		ProjectSelector selector = new ProjectSelector(projects);
+		return selector.promptUser();
 	}
 
-	ProjectSelector selector = new ProjectSelector(projects);
-	return selector.promptUser();
-    }
+	public void init() throws Exception {
+		Project p = promptForProject();
 
-    public void init() throws Exception {
-	Project p = promptForProject();
+		if (p == null) {
+			System.out.println("Interrupted by user");
+			return;
+		}
 
-	if (p == null) {
-	    System.out.println("Interrupted by user");
-	    return;
+		SplashScreen ss = new SplashScreen(APPLICATION_NAME,
+				new Font("Dialog", Font.BOLD, 32));
+		ss.start();
+
+		try {
+			model = p.createModel();
+			view = new View(model);
+			controller = new Controller(model, view);
+
+			model.init(ss);
+
+			ss.setProgression(99, "Preparation de l'interface utilisateur ...");
+			view.init();
+			controller.init();
+		} catch (Exception e) {
+			if (view != null)
+				view.close();
+			if (controller != null)
+				controller.close();
+			if (model != null)
+				model.close(new ProgressionObserver() {
+					public void setProgression(int progression, String txt) { /* dumb */ }
+				}); // no saving.
+			throw e;
+		} finally {
+			ss.stop();
+		}
 	}
 
-	SplashScreen ss = new SplashScreen(APPLICATION_NAME,
-					   new Font("Dialog", Font.BOLD, 32));
-	ss.start();
+	public void extractFileFromJar(String src, String dst) throws Exception {
+		try {
+			String realHome = this.getClass().getProtectionDomain().
+				getCodeSource().getLocation().toString();
 
-	try {
-	    model = p.createModel();
-	    view = new View(model);
-	    controller = new Controller(model, view);
+			String home = java.net.URLDecoder.decode(realHome.substring(5), "UTF-8");
 
-	    model.init(ss);
+			System.out.println("Extracting : "+realHome+" ; "+src+" ; "+dst);
 
-	    ss.setProgression(99, "Preparation de l'interface utilisateur ...");
-	    view.init();
-	    controller.init();
-	} catch (Exception e) {
-	    if (view != null)
-		view.close();
-	    if (controller != null)
-		controller.close();
-	    if (model != null)
-		model.close(new ProgressionObserver() {
-			public void setProgression(int progression, String txt) { /* dumb */ }
-		    }); // no saving.
-	    throw e;
-	} finally {
-	    ss.stop();
+			ZipFile jar = new ZipFile(home);
+			ZipEntry entry = jar.getEntry(src);
+
+			File jarFile = new File(dst);
+
+
+			InputStream in = new BufferedInputStream(jar.getInputStream(entry));
+			OutputStream out = new BufferedOutputStream(new FileOutputStream(jarFile));
+
+			byte[] buffer = new byte[2048];
+
+			int nBytes;
+
+			while( (nBytes = in.read(buffer)) > 0) {
+				out.write(buffer, 0, nBytes);
+			}
+
+			out.flush();
+			out.close();
+			in.close();
+
+			return;
+		} catch(IOException e) {
+			throw new Exception("Can't extract '" + src + "'", e);
+		}
 	}
-    }
 
-    public void extractFileFromJar(String src, String dst) throws Exception {
-	try {
-	    String realHome = this.getClass().getProtectionDomain().
-		getCodeSource().getLocation().toString();
+	/**
+	 * @param args the command line arguments
+	 */
+	public static void main(String[] args) throws Exception {
+		System.out.println("");
+		System.out.println("SAIREPA : SAIsie des REgistres PAroissiaux");
+		System.out.println("");
 
-	    String home = java.net.URLDecoder.decode(realHome.substring(5), "UTF-8");
-
-	    System.out.println("Extracting : "+realHome+" ; "+src+" ; "+dst);
-
-	    ZipFile jar = new ZipFile(home);
-	    ZipEntry entry = jar.getEntry(src);
-
-	    File jarFile = new File(dst);
-
-
-	    InputStream in = new BufferedInputStream(jar.getInputStream(entry));
-	    OutputStream out = new BufferedOutputStream(new FileOutputStream(jarFile));
-
-	    byte[] buffer = new byte[2048];
-
-	    int nBytes;
-
-	    while( (nBytes = in.read(buffer)) > 0) {
-		out.write(buffer, 0, nBytes);
-	    }
-
-	    out.flush();
-	    out.close();
-	    in.close();
-
-	    return;
-	} catch(IOException e) {
-	    throw new Exception("Can't extract '" + src + "'", e);
+		try {
+			Main main = new Main();
+			main.extractFileFromJar("prncv.dbf", "prncv.dbf");
+			main.init();
+		} catch(Exception e) {
+			ErrorMessage.displayError("Erreur lors de l'initialisation de SaiRePa", e);
+			throw e;
+		}
 	}
-    }
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws Exception {
-	System.out.println("");
-	System.out.println("SAIREPA : SAIsie des REgistres PAroissiaux");
-	System.out.println("");
-
-	try {
-	    Main main = new Main();
-	    main.extractFileFromJar("prncv.dbf", "prncv.dbf");
-	    main.init();
-	} catch(Exception e) {
-	    ErrorMessage.displayError("Erreur lors de l'initialisation de SaiRePa", e);
-	    throw e;
-	}
-    }
 }
