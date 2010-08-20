@@ -250,7 +250,8 @@ public class DbActList implements ActList
 			int start = (shift >= 0 ? lastRow : position);
 			int move = (shift >= 0 ? -1 : 1);
 
-			for ( int row = start ; row <= lastRow && row >= position ; row += shift ) {
+			for ( int row = start ; row <= lastRow && row >= position ; row += move ) {
+				System.out.println("Shifting " + row + " to " + (row+shift));
 				update.setInt(1, row + shift);
 				update.setInt(2, row);
 				update.setInt(3, fieldId);
