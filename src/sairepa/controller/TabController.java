@@ -13,24 +13,24 @@ import sairepa.view.ViewerFactory;
  */
 public class TabController implements TabSelecter.TabSelecterObserver
 {
-  private Model model;
-  private View view;
-  private Controller controller;
+	private Model model;
+	private View view;
+	private Controller controller;
 
-  public TabController(Model model, View view, Controller controller) {
-    this.model = model;
-    this.view = view;
-    this.controller = controller;
-  }
+	public TabController(Model model, View view, Controller controller) {
+		this.model = model;
+		this.view = view;
+		this.controller = controller;
+	}
 
-  public Viewer requestTabOpening(ActListFactory actListFactory, ViewerFactory viewerFactory) {
-    Viewer v = viewerFactory.createViewer(view.getMainWindow(),
-					  viewerFactory.extractActList(actListFactory));
-    Util.check(v != null);
-    v.addObserver(new ViewerController(model, view, controller));
-    view.getMainWindow().addViewer(v);
-    view.getMainWindow().selectViewer(v);
-    v.init();
-    return v;
-  }
+	public Viewer requestTabOpening(ActListFactory actListFactory, ViewerFactory viewerFactory) {
+		Viewer v = viewerFactory.createViewer(view.getMainWindow(),
+				viewerFactory.extractActList(actListFactory));
+		Util.check(v != null);
+		v.addObserver(new ViewerController(model, view, controller));
+		view.getMainWindow().addViewer(v);
+		view.getMainWindow().selectViewer(v);
+		v.init();
+		return v;
+	}
 }
