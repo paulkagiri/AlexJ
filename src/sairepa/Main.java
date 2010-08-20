@@ -1,23 +1,24 @@
 package sairepa;
 
+import java.awt.AWTEvent;
+import java.awt.EventQueue;
 import java.awt.Font;
-
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Vector;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-
-import java.util.zip.ZipFile;
-import java.util.zip.ZipEntry;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Vector;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 import sairepa.controller.Controller;
 import sairepa.model.Model;
@@ -134,6 +135,20 @@ public class Main {
 		}
 	}
 
+	static class EventQueueProxy extends EventQueue {
+		protected void dispatchEvent(AWTEvent newEvent) {
+			try {
+				super.dispatchEvent(newEvent);
+			} catch (Exception e) {
+				e.printStackTrace();
+				ErrorMessage.displayError("Erreur interne. Merci de signaler ce probleme en precisant ce que vous avez"
+						+ " fait qui a declenche cette erreur ainsi qu'en faisant un copier-coller de l'encadre ci-dessous",
+						e);
+			}
+		}
+	}
+
+
 	/**
 	 * @param args the command line arguments
 	 */
@@ -141,6 +156,9 @@ public class Main {
 		System.out.println("");
 		System.out.println("SAIREPA : SAIsie des REgistres PAroissiaux");
 		System.out.println("");
+
+		EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+		queue.push(new EventQueueProxy());
 
 		try {
 			Main main = new Main();
