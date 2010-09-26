@@ -34,6 +34,16 @@
 
 	<target name="compile">
 		<mkdir dir="${bin.dir}" />
+
+		<tstamp>
+			<format property="TODAY_FR"
+    	      pattern="dd-MM-yyyy"
+        	  locale="fr,FR"/>
+		</tstamp>
+		<replace file="${src.dir}/sairepa/Main.java">
+			<replacefilter token="@date@" value="${TODAY_FR}"/>
+		</replace>
+
 		<javac srcdir="${src.dir}" destdir="${bin.dir}" debug="true" optimize="true" encoding="UTF8">
 			<compilerarg value="-Xlint" />
 			<classpath>
@@ -51,6 +61,10 @@
 			<zipfileset src="${sqlite.location}" />
 			<zipfileset src="${jlha.location}" />
 		</copy>
+
+		<replace file="${src.dir}/sairepa/Main.java">
+			<replacefilter token="${TODAY_FR}" value="@date@"/>
+		</replace>
 	</target>
 
 	<target name="jar" depends="compile" description="Make the Jar" >

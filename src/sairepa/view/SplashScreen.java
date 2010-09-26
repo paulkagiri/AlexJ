@@ -19,7 +19,7 @@ import sairepa.model.ActList;
 public class SplashScreen extends JDialog implements ProgressionObserver
 {
 	public final static long serialVersionUID = 1;
-	public final static int SIZE_X = 300;
+	public final static int SIZE_X = 450;
 	public final static int SIZE_Y = 150;
 	private JPanel p = new JPanel(new BorderLayout());
 	private JProgressBar bar = new JProgressBar(0, 100);
