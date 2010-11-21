@@ -147,28 +147,32 @@ public abstract class ActListFactory
 		st.setInt(1, fileId);
 
 		ResultSet set = st.executeQuery();
-		while(set.next()) {
-			st = db.getConnection().prepareStatement("DELETE FROM entries WHERE field = ?");
-			st.setInt(1, set.getInt(1));
-			st.executeUpdate();
+		try {
+			while(set.next()) {
+				st = db.getConnection().prepareStatement("DELETE FROM entries WHERE field = ?");
+				st.setInt(1, set.getInt(1));
+				st.executeUpdate();
 
-			st = db.getConnection().prepareStatement("DELETE FROM fields WHERE id = ?");
-			st.setInt(1, set.getInt(1));
-			st.executeUpdate();
+				st = db.getConnection().prepareStatement("DELETE FROM fields WHERE id = ?");
+				st.setInt(1, set.getInt(1));
+				st.executeUpdate();
+			}
+		} finally {
+			set.close();
 		}
-		set.close();
 	}
 
 	private int getFileId() throws SQLException {
 		PreparedStatement st
 			= db.getConnection().prepareStatement("SELECT id FROM files WHERE LOWER(file) = ? LIMIT 1");
 		st.setString(1, dbf.getPath().toLowerCase());
-		ResultSet set = st.executeQuery();
 		int id;
-
-		id = ((set.next()) ? set.getInt(1) : -1);
-
-		set.close();
+		ResultSet set = st.executeQuery();
+		try {
+			id = ((set.next()) ? set.getInt(1) : -1);
+		} finally {
+			set.close();
+		}
 		return id;
 	}
 
@@ -200,10 +204,14 @@ public abstract class ActListFactory
 				db.getConnection().prepareStatement("SELECT id, name FROM fields WHERE file = ?");
 			st.setInt(1, fileId);
 			ResultSet set = st.executeQuery();
-			while(set.next()) {
-				int id = set.getInt(1);
-				String name = set.getString(2);
-				_fieldNameToId.put(name, id);
+			try {
+				while(set.next()) {
+					int id = set.getInt(1);
+					String name = set.getString(2);
+					_fieldNameToId.put(name, id);
+				}
+			} finally {
+				set.close();
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException("SQLException", e);
@@ -306,12 +314,16 @@ public abstract class ActListFactory
 					"WHERE fields.file = ?");
 			st.setInt(1, fileId);
 
-			ResultSet set = st.executeQuery();
 			dbfFields = new HashMap<String, Integer>();
-			while(set.next()) {
-				int fieldId = set.getInt(1);
-				String name = set.getString(2);
-				dbfFields.put(name, fieldId);
+			ResultSet set = st.executeQuery();
+			try {
+				while(set.next()) {
+					int fieldId = set.getInt(1);
+					String name = set.getString(2);
+					dbfFields.put(name, fieldId);
+				}
+			} finally {
+				set.close();
 			}
 
 			st = db.getConnection().prepareStatement("SELECT entries.field, entries.row, entries.value " +
@@ -372,6 +384,14 @@ public abstract class ActListFactory
 				value = "";
 			return value;
 		}
+
+		public void close() throws SQLException {
+			try {
+				data.close();
+			} catch(SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	private List<XBaseHeader.XBaseField> getDbfFields() throws XBaseException {
@@ -393,12 +413,16 @@ public abstract class ActListFactory
 		}
 		try {
 			XBaseProvider provider = new XBaseProvider();
-			XBaseExport export = new XBaseExport(dbf, dbt,
-					XBaseHeader.XBaseVersion.XBASE_VERSION_DBASE_IIIP_MEMO,
-					XBaseHeader.XBaseCharset.CHARSET_DOS_USA,
-					getDbfFields(),
-					provider, ' ');
-			export.write();
+			try {
+				XBaseExport export = new XBaseExport(dbf, dbt,
+						XBaseHeader.XBaseVersion.XBASE_VERSION_DBASE_IIIP_MEMO,
+						XBaseHeader.XBaseCharset.CHARSET_DOS_USA,
+						getDbfFields(),
+						provider, ' ');
+				export.write();
+			} finally {
+				provider.close();
+			}
 		} catch (XBaseException e) {
 			throw new RuntimeException("XBaseException while writing the dbf file: " + e.toString(), e);
 		}

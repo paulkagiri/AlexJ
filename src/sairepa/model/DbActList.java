@@ -115,14 +115,13 @@ public class DbActList implements ActList
 		synchronized(db.getConnection()) {
 			try {
 				PreparedStatement st;
-				ResultSet set;
 
 				dbObserver.startOfJobBatch(2);
 				dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 0, 1);
 
 				st = db.getConnection().prepareStatement("SELECT fields.id, fields.name FROM fields WHERE fields.file = ?");
 				st.setInt(1, fileId);
-				set = st.executeQuery();
+				ResultSet set = st.executeQuery();
 
 				try {
 					while(set.next()) {
@@ -246,11 +245,14 @@ public class DbActList implements ActList
 				selectRows.setInt(1, fieldId);
 				ResultSet rowSet = selectRows.executeQuery();
 				int lastRow;
-				if (rowSet.next())
-					lastRow = rowSet.getInt(1);
-				else
-					lastRow = position-1;
-				rowSet.close();
+				try {
+					if (rowSet.next())
+						lastRow = rowSet.getInt(1);
+					else
+						lastRow = position-1;
+				} finally {
+					rowSet.close();
+				}
 
 				int start = (shift >= 0 ? lastRow : position);
 				int move = (shift >= 0 ? -1 : 1);

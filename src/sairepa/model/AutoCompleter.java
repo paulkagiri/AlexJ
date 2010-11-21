@@ -50,9 +50,12 @@ public interface AutoCompleter
 				st.setInt(4, initialString.length() + DEFAULT_MAX_DISTANCE);
 
 				ResultSet set = st.executeQuery();
-
-				while (set.next()) {
-					suggestions.add(set.getString(1));
+				try {
+					while (set.next()) {
+						suggestions.add(set.getString(1));
+					}
+				} finally {
+					set.close();
 				}
 			}
 
