@@ -66,9 +66,12 @@ public class DbActList implements ActList
 			st.setInt(1, fileId);
 
 			ResultSet set = st.executeQuery();
-			this.rowCount = ((set.next()) ? set.getInt(1) + 1 : 0);
-			System.out.println("computeRowCount(): row count: " + this.rowCount);
-			set.close();
+			try {
+				this.rowCount = ((set.next()) ? set.getInt(1) + 1 : 0);
+				System.out.println("computeRowCount(): row count: " + this.rowCount);
+			} finally {
+				set.close();
+			}
 		}
 	}
 
@@ -226,7 +229,6 @@ public class DbActList implements ActList
 		PreparedStatement selectFields
 			= db.getConnection().prepareStatement("SELECT fields.id FROM fields WHERE fields.file = ?");
 		selectFields.setInt(1, fileId);
-		ResultSet fieldSet = selectFields.executeQuery();
 
 		PreparedStatement selectRows
 			= db.getConnection().prepareStatement("SELECT row FROM entries WHERE field = ? ORDER BY row DESC LIMIT 1");
@@ -235,30 +237,35 @@ public class DbActList implements ActList
 			= db.getConnection().prepareStatement("UPDATE entries SET row = ? " +
 					"WHERE row = ? AND field = ?");
 
-		while(fieldSet.next()) {
-			int fieldId = fieldSet.getInt(1);
+		ResultSet fieldSet = selectFields.executeQuery();
 
-			selectRows.setInt(1, fieldId);
-			ResultSet rowSet = selectRows.executeQuery();
-			int lastRow;
-			if (rowSet.next())
-				lastRow = rowSet.getInt(1);
-			else
-				lastRow = position-1;
-			rowSet.close();
+		try {
+			while(fieldSet.next()) {
+				int fieldId = fieldSet.getInt(1);
 
-			int start = (shift >= 0 ? lastRow : position);
-			int move = (shift >= 0 ? -1 : 1);
+				selectRows.setInt(1, fieldId);
+				ResultSet rowSet = selectRows.executeQuery();
+				int lastRow;
+				if (rowSet.next())
+					lastRow = rowSet.getInt(1);
+				else
+					lastRow = position-1;
+				rowSet.close();
 
-			for ( int row = start ; row <= lastRow && row >= position ; row += move ) {
-				System.out.println("Shifting " + row + " to " + (row+shift));
-				update.setInt(1, row + shift);
-				update.setInt(2, row);
-				update.setInt(3, fieldId);
-				update.execute();
+				int start = (shift >= 0 ? lastRow : position);
+				int move = (shift >= 0 ? -1 : 1);
+
+				for ( int row = start ; row <= lastRow && row >= position ; row += move ) {
+					System.out.println("Shifting " + row + " to " + (row+shift));
+					update.setInt(1, row + shift);
+					update.setInt(2, row);
+					update.setInt(3, fieldId);
+					update.execute();
+				}
 			}
+		} finally {
+			fieldSet.close();
 		}
-		fieldSet.close();
 		
 		computeRowCount();
 	}
@@ -306,13 +313,17 @@ public class DbActList implements ActList
 			synchronized(db.getConnection()) {
 				if (sortedBy != null) {
 					try {
-						PreparedStatement fieldGetter
-							= db.getConnection().prepareStatement("SELECT fields.id FROM fields WHERE fields.name = ? AND fields.file = ? LIMIT 1");
+						PreparedStatement fieldGetter = db.getConnection().prepareStatement(
+								"SELECT fields.id FROM fields WHERE fields.name = ? AND fields.file = ? LIMIT 1");
 						fieldGetter.setString(1, sortedBy);
 						fieldGetter.setInt(2, fileId);
 						ResultSet set = fieldGetter.executeQuery();
-						Util.check(set.next());
-						sortingFieldId = set.getInt(1);
+						try {
+							Util.check(set.next());
+							sortingFieldId = set.getInt(1);
+						} finally {
+							set.close();
+						}
 					} catch (SQLException e) {
 						throw new RuntimeException("SQLException", e);
 					}
@@ -380,9 +391,12 @@ public class DbActList implements ActList
 						rowGetter.setInt(1, sortingFieldId);
 						rowGetter.setInt(2, position);
 						ResultSet set = rowGetter.executeQuery();
-
-						Util.check(set.next());
-						row = set.getInt(1);
+						try {
+							Util.check(set.next());
+							row = set.getInt(1);
+						} finally {
+							set.close();
+						}
 					} catch(SQLException e) {
 						throw new RuntimeException("SQLException", e);
 					}
@@ -418,16 +432,20 @@ public class DbActList implements ActList
 								+ (desc ? " DESC" : ""));
 					rowGetter.setInt(1, sortingFieldId);
 					ResultSet set = rowGetter.executeQuery();
-					dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 1, 1);
-					int i = 0, total;
-					total = getRowCount();
-					while(set.next()) {
-						if ( i % (total > 3000 ? 1000 : 100) == 0 ) {
-							dbObserver.jobUpdate(ActList.DbHandling.DB_FETCH, i, total);
+					try {
+						dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 1, 1);
+						int i = 0, total;
+						total = getRowCount();
+						while(set.next()) {
+							if ( i % (total > 3000 ? 1000 : 100) == 0 ) {
+								dbObserver.jobUpdate(ActList.DbHandling.DB_FETCH, i, total);
+							}
+							int row = set.getInt(1);
+							sortedActs.add(unsortedActs.get(row));
+							i++;
 						}
-						int row = set.getInt(1);
-						sortedActs.add(unsortedActs.get(row));
-						i++;
+					} finally {
+						set.close();
 					}
 				} catch (SQLException e) {
 					throw new RuntimeException("SQLException", e);
