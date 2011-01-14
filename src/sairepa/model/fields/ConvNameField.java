@@ -16,7 +16,7 @@ public class ConvNameField extends ActField {
 
     public ConvNameField(String fieldName, Conventionalizer conv,
 			 Sex sex, ActField origin) throws IOException {
-	super(fieldName, 20, new XBaseFieldType.XBaseFieldTypeString());
+	super(fieldName, 8, new XBaseFieldType.XBaseFieldTypeString());
 	this.conventionalizer = conv;
 	this.sex = sex;
 	this.sexField = null;
@@ -34,7 +34,7 @@ public class ConvNameField extends ActField {
 			 ActField originMale, ActField originFemale, ActField originUnknown)
 	throws IOException {
 
-	super(fieldName, 20, new XBaseFieldType.XBaseFieldTypeString());
+	super(fieldName, 8, new XBaseFieldType.XBaseFieldTypeString());
 	this.sex = Sex.UNKNOWN;
 	this.conventionalizer = conv;
 	this.sexField = sexField;
