@@ -7,8 +7,8 @@ import sairepa.model.*;
 import net.kwain.fxie.XBaseFieldType;
 
 public class ConvNameField extends ActField {
-	public static final int CONV_NAME_FIELD_PRN_LNG = 8;
-	public static final int CONV_NAME_FIELD_NOM_LNG = 20;
+	public static final int PRN_DEFAULT_LNG = 8;
+	public static final int NOM_DEFAULT_LNG = 20;
 
 	private Sex sex;
 	private SexField sexField;
@@ -17,9 +17,9 @@ public class ConvNameField extends ActField {
 	private Conventionalizer conventionalizer;
 	private ActField[] origins = new ActField[3];
 
-	public ConvNameField(String fieldName, Conventionalizer conv,
+	public ConvNameField(String fieldName, int length, Conventionalizer conv,
 			Sex sex, ActField origin) throws IOException {
-		super(fieldName, 8, new XBaseFieldType.XBaseFieldTypeString());
+		super(fieldName, length, new XBaseFieldType.XBaseFieldTypeString());
 		this.conventionalizer = conv;
 		this.sex = sex;
 		this.sexField = null;
@@ -27,17 +27,17 @@ public class ConvNameField extends ActField {
 		origins[sex.toInteger()] = origin;
 	}
 
-	public ConvNameField(String fieldName, Conventionalizer conv,
+	public ConvNameField(String fieldName, int length, Conventionalizer conv,
 			Sex sex, ActField origin, String defaultValue) throws IOException {
-		this(fieldName, conv, sex, origin);
+		this(fieldName, length, conv, sex, origin);
 		this.defaultValue = defaultValue;
 	}
 
-	public ConvNameField(String fieldName, Conventionalizer conv, SexField sexField,
+	public ConvNameField(String fieldName, int length, Conventionalizer conv, SexField sexField,
 			ActField originMale, ActField originFemale, ActField originUnknown)
 		throws IOException {
 
-		super(fieldName, 8, new XBaseFieldType.XBaseFieldTypeString());
+		super(fieldName, length, new XBaseFieldType.XBaseFieldTypeString());
 		this.sex = Sex.UNKNOWN;
 		this.conventionalizer = conv;
 		this.sexField = sexField;
@@ -46,27 +46,27 @@ public class ConvNameField extends ActField {
 		origins[Sex.UNKNOWN.toInteger()] = originUnknown;
 	}
 
-	public ConvNameField(String fieldName, Conventionalizer conv, SexField sexField,
+	public ConvNameField(String fieldName, int length, Conventionalizer conv, SexField sexField,
 			ActField originMale, ActField originFemale, ActField originUnknown,
 			Sex sex)
 		throws IOException {
-		this(fieldName, conv, sexField, originMale, originFemale, originUnknown);
+		this(fieldName, length, conv, sexField, originMale, originFemale, originUnknown);
 		this.sex = sex;
 	}
 
-	public ConvNameField(String fieldName,  Conventionalizer conv, SexField sexField,
+	public ConvNameField(String fieldName, int length, Conventionalizer conv, SexField sexField,
 			ActField originMale, ActField originFemale, ActField originUnknown,
 			String defaultValue)
 		throws IOException {
-		this(fieldName, conv, sexField, originMale, originFemale, originUnknown);
+		this(fieldName, length, conv, sexField, originMale, originFemale, originUnknown);
 		this.defaultValue = defaultValue;
 	}
 
-	public ConvNameField(String fieldName,  Conventionalizer conv, SexField sexField,
+	public ConvNameField(String fieldName, int length, Conventionalizer conv, SexField sexField,
 			ActField originMale, ActField originFemale, ActField originUnknown,
 			String defaultValue, Sex sex)
 		throws IOException {
-		this(fieldName, conv, sexField, originMale, originFemale, originUnknown, defaultValue);
+		this(fieldName, length, conv, sexField, originMale, originFemale, originUnknown, defaultValue);
 		this.sex = sex;
 	}
 
