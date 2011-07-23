@@ -27,7 +27,7 @@ public class ActionRestore implements ActionListener
 
   public void actionPerformed(ActionEvent e) {
     if (JOptionPane.showConfirmDialog(view.getMainWindow(),
-				      "Attention ! Vous allez effacer tout les changements " +
+				      "Attention ! Vous allez effacer tous les changements " +
 				      "effectu\351s entre le moment de la sauvegarde et maintenant. " +
 				      "Ceci est irr\351versible ! \312tes-vous s\373r ?",
 				      "\312tes-vous s\373r ?",
