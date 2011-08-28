@@ -2,3 +2,8 @@ bin/*
 build/*
 *~
 *.javac
+GTAGS
+GPATH
+GRTAGS
+GSYMS
+
