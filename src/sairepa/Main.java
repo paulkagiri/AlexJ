@@ -34,7 +34,7 @@ import sairepa.view.View;
  * @author jflesch
  */
 public class Main {
-	public final static String APPLICATION_NAME = "AlexJ @date@";
+	public final static String APPLICATION_NAME = "AlexJ 27-08-2011";
 
 	private Model model = null;
 	private View view = null;

@@ -17,7 +17,7 @@ public abstract class Viewer extends JPanel implements CloseableTabbedPane.Close
   private final String viewerName;
   private final ImageIcon icon;
   private List<ViewerObserver> observers;
-   private final ActList actList;
+  private final ActList actList;
 
   public Viewer(ActList actList, String viewerName, ImageIcon icon) {
     this.factoryName = actList.getName();

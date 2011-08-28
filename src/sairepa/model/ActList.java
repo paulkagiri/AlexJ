@@ -20,9 +20,9 @@ public interface ActList extends Iterable<Act>
   public int getRowCount();
 
   public enum DbHandling {
-      DB_QUERY(),
-	  DB_FETCH(),
-	  DB_SORT(),
+    DB_QUERY(),
+    DB_FETCH(),
+    DB_SORT(),
   }
 
   /**
