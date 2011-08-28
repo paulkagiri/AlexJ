@@ -10,7 +10,7 @@ import sairepa.model.InMemoryActList;
 
 public class SortedActListViewerFactory implements ViewerFactory
 {
-	public final static String NAME = "Vue triée";
+	public final static String NAME = "Tableau trié";
 
 	public SortedActListViewerFactory() { }
 

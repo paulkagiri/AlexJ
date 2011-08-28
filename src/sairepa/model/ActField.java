@@ -151,4 +151,11 @@ public class ActField implements FieldLayoutElement, Comparable<ActField>
 		observers.add(f);
 	}
 
+	public int compareTo(ActField af) {
+		return getName().compareTo(af.getName());
+	}
+
+	public String toString() {
+		return getName();
+	}
 }

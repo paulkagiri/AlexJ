@@ -20,6 +20,8 @@ public class IconBox
   public final static ImageIcon copy        = loadIcon("copy.png");
   public final static ImageIcon cut         = loadIcon("cut.png");
   public final static ImageIcon paste       = loadIcon("paste.png");
+  public final static ImageIcon add         = loadIcon("list-add.png");
+  public final static ImageIcon remove      = loadIcon("list-remove.png");
 
 
   private IconBox() { }
