@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -16,7 +15,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import sairepa.gui.IconBox;
 import sairepa.gui.RightClickMenu;
 import sairepa.gui.Table;
 import sairepa.model.Act;
@@ -33,9 +31,7 @@ public class SortedActListViewer extends Viewer
 	private Viewer currentViewer = null;
 
 	public SortedActListViewer(ActList actList) {
-		super(actList,
-				SortedActListViewerFactory.NAME,
-				SortedActListViewerFactory.ICON);
+		super(actList, SortedActListViewerFactory.NAME);
 
 		Viewer v = new SortingChooser(actList);
 		setViewer(v);
@@ -137,8 +133,7 @@ public class SortedActListViewer extends Viewer
 
 		public SortingChooser(ActList al) {
 			super(al,
-					SortedActListViewerFactory.NAME,
-					SortedActListViewerFactory.ICON);
+					SortedActListViewerFactory.NAME);
 			this.actList = al;
 		}
 

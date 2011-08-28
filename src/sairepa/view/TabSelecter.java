@@ -82,7 +82,6 @@ public class TabSelecter extends JPanel
     private ViewerFactory viewerFactory;
 
     protected TabSelecterButton(ActListFactory actListFactory, ViewerFactory viewerFactory) {
-      //super(viewerFactory.getName(), viewerFactory.getIcon());
       super(viewerFactory.getName());
       setHorizontalAlignment(JButton.LEFT);
 

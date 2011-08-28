@@ -30,7 +30,7 @@ public class TabController implements TabSelecter.TabSelecterObserver
 			/* TODO(Jflesch): swing thingies shouldn't be done here */
 			view.getMainWindow().getContentPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			Viewer v = viewerFactory.createViewer(view.getMainWindow(),
-					viewerFactory.extractActList(actListFactory));
+					actListFactory.getActList());
 			Util.check(v != null);
 			v.addObserver(new ViewerController(model, view, controller));
 			view.getMainWindow().addViewer(v);

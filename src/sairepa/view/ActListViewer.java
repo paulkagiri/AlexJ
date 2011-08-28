@@ -45,9 +45,7 @@ public class ActListViewer extends Viewer
   private Table table;
 
   public ActListViewer(ActList actList) {
-    super(actList,
-	  ActListViewerFactory.NAME,
-	  ActListViewerFactory.ICON);
+    super(actList, ActListViewerFactory.NAME);
     this.actList = actList;
     this.setLayout(new BorderLayout());
     model = new ActListTableModel();
