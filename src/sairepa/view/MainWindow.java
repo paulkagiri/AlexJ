@@ -217,7 +217,8 @@ public class MainWindow extends JFrame implements ChangeListener {
   }
 
   public void closeAllViewers() {
-    Vector<Viewer> copy = (Vector<Viewer>)viewers.clone();
+    Vector<Viewer> copy = new Vector<Viewer>();
+    java.util.Collections.copy(copy, viewers);
     for (Viewer v : copy)
       removeViewer(v);
   }
