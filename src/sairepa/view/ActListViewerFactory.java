@@ -15,7 +15,7 @@ public class ActListViewerFactory implements ViewerFactory
   }
 
   public Viewer createViewer(MainWindow mainWindow, ActList list) {
-      ActList al = InMemoryActList.encapsulate(list, new SplashScreen.DbObserver());
+      ActList al = InMemoryActList.encapsulate(list);
       return new ActListViewer(al, true /* allow reordering */);
   }
 }

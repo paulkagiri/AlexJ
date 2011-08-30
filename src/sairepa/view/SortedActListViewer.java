@@ -269,7 +269,7 @@ public class SortedActListViewer extends Viewer
 					sortingRule.add(chooser.getSorting());
 				}
 				ActList al = this.actList.getSortedActList(sortingRule);
-				al = InMemoryActList.encapsulate(al, new SplashScreen.DbObserver());
+				al = InMemoryActList.encapsulate(al);
 				SortedActListViewer.this.setViewer(new ActListViewer(al, false /* allowReordering */),
 						true /* maxSize */);
 			} else if (e.getSource() == addButton) {
