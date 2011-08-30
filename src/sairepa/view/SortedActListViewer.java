@@ -29,6 +29,7 @@ import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.ActList;
 import sairepa.model.ActListFactory;
+import sairepa.model.InMemoryActList;
 import sairepa.model.Util;
 
 public class SortedActListViewer extends Viewer
@@ -50,7 +51,8 @@ public class SortedActListViewer extends Viewer
 		}
 
 		this.removeAll();
-		this.add(viewer);
+		this.setLayout(new BorderLayout());
+		this.add(viewer, BorderLayout.WEST);
 
 		this.currentViewer = viewer;
 	}
@@ -158,12 +160,10 @@ public class SortedActListViewer extends Viewer
 			return removeButton;
 		}
 
-		public ActField getField() {
-			return (ActField)fieldChooser.getSelectedItem();
-		}
-
-		public boolean getOrder() {
-			return orderChooser.isSelected();
+		public ActList.ActSorting getSorting() {
+			return new ActList.ActSorting(
+					((ActField)fieldChooser.getSelectedItem()).getName(),
+					orderChooser.isSelected());
 		}
 	}
 
@@ -255,7 +255,13 @@ public class SortedActListViewer extends Viewer
 
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == validButton) {
-				// TODO
+				Vector<ActList.ActSorting> sortingRule = new Vector<ActList.ActSorting>();
+				for (SortingChooser chooser : choosers) {
+					sortingRule.add(chooser.getSorting());
+				}
+				ActList al = this.actList.getSortedActList(sortingRule);
+				al = InMemoryActList.encapsulate(al, new SplashScreen.DbObserver());
+				SortedActListViewer.this.setViewer(new ActListViewer(al));
 			} else if (e.getSource() == addButton) {
 				SortingChooser chooser = new SortingChooser(this.possibleFields);
 				choosers.add(chooser);

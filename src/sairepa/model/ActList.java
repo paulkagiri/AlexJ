@@ -54,11 +54,36 @@ public interface ActList extends Iterable<Act>
   public int getActVisualRow(Act a);
   public List<Act> getAllActs();
 
+  public static class ActSorting {
+    private String field;
+    private boolean desc;
+
+    public ActSorting(String sortedBy, boolean desc) {
+      this.field = sortedBy;
+      this.desc = desc;
+    }
+
+    public String getField() {
+      return field;
+    }
+
+    public boolean getOrder() {
+      return desc;
+    }
+
+    public String toString() {
+      if (!desc)
+        return field;
+      else
+        return field + " (desc)";
+    }
+  }
+
   /**
    * @param sortedBy field name ; can be null
    * @return beware: can return this !
    */
-  public ActList getSortedActList(String sortedBy, boolean desc);
+  public ActList getSortedActList(List<ActSorting> sortingRule);
 
   public void insert(Act act);
   public void insert(Act act, int row);

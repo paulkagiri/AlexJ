@@ -305,34 +305,16 @@ public class DbActList implements ActList
 	}
 
 	protected class SortedActList implements ActList {
-		private boolean desc;
-		private int sortingFieldId = -1;
 		private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
 
-		public SortedActList(String sortedBy, boolean desc) {
-			this.desc = desc;
-
-			synchronized(db.getConnection()) {
-				if (sortedBy != null) {
-					try {
-						PreparedStatement fieldGetter = db.getConnection().prepareStatement(
-								"SELECT fields.id FROM fields WHERE fields.name = ? AND fields.file = ? LIMIT 1");
-						fieldGetter.setString(1, sortedBy);
-						fieldGetter.setInt(2, fileId);
-						ResultSet set = fieldGetter.executeQuery();
-						try {
-							Util.check(set.next());
-							sortingFieldId = set.getInt(1);
-						} finally {
-							set.close();
-						}
-					} catch (SQLException e) {
-						throw new RuntimeException("SQLException", e);
-					}
-				} else {
-					sortingFieldId = -1;
-				}
+		public SortedActList(List<ActSorting> sortingRule) {
+			System.out.println("Sorting by: ");
+			for (ActSorting as : sortingRule) {
+				System.out.println(as.toString());
 			}
+			System.out.println("--");
+
+			// TODO
 		}
 
 		public void setActListDbObserver(ActList.ActListDbObserver obs) {
@@ -360,113 +342,26 @@ public class DbActList implements ActList
 		private Act lastActReturned = null;
 
 		public int getActVisualRow(Act a) {
-			try {
-				int i = 0;
-				List<Act> acts = getAllActs();
-				for ( Act ourAct : acts ) {
-					if ( ourAct.getRow() == a.getRow() )
-						return i;
-					i++;
-				}
-				return -1;
-			} catch (Exception e) {
-				System.out.println("SortedActList.getActRow(), Exception : " + e.toString());
-				System.out.println("Assuming not enough memory");
-				e.printStackTrace();
-				return -1;
-			}
+			// TODO
+			return -1;
 		}
 
 		public Act getAct(int position) {
-			synchronized(db.getConnection()) {
-				if (position == lastPositionReturned && lastActReturned != null) {
-					return lastActReturned;
-				}
-
-				int row = -1;
-
-				if (sortingFieldId >= 0) {
-					try {
-						PreparedStatement rowGetter
-							= db.getConnection().prepareStatement("SELECT row FROM entries WHERE field = ? ORDER BY LOWER(LTRIM(value))"
-									+ (desc ? " DESC" : "") + " LIMIT 1 OFFSET ?");
-						rowGetter.setInt(1, sortingFieldId);
-						rowGetter.setInt(2, position);
-						ResultSet set = rowGetter.executeQuery();
-						try {
-							Util.check(set.next());
-							row = set.getInt(1);
-						} finally {
-							set.close();
-						}
-					} catch(SQLException e) {
-						throw new RuntimeException("SQLException", e);
-					}
-				} else if (desc) {
-					row = (getRowCount()-1) - position;
-				} else {
-					row = position;
-				}
-
-				Util.check(row >= 0);
-
-				Act a = DbActList.this.getAct(row);
-				lastPositionReturned = position;
-				lastActReturned = a;
-				return a;
-			}
+			// TODO
+			return null;
 		}
 
 		public List<Act> getAllActs()
 		{
-			java.util.Date start, stop;
-			start = new java.util.Date();
-
-			List<Act> unsortedActs = DbActList.this.getAllActs();
-			Vector<Act> sortedActs = new Vector<Act>(unsortedActs.size());
-
-			synchronized(db.getConnection()) {
-				try {
-					dbObserver.startOfJobBatch(2);
-					dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 0, 1);
-					PreparedStatement rowGetter
-						= db.getConnection().prepareStatement("SELECT row from entries WHERE field = ? ORDER BY LOWER(LTRIM(value))"
-								+ (desc ? " DESC" : ""));
-					rowGetter.setInt(1, sortingFieldId);
-					ResultSet set = rowGetter.executeQuery();
-					try {
-						dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 1, 1);
-						int i = 0, total;
-						total = getRowCount();
-						while(set.next()) {
-							if ( i % (total > 3000 ? 1000 : 100) == 0 ) {
-								dbObserver.jobUpdate(ActList.DbHandling.DB_FETCH, i, total);
-							}
-							int row = set.getInt(1);
-							sortedActs.add(unsortedActs.get(row));
-							i++;
-						}
-					} finally {
-						set.close();
-					}
-				} catch (SQLException e) {
-					throw new RuntimeException("SQLException", e);
-				} finally {
-					dbObserver.endOfJobBatch();
-				}
-			}
-
-			stop = new java.util.Date();
-			System.out.println("Took " + Long.toString((stop.getTime() - start.getTime()) / 1000) + " seconds to load sorted list");
-
-			return sortedActs;
+			// TODO
+			throw new UnsupportedOperationException("TODO");
 		}
 
 		/**
 		 * @return beware: can return this !
 		 */
-		public ActList getSortedActList(String sortedBy, boolean desc) {
-			return DbActList.this.getSortedActList(sortedBy, desc);
+		public ActList getSortedActList(List<ActSorting> sortingRule) {
+			return DbActList.this.getSortedActList(sortingRule);
 		}
 
 		public void insert(Act act) {
@@ -552,8 +447,8 @@ public class DbActList implements ActList
 		/**
 		 * @return beware: can return this !
 		 */
-		public ActList getSortedActList(String sortedBy, boolean desc) {
-			return DbActList.this.getSortedActList(sortedBy, desc);
+		public ActList getSortedActList(List<ActSorting> sortingRule) {
+			return DbActList.this.getSortedActList(sortingRule);
 		}
 
 		public void insert(Act act) {
@@ -585,12 +480,11 @@ public class DbActList implements ActList
 		}
 	}
 
-
-	public ActList getSortedActList(String sortedBy, boolean desc) {
-		if ( sortedBy == null && !desc )
+	public ActList getSortedActList(List<ActSorting> sortingRule) {
+		if ( sortingRule.get(0).getField() == null && !sortingRule.get(0).getOrder() )
 			return this;
-		else if ( sortedBy == null )
+		else if ( sortingRule.get(0).getField() == null )
 			return new ReverseActList();
-		return new SortedActList(sortedBy, desc);
+		return new SortedActList(sortingRule);
 	}
 }

@@ -75,9 +75,9 @@ public class InMemoryActList implements ActList
 		return encapsulate(actList, null);
 	}
 
-	public ActList getSortedActList(String sortedBy, boolean desc) {
+	public ActList getSortedActList(List<ActSorting> sortingRule) {
 		try {
-			dbActList = dbActList.getSortedActList(sortedBy, desc);
+			dbActList = dbActList.getSortedActList(sortingRule);
 			refresh();
 		} catch (OutOfMemoryError e) {
 			System.err.println("OutOfMemoryError: Woops! JVM probably screwed up because " +
