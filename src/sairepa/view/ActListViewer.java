@@ -35,6 +35,7 @@ import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.ActList;
 import sairepa.model.ActListFactory;
+import sairepa.model.ActSorting;
 import sairepa.model.Util;
 
 public class ActListViewer extends Viewer
@@ -46,12 +47,13 @@ public class ActListViewer extends Viewer
   private ActListTableModel model;
   private Table table;
 
-  public ActListViewer(ActList actList) {
+  public ActListViewer(ActList actList, boolean allowReordering) {
     super(actList, ActListViewerFactory.NAME);
     this.actList = actList;
     this.setLayout(new BorderLayout());
     model = new ActListTableModel();
     table = new Table(model);
+    table.setReorderingState(allowReordering);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     table.addReorderingListener(this);
     table.setRowSelectionAllowed(true);
@@ -186,13 +188,13 @@ public class ActListViewer extends Viewer
   }
 
   public void reorder(int columnIndex, boolean desc) {
-    Vector<ActList.ActSorting> sortingRule = new Vector<ActList.ActSorting>();
+    Vector<ActSorting> sortingRule = new Vector<ActSorting>();
 
     if (columnIndex == 0) {
-      sortingRule.add(new ActList.ActSorting(null, desc));
+      sortingRule.add(new ActSorting(null, desc));
     } else {
       String colName = model.getColumnName(columnIndex);
-      sortingRule.add(new ActList.ActSorting(colName, desc));
+      sortingRule.add(new ActSorting(colName, desc));
     }
     actList = actList.getSortedActList(sortingRule);
     refresh();

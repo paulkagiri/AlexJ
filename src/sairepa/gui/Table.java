@@ -36,6 +36,8 @@ public class Table extends JTable implements MouseListener {
   private boolean desc = false;
   private int sortedColumn = -1;
 
+  private boolean allowReorder = true;
+
   private List<ReorderingListener> orderListeners = new Vector<ReorderingListener>();
 
   public static interface ReorderingListener {
@@ -61,7 +63,6 @@ public class Table extends JTable implements MouseListener {
     addMouseListenerOnHeader();
   }
 
-
   public Table(TableModel model) {
     super(model);
     setDefaultRenderer();
@@ -75,7 +76,7 @@ public class Table extends JTable implements MouseListener {
   }
 
   public Table(TableModel model, TableColumnModel cModel,
-	       ListSelectionModel lModel) {
+      ListSelectionModel lModel) {
     super(model, cModel, lModel);
     setDefaultRenderer();
     addMouseListenerOnHeader();
@@ -85,6 +86,10 @@ public class Table extends JTable implements MouseListener {
     super(data, columns);
     setDefaultRenderer();
     addMouseListenerOnHeader();
+  }
+
+  public void setReorderingState(boolean enabled) {
+    this.allowReorder = enabled;
   }
 
   public void addReorderingListener(ReorderingListener l) {
@@ -119,6 +124,9 @@ public class Table extends JTable implements MouseListener {
   }
 
   public void mouseClicked(final MouseEvent e) {
+    if (!allowReorder)
+      return;
+    
     final TableColumnModel colModel = getColumnModel();
     final int columnModelIndex = colModel.getColumnIndexAtX(e.getX());
     final int modelIndex = colModel.getColumn(columnModelIndex).getModelIndex();
@@ -192,8 +200,8 @@ public class Table extends JTable implements MouseListener {
     }
 
     public Component getTableCellRendererComponent(final JTable table, Object value,
-						   final boolean isSelected, final boolean hasFocus,
-						   final int row, final int column) {
+	final boolean isSelected, final boolean hasFocus,
+	final int row, final int column) {
 
       if (value == null)
 	value = "";
@@ -215,8 +223,8 @@ public class Table extends JTable implements MouseListener {
 
       } else {
 	cell = super.getTableCellRendererComponent(table, value,
-						   isSelected, hasFocus,
-						   row, column);
+	    isSelected, hasFocus,
+	    row, column);
 
       }
 

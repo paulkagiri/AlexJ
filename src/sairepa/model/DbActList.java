@@ -272,7 +272,7 @@ public class DbActList implements ActList
 		return new Act(db.getConnection(), this, fileId, fields);
 	}
 
-	protected int getFileId() {
+	public int getFileId() {
 		return fileId;
 	}
 

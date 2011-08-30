@@ -33,6 +33,8 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 
 	public SplashScreen(String txt, Font font) {
 		super();
+		this.setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+
 		bar.setStringPainted(true);
 
 		getContentPane().setLayout(new GridLayout(1, 1));
@@ -129,59 +131,67 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 		private int currentJob;
 		private boolean visible;
 		private ActList.DbOp lastJob;
+		int nbStart;
 
 		public DbObserver() {
+			nbStart = 0;
 		}
 
 		@Override
-			public void startOfJobBatch(int nmbJobs) {
+		public void startOfJobBatch(int nmbJobs) {
+			if (nbStart == 0) {
 				ss = new SplashScreen("Chargement"); /* TODO(Jflesch): L10n */
 				this.nmbJobs = nmbJobs; /* we count from 0 here */
 				this.currentJob = -1;
 				this.visible = false;
 				this.lastJob = null;
 			}
+			nbStart++;
+		}
 
 		@Override
-			public void jobUpdate(ActList.DbOp job, int currentPosition, int endOfJobPosition) {
-				if ( job != lastJob ) {
-					lastJob = job;
-					currentJob++;
-				}
-
-				int fullJobProgression = 100 / nmbJobs;
-				int jobProgression = (currentPosition * fullJobProgression) / endOfJobPosition;
-				int progression = (currentJob * fullJobProgression) + jobProgression;
-
-				String txt = null;
-				switch(job) {
-
-					case DB_QUERY:
-						txt = "Interrogation de la base de donn\351es"; /* TODO(Jflesch): l10n */
-						break;
-
-					case DB_FETCH:
-						txt = "R\351cuperation des donn\351es"; /* TODO(Jflesch): l10n */
-						break;
-
-					case DB_SORT:
-						txt = "Triage"; /* TODO(Jflesch): l10n */
-						break;
-
-				}
-
-				sairepa.model.Util.check(txt != null);
-
-				if (!visible)
-					ss.start();
-
-				ss.setProgression(progression, txt);
+		public void jobUpdate(ActList.DbOp job, int currentPosition, int endOfJobPosition) {
+			if ( job != lastJob ) {
+				lastJob = job;
+				currentJob++;
 			}
 
+			int fullJobProgression = 100 / nmbJobs;
+			int jobProgression = (currentPosition * fullJobProgression) / endOfJobPosition;
+			int progression = (currentJob * fullJobProgression) + jobProgression;
+
+			String txt = null;
+			switch(job) {
+
+				case DB_QUERY:
+					txt = "Interrogation de la base de donn\351es"; /* TODO(Jflesch): l10n */
+					break;
+
+				case DB_FETCH:
+					txt = "R\351cuperation des donn\351es"; /* TODO(Jflesch): l10n */
+					break;
+
+				case DB_SORT:
+					txt = "Triage"; /* TODO(Jflesch): l10n */
+					break;
+
+			}
+
+			sairepa.model.Util.check(txt != null);
+
+			if (!visible)
+				ss.start();
+
+			ss.setProgression(progression, txt);
+		}
+
 		@Override
-			public void endOfJobBatch() {
+		public void endOfJobBatch() {
+			nbStart--;
+			if (nbStart == 0) {
 				ss.stop();
 				ss = null;
 			}
+		}
 	}
 }

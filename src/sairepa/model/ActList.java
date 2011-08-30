@@ -19,6 +19,12 @@ public interface ActList extends Iterable<Act>
   public FieldLayout getFields();
   public int getRowCount();
 
+  /**
+   * Internal to the model. Do not use outside of it.
+   * @return the id of the file this act list is attached to
+   */
+  public int getFileId();
+
   public enum DbOp {
     DB_QUERY(),
     DB_FETCH(),
@@ -53,31 +59,6 @@ public interface ActList extends Iterable<Act>
   public Act getAct(int row);
   public int getActVisualRow(Act a);
   public List<Act> getAllActs();
-
-  public static class ActSorting {
-    private String field;
-    private boolean desc;
-
-    public ActSorting(String sortedBy, boolean desc) {
-      this.field = sortedBy;
-      this.desc = desc;
-    }
-
-    public String getField() {
-      return field;
-    }
-
-    public boolean getOrder() {
-      return desc;
-    }
-
-    public String toString() {
-      if (!desc)
-        return field;
-      else
-        return field + " (desc)";
-    }
-  }
 
   /**
    * @param sortedBy field name ; can be null

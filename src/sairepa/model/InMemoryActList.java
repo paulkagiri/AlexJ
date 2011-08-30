@@ -149,4 +149,8 @@ public class InMemoryActList implements ActList
 			refresh();
 		}
 	}
+
+	public int getFileId() {
+		return dbActList.getFileId();
+	}
 }

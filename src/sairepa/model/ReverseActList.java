@@ -7,7 +7,7 @@ public class ReverseActList implements ActList {
 	private final ActList masterActList;
 	private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
 
-	public ReverseActList(DbHandler db, ActList masterActList) {
+	protected ReverseActList(DbHandler db, ActList masterActList) {
 		this.db = db;
 		this.masterActList = masterActList;
 	}
@@ -82,6 +82,10 @@ public class ReverseActList implements ActList {
 
 	public void refresh(Act a) {
 		masterActList.refresh(a);
+	}
+
+	public int getFileId() {
+		return masterActList.getFileId();
 	}
 }
 

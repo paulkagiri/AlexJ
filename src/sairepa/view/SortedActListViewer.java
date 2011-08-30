@@ -29,6 +29,7 @@ import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.ActList;
 import sairepa.model.ActListFactory;
+import sairepa.model.ActSorting;
 import sairepa.model.InMemoryActList;
 import sairepa.model.Util;
 
@@ -40,21 +41,28 @@ public class SortedActListViewer extends Viewer
 
 	public SortedActListViewer(ActList actList) {
 		super(actList, SortedActListViewerFactory.NAME);
+		this.setLayout(new BorderLayout());
 
 		Viewer v = new SortingChoosers(actList);
-		setViewer(v);
+		setViewer(v, false);
 	}
 
-	private void setViewer(Viewer viewer) {
+	private void setViewer(Viewer viewer, boolean maxSize) {
 		for (ViewerObserver obs : this.getObservers() ) {
 			viewer.addObserver(obs);
 		}
 
 		this.removeAll();
-		this.setLayout(new BorderLayout());
-		this.add(viewer, BorderLayout.WEST);
+		if (!maxSize) {
+			this.add(viewer, BorderLayout.WEST);
+			this.add(new JLabel(""), BorderLayout.CENTER);
+		} else {
+			this.add(viewer, BorderLayout.CENTER);
+		}
 
 		this.currentViewer = viewer;
+
+		this.validate();
 	}
 
 	@Override
@@ -102,7 +110,8 @@ public class SortedActListViewer extends Viewer
 
 	@Override
 	public void close() {
-		currentViewer.close();
+		super.close();
+		currentViewer = null;
 	}
 
 	@Override
@@ -160,8 +169,8 @@ public class SortedActListViewer extends Viewer
 			return removeButton;
 		}
 
-		public ActList.ActSorting getSorting() {
-			return new ActList.ActSorting(
+		public ActSorting getSorting() {
+			return new ActSorting(
 					((ActField)fieldChooser.getSelectedItem()).getName(),
 					orderChooser.isSelected());
 		}
@@ -250,18 +259,19 @@ public class SortedActListViewer extends Viewer
 			omegaPanel.add(new JLabel(""), BorderLayout.CENTER);
 			this.add(omegaPanel);
 
-			this.validate();
+			SortedActListViewer.this.validate();
 		}
 
 		public void actionPerformed(ActionEvent e) {
 			if (e.getSource() == validButton) {
-				Vector<ActList.ActSorting> sortingRule = new Vector<ActList.ActSorting>();
+				Vector<ActSorting> sortingRule = new Vector<ActSorting>();
 				for (SortingChooser chooser : choosers) {
 					sortingRule.add(chooser.getSorting());
 				}
 				ActList al = this.actList.getSortedActList(sortingRule);
 				al = InMemoryActList.encapsulate(al, new SplashScreen.DbObserver());
-				SortedActListViewer.this.setViewer(new ActListViewer(al));
+				SortedActListViewer.this.setViewer(new ActListViewer(al, false /* allowReordering */),
+						true /* maxSize */);
 			} else if (e.getSource() == addButton) {
 				SortingChooser chooser = new SortingChooser(this.possibleFields);
 				choosers.add(chooser);

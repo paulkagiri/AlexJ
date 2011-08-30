@@ -130,33 +130,27 @@ public class Model
   }
 
   private void createTables() throws SQLException {
-    try {
-      executeQuery("CREATE TABLE IF NOT EXISTS files ("
-		   + "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
-		   + "file VARCHAR NOT NULL, " // "dir/file.dbf"
-		   + "lastDbfSync TIMESTAMP NULL, "
-		   + "UNIQUE (file)"
-		   + ");");
-      executeQuery("CREATE TABLE IF NOT EXISTS fields ("
-		   + "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
-		   + "file INTEGER NOT NULL, "
-		   + "name VARCHAR NOT NULL, "
-		   + "UNIQUE (file, name), "
-		   + "FOREIGN KEY (file) REFERENCES files (id)"
-		   + ");");
-      executeQuery("CREATE TABLE IF NOT EXISTS entries ("
-		   + "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
-		   + "field INTEGER NOT NULL, "
-		   + "row INTEGER NOT NULL, "
-		   + "value VARCHAR NOT NULL, "
-		   + "UNIQUE (field, row), "
-		   + "FOREIGN KEY (field) REFERENCES fields (id)"
-		   + ");");
-    } catch(SQLException e) {
-      // Probably a "table already exists", no worry on
-      // this point.
-      System.out.println("SQLException : " + e.toString());
-    }
+    executeQuery("CREATE TABLE IF NOT EXISTS files ("
+	+ "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
+	+ "file VARCHAR NOT NULL, " // "dir/file.dbf"
+	+ "lastDbfSync TIMESTAMP NULL, "
+	+ "UNIQUE (file)"
+	+ ");");
+    executeQuery("CREATE TABLE IF NOT EXISTS fields ("
+	+ "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
+	+ "file INTEGER NOT NULL, "
+	+ "name VARCHAR NOT NULL, "
+	+ "UNIQUE (file, name), "
+	+ "FOREIGN KEY (file) REFERENCES files (id)"
+	+ ");");
+    executeQuery("CREATE TABLE IF NOT EXISTS entries ("
+	+ "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
+	+ "field INTEGER NOT NULL, "
+	+ "row INTEGER NOT NULL, "
+	+ "value VARCHAR NOT NULL, "
+	+ "UNIQUE (field, row), "
+	+ "FOREIGN KEY (field) REFERENCES fields (id)"
+	+ ");");
   }
 
   private void executeQuery(final String query) throws java.sql.SQLException {
