@@ -16,14 +16,14 @@ import java.util.Vector;
 public class DbActList implements ActList
 {
 	private ActListFactory factory;
-	private Hsqldb db;
+	private DbHandler db;
 	private int fileId;
 	private FieldLayout fields;
 	private int rowCount;
 	private String name;
 	private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
 
-	protected DbActList(ActListFactory factory, Hsqldb db,
+	protected DbActList(ActListFactory factory, DbHandler db,
 			int fileId, FieldLayout fields, String name)
 		throws SQLException, IOException {
 		this.db = db;

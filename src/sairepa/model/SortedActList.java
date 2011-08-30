@@ -4,13 +4,13 @@ import java.sql.*;
 import java.util.List;
 
 public class SortedActList implements ActList {
-	private final Hsqldb db;
+	private final DbHandler db;
 	private final ActList masterActList;
 	private final List<ActSorting> sortingRule;
 
 	private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
 
-	public SortedActList(Hsqldb db,
+	public SortedActList(DbHandler db,
 			ActList masterActList,
 			List<ActSorting> sortingRule) {
 		this.db = db;

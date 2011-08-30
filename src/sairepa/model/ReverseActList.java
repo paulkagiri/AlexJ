@@ -3,11 +3,11 @@ package sairepa.model;
 import java.util.List;
 
 public class ReverseActList implements ActList {
-	private final Hsqldb db;
+	private final DbHandler db;
 	private final ActList masterActList;
 	private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
 
-	public ReverseActList(Hsqldb db, ActList masterActList) {
+	public ReverseActList(DbHandler db, ActList masterActList) {
 		this.db = db;
 		this.masterActList = masterActList;
 	}

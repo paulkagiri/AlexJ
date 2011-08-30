@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import sairepa.model.Hsqldb;
+import sairepa.model.DbHandler;
 
 public interface AutoCompleter
 {
@@ -27,7 +27,7 @@ public interface AutoCompleter
 			this.fieldName = fieldName;
 		}
 
-		private Collection<String> getSuggestions(Hsqldb db, ActListFactory factory, String initialString)
+		private Collection<String> getSuggestions(DbHandler db, ActListFactory factory, String initialString)
 			throws SQLException {
 
 			LinkedList<String> suggestions = new LinkedList<String>();
@@ -77,7 +77,7 @@ public interface AutoCompleter
 
 			ArrayList<String> suggestions = new ArrayList<String>();
 			Model model = entry.getAct().getActList().getFactory().getModel();
-			Hsqldb db = model.getDb();
+			DbHandler db = model.getDb();
 
 			try {
 				for (ActListFactory factory : model.getFactories()) {

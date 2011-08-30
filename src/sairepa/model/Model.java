@@ -13,7 +13,7 @@ import sairepa.model.structs.*;
 public class Model
 {
   private final File projectDir;
-  private final Hsqldb db;
+  private final DbHandler db;
   private final ClientFile clientFile;
   private final ActListFactoryLayout factories;
   private final BackupManager backupManager;
@@ -25,7 +25,7 @@ public class Model
     this.projectDir = projectDir;
     this.clientFile = clientFile;
 
-    db = new Hsqldb();
+    db = new DbHandler();
 
     factories = new ActListFactoryLayout(this,
 	new String[] {
@@ -66,7 +66,7 @@ public class Model
     return prncvDb;
   }
 
-  public Hsqldb getDb() {
+  public DbHandler getDb() {
     return db;
   }
 

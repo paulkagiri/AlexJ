@@ -8,12 +8,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class Hsqldb {
+public class DbHandler {
   public static final Object dbLock = new Object();
   private Connection connection = null;
   private String project;
 
-  public Hsqldb() throws SQLException {
+  public DbHandler() throws SQLException {
     try {
       Class.forName("org.sqlite.JDBC");
     } catch (ClassNotFoundException e) {

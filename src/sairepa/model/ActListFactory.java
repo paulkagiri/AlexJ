@@ -16,7 +16,7 @@ import java.util.Vector;
 import net.kwain.fxie.*;
 
 /**
- * Do the work about importing/exporting DBF files into Hsqldb
+ * Do the work about importing/exporting DBF files into the db
  */
 public abstract class ActListFactory
 {
@@ -28,7 +28,7 @@ public abstract class ActListFactory
 	private File dbt;
 	private int fileId; // db specific
 
-	private Hsqldb db;
+	private DbHandler db;
 
 	public ActListFactory(Model m, File dbf, File dbt, FieldLayout fields) {
 		this.fields = fields;
@@ -49,7 +49,7 @@ public abstract class ActListFactory
 		return dbt;
 	}
 
-	public void init(Hsqldb db) throws SQLException, IOException {
+	public void init(DbHandler db) throws SQLException, IOException {
 		this.db = db;
 
 		/* Workaround: when restoring files, the case may have changed ... */
