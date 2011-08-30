@@ -11,7 +11,7 @@ public class InMemoryActList implements ActList
 	protected InMemoryActList(ActList dbActList) {
 		assert(dbActList != null && !(dbActList instanceof InMemoryActList));
 		this.dbActList = dbActList;
-		refresh();
+		refreshMemList();
 	}
 
 	public ActListFactory getFactory() {
@@ -71,7 +71,7 @@ public class InMemoryActList implements ActList
 	public ActList getSortedActList(List<ActSorting> sortingRule) {
 		try {
 			dbActList = dbActList.getSortedActList(sortingRule);
-			refresh();
+			refreshMemList();
 		} catch (OutOfMemoryError e) {
 			System.err.println("OutOfMemoryError: Woops! JVM probably screwed up because " +
 					"it's unexpected here ; anyway let's fall back on direct DB " +
@@ -87,17 +87,17 @@ public class InMemoryActList implements ActList
 
 	public void insert(Act act) {
 		dbActList.insert(act);
-		refresh();
+		refreshMemList();
 	}
 
 	public void insert(Act act, int row) {
 		dbActList.insert(act, row);
-		refresh();
+		refreshMemList();
 	}
 
 	public void delete(Act act) {
 		dbActList.delete(act);
-		refresh();
+		refreshMemList();
 	}
 
 	public void setActListDbObserver(ActList.ActListDbObserver obs) {
@@ -119,7 +119,10 @@ public class InMemoryActList implements ActList
 
 	public void refresh() {
 		dbActList.refresh();
+		refreshMemList();
+	}
 
+	public void refreshMemList() {
 		// reload the content of the act list in memory
 		int current = 0;
 		int total = dbActList.getRowCount();
@@ -135,15 +138,16 @@ public class InMemoryActList implements ActList
 	}
 
 	public void refresh(Act a) {
+		dbActList.refresh(a);
 		try {
 			Act ourAct = getAct(a.getRow());
 			if ( ourAct == null ) {
-				refresh();
+				refreshMemList();
 				return;
 			}
 			ourAct.reload();
 		} catch (ArrayIndexOutOfBoundsException e) {
-			refresh();
+			refreshMemList();
 		}
 	}
 

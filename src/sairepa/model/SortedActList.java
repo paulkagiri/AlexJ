@@ -149,7 +149,7 @@ public class SortedActList implements ActList {
 
 		Vector<SortingResult> results = new Vector<SortingResult>(masterActList.getRowCount());
 
-		//System.out.println("(1) Sorting on field '" + sorting.getField() + "'");
+		System.out.println("(1) Sorting on field '" + sorting.getField() + "'");
 
 		synchronized(db.getConnection()) {
 			try {
@@ -226,7 +226,7 @@ public class SortedActList implements ActList {
 
 		Util.check(sorting.getFieldId() >= 0);
 
-		//System.out.println("(2) Sorting on field '" + sorting.getField() + "'");
+		System.out.println("(2) Sorting on field '" + sorting.getField() + "'");
 
 		boolean first = true;
 		String query = "SELECT value, row FROM entries WHERE field = ? AND (";
@@ -327,9 +327,9 @@ public class SortedActList implements ActList {
 			// .. and sort them
 			if (depth == 1)
 				masterActList.getActListDbObserver().jobUpdate(DbOp.DB_SORT, endidx, total);
-			//System.out.println("Sorting: Sorting " + Integer.toString(depth) + " left "
-			//		+ Integer.toString(endidx - startidx) + " elements unsorted (from "
-			//		+ Integer.toString(startidx) + " to " + Integer.toString(endidx - 1) + ")");
+			System.out.println("Sorting: Sorting " + Integer.toString(depth) + " left "
+					+ Integer.toString(endidx - startidx) + " elements unsorted (from "
+					+ Integer.toString(startidx) + " to " + Integer.toString(endidx - 1) + ")");
 			Util.check(startidx < (endidx - 1));
 			sortResults(results.subList(startidx, endidx), nextSortingCriteria, depth);
 
