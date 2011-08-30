@@ -231,6 +231,8 @@ public class SortedActList implements ActList {
 			first = false;
 		}
 		query += ") ORDER BY LOWER(LTRIM(value))";
+		if (sorting.getOrder())
+			query += " DESC";
 
 		int i = 0;
 		synchronized(db.getConnection()) {
