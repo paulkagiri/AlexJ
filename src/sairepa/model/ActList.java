@@ -36,7 +36,7 @@ public interface ActList extends Iterable<Act>
    * or manipulation is started
    */
   public static interface ActListDbObserver {
-      public void startOfJobBatch(int nmbJob);
+      public void startOfJobBatch(String description, int nmbJob);
       public void jobUpdate(DbOp job, int currentPosition, int endOfJobPosition);
       public void endOfJobBatch();
   }

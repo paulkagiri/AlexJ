@@ -325,7 +325,7 @@ public class SortedActList implements ActList {
 	public void refresh() {
 		masterActList.refresh();
 
-		dbObserver.startOfJobBatch(3);
+		dbObserver.startOfJobBatch("Triage des actes", 3);
 		try {
 			List<SortingResult> results = getSortedList(sortingRule.get(0));
 

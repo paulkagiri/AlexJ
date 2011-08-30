@@ -109,7 +109,7 @@ public class DbActList implements ActList
 			try {
 				PreparedStatement st;
 
-				dbObserver.startOfJobBatch(2);
+				dbObserver.startOfJobBatch("Récupération des actes", 2);
 				dbObserver.jobUpdate(ActList.DbOp.DB_QUERY, 0, 1);
 
 				st = db.getConnection().prepareStatement("SELECT fields.id, fields.name FROM fields WHERE fields.file = ?");

@@ -116,7 +116,7 @@ public class ActionOpen implements ActionListener
     view.getMainWindow().closeAllViewers();
     view.getMainWindow().setVisible(false);
 
-    SplashScreen ss = new SplashScreen("Ouverture");
+    SplashScreen ss = new SplashScreen("Ouverture", null);
     ss.start();
     ss.setProgression(0, "Unziping");
     try {

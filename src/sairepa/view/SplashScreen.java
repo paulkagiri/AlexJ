@@ -27,18 +27,22 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 	private SplashScreenThread thread = null;
 	private Thread rth = null;
 
-	public SplashScreen(String txt) {
-		this(txt, null);
+	public SplashScreen(String shortTxt, String longTxt) {
+		this(shortTxt, longTxt, null);
 	}
 
-	public SplashScreen(String txt, Font font) {
+	public SplashScreen(String shortTxt, String longTxt, Font font) {
 		super();
 		this.setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
 
 		bar.setStringPainted(true);
 
 		getContentPane().setLayout(new GridLayout(1, 1));
-		final JLabel appNameLabel = new JLabel(txt);
+		final JLabel appNameLabel;
+		if (longTxt != null && !"".equals(longTxt))
+			appNameLabel = new JLabel("<html>" + shortTxt + "<br>" + longTxt+"</html>");
+		else
+			appNameLabel = new JLabel(shortTxt);
 		if (font != null)
 			appNameLabel.setFont(font);
 		appNameLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -138,9 +142,9 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 		}
 
 		@Override
-		public void startOfJobBatch(int nmbJobs) {
+		public void startOfJobBatch(String description, int nmbJobs) {
 			if (nbStart == 0) {
-				ss = new SplashScreen("Chargement"); /* TODO(Jflesch): L10n */
+				ss = new SplashScreen("Chargement : ", description); /* TODO(Jflesch): L10n */
 				this.nmbJobs = nmbJobs; /* we count from 0 here */
 				this.currentJob = -1;
 				this.visible = false;

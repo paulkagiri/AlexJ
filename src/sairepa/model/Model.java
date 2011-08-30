@@ -151,6 +151,10 @@ public class Model
 	+ "UNIQUE (field, row), "
 	+ "FOREIGN KEY (field) REFERENCES fields (id)"
 	+ ");");
+
+    executeQuery("CREATE INDEX IF NOT EXISTS idx_filenames ON files (file);");
+    executeQuery("CREATE INDEX IF NOT EXISTS idx_fieldnames ON fields (file, name);");
+    executeQuery("CREATE INDEX IF NOT EXISTS idx_entries ON entries (field, row);");
   }
 
   private void executeQuery(final String query) throws java.sql.SQLException {

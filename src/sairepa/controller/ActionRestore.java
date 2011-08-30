@@ -45,7 +45,7 @@ public class ActionRestore implements ActionListener
     view.getMainWindow().closeAllViewers();
     view.getMainWindow().setVisible(false);
 
-    SplashScreen sc = new SplashScreen("Restauration");
+    SplashScreen sc = new SplashScreen("Restauration", null);
     sc.start();
     try {
       model.close(ProgressionObserver.DUMB_OBSERVER);
