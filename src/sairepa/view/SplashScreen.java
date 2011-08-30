@@ -128,7 +128,7 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 		private int nmbJobs;
 		private int currentJob;
 		private boolean visible;
-		private ActList.DbHandling lastJob;
+		private ActList.DbOp lastJob;
 
 		public DbObserver() {
 		}
@@ -143,7 +143,7 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 			}
 
 		@Override
-			public void jobUpdate(ActList.DbHandling job, int currentPosition, int endOfJobPosition) {
+			public void jobUpdate(ActList.DbOp job, int currentPosition, int endOfJobPosition) {
 				if ( job != lastJob ) {
 					lastJob = job;
 					currentJob++;

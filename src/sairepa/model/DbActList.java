@@ -46,13 +46,6 @@ public class DbActList implements ActList
 		return fields;
 	}
 
-	public static class DumbDbObserver implements ActList.ActListDbObserver {
-		public DumbDbObserver() { }
-		public void startOfJobBatch(int nmbJob) { }
-		public void jobUpdate(DbHandling job, int currentPosition, int endOfJobPosition) { }
-		public void endOfJobBatch() { }
-	}
-
 	public void setActListDbObserver(ActList.ActListDbObserver obs) {
 		this.dbObserver = obs;
 	}
@@ -117,7 +110,7 @@ public class DbActList implements ActList
 				PreparedStatement st;
 
 				dbObserver.startOfJobBatch(2);
-				dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 0, 1);
+				dbObserver.jobUpdate(ActList.DbOp.DB_QUERY, 0, 1);
 
 				st = db.getConnection().prepareStatement("SELECT fields.id, fields.name FROM fields WHERE fields.file = ?");
 				st.setInt(1, fileId);
@@ -141,7 +134,7 @@ public class DbActList implements ActList
 				st.setInt(1, fileId);
 				set = st.executeQuery();
 
-				dbObserver.jobUpdate(ActList.DbHandling.DB_QUERY, 1, 1);
+				dbObserver.jobUpdate(ActList.DbOp.DB_QUERY, 1, 1);
 
 				try {
 					Map<ActField, String> entries = null;
@@ -155,7 +148,7 @@ public class DbActList implements ActList
 
 						if ( row != currentRow ) {
 							if ( row % (total > 3000 ? 1000 : 100) == 0 ) {
-								dbObserver.jobUpdate(ActList.DbHandling.DB_FETCH, row, total);
+								dbObserver.jobUpdate(ActList.DbOp.DB_FETCH, row, total);
 							}
 
 							Util.check( row == currentRow + 1 );
@@ -304,187 +297,11 @@ public class DbActList implements ActList
 		}
 	}
 
-	protected class SortedActList implements ActList {
-		private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
-
-		public SortedActList(List<ActSorting> sortingRule) {
-			System.out.println("Sorting by: ");
-			for (ActSorting as : sortingRule) {
-				System.out.println(as.toString());
-			}
-			System.out.println("--");
-
-			// TODO
-		}
-
-		public void setActListDbObserver(ActList.ActListDbObserver obs) {
-			DbActList.this.setActListDbObserver(obs);
-			this.dbObserver = obs;
-		}
-
-		public ActListFactory getFactory() {
-			return DbActList.this.getFactory();
-		}
-
-		public String getName() {
-			return DbActList.this.getName();
-		}
-
-		public FieldLayout getFields() {
-			return DbActList.this.getFields();
-		}
-
-		public int getRowCount() {
-			return DbActList.this.getRowCount();
-		}
-
-		private int lastPositionReturned = -1;
-		private Act lastActReturned = null;
-
-		public int getActVisualRow(Act a) {
-			// TODO
-			return -1;
-		}
-
-		public Act getAct(int position) {
-			// TODO
-			return null;
-		}
-
-		public List<Act> getAllActs()
-		{
-			// TODO
-			throw new UnsupportedOperationException("TODO");
-		}
-
-		/**
-		 * @return beware: can return this !
-		 */
-		public ActList getSortedActList(List<ActSorting> sortingRule) {
-			return DbActList.this.getSortedActList(sortingRule);
-		}
-
-		public void insert(Act act) {
-			DbActList.this.insert(act);
-		}
-
-		public void insert(Act act, int row) {
-			throw new UnsupportedOperationException("Can't do");
-		}
-
-		public void delete(Act act) {
-			DbActList.this.delete(act);
-		}
-
-		public ActListIterator iterator() {
-			return new GenericActListIterator(db.getConnection(), SortedActList.this);
-		}
-
-		public Act createAct() {
-			return DbActList.this.createAct();
-		}
-
-		public void refresh() {
-			synchronized(db.getConnection()) {
-				lastActReturned = null;
-				lastPositionReturned = -1;
-				DbActList.this.refresh();
-			}
-		}
-
-		public void refresh(Act a) {
-			synchronized(db.getConnection()) {
-				if ( a.getRow() == lastPositionReturned ) {
-					lastActReturned = null;
-					lastPositionReturned = -1;
-				}
-			}
-		}
-	}
-
-	protected class ReverseActList implements ActList {
-		private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
-
-		public ReverseActList() {
-		}
-
-		public void setActListDbObserver(ActList.ActListDbObserver obs) {
-			DbActList.this.setActListDbObserver(obs);
-			this.dbObserver = obs;
-		}
-
-		public ActListFactory getFactory() {
-			return DbActList.this.getFactory();
-		}
-
-		public String getName() {
-			return DbActList.this.getName();
-		}
-
-		public FieldLayout getFields() {
-			return DbActList.this.getFields();
-		}
-
-		public int getRowCount() {
-			return DbActList.this.getRowCount();
-		}
-
-		public int getActVisualRow(Act a) {
-			return (getRowCount()-1) - DbActList.this.getActVisualRow(a);
-		}
-
-		public Act getAct(int position) {
-			return DbActList.this.getAct((getRowCount()-1) - position);
-		}
-
-		public List<Act> getAllActs()
-		{
-			List<Act> acts = DbActList.this.getAllActs();
-			java.util.Collections.reverse(acts);
-			return acts;
-		}
-
-		/**
-		 * @return beware: can return this !
-		 */
-		public ActList getSortedActList(List<ActSorting> sortingRule) {
-			return DbActList.this.getSortedActList(sortingRule);
-		}
-
-		public void insert(Act act) {
-			DbActList.this.insert(act);
-		}
-
-		public void insert(Act act, int row) {
-			/* row definition is not clear here, better not do anything */
-			throw new UnsupportedOperationException("Can't do");
-		}
-
-		public void delete(Act act) {
-			DbActList.this.delete(act);
-		}
-
-		public ActListIterator iterator() {
-			return new GenericActListIterator(db.getConnection(), ReverseActList.this);
-		}
-
-		public Act createAct() {
-			return DbActList.this.createAct();
-		}
-
-		public void refresh() {
-			DbActList.this.refresh();
-		}
-
-		public void refresh(Act a) {
-		}
-	}
-
 	public ActList getSortedActList(List<ActSorting> sortingRule) {
 		if ( sortingRule.get(0).getField() == null && !sortingRule.get(0).getOrder() )
 			return this;
 		else if ( sortingRule.get(0).getField() == null )
-			return new ReverseActList();
-		return new SortedActList(sortingRule);
+			return new ReverseActList(db, this);
+		return new SortedActList(db, this, sortingRule);
 	}
 }

@@ -19,7 +19,7 @@ public interface ActList extends Iterable<Act>
   public FieldLayout getFields();
   public int getRowCount();
 
-  public enum DbHandling {
+  public enum DbOp {
     DB_QUERY(),
     DB_FETCH(),
     DB_SORT(),
@@ -31,7 +31,7 @@ public interface ActList extends Iterable<Act>
    */
   public static interface ActListDbObserver {
       public void startOfJobBatch(int nmbJob);
-      public void jobUpdate(DbHandling job, int currentPosition, int endOfJobPosition);
+      public void jobUpdate(DbOp job, int currentPosition, int endOfJobPosition);
       public void endOfJobBatch();
   }
   public void setActListDbObserver(ActListDbObserver obs);
