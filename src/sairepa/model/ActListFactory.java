@@ -436,7 +436,8 @@ public abstract class ActListFactory
 	/**
 	 * Returns the default act list type, always hitting the DB
 	 */
-	public ActList getActList() {
+	public ActList getActList(ActList.ActListDbObserver obs) {
+		actList.setActListDbObserver(obs);
 		return actList;
 	}
 

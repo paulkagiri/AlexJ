@@ -5,7 +5,6 @@ import java.util.List;
 public class ReverseActList implements ActList {
 	private final DbHandler db;
 	private final ActList masterActList;
-	private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
 
 	protected ReverseActList(DbHandler db, ActList masterActList) {
 		this.db = db;
@@ -14,7 +13,10 @@ public class ReverseActList implements ActList {
 
 	public void setActListDbObserver(ActList.ActListDbObserver obs) {
 		masterActList.setActListDbObserver(obs);
-		this.dbObserver = obs;
+	}
+
+	public ActList.ActListDbObserver getActListDbObserver() {
+		return masterActList.getActListDbObserver();
 	}
 
 	public ActListFactory getFactory() {

@@ -10,8 +10,6 @@ public class SortedActList implements ActList {
 	private final ActList masterActList;
 	private final List<ActSorting> sortingRule;
 
-	private ActList.ActListDbObserver dbObserver = new DumbDbObserver();
-
 	private List<Integer> positionToActRow; // position = position once sorted
 	private List<Integer> actRowToPosition; // position = position once sorted
 
@@ -38,7 +36,10 @@ public class SortedActList implements ActList {
 
 	public void setActListDbObserver(ActList.ActListDbObserver obs) {
 		masterActList.setActListDbObserver(obs);
-		this.dbObserver = obs;
+	}
+
+	public ActList.ActListDbObserver getActListDbObserver() {
+		return masterActList.getActListDbObserver();
 	}
 
 	public ActListFactory getFactory() {
@@ -148,22 +149,26 @@ public class SortedActList implements ActList {
 
 		Vector<SortingResult> results = new Vector<SortingResult>(masterActList.getRowCount());
 
-		System.out.println("Sorting on field '" + sorting.getField() + "'");
+		//System.out.println("(1) Sorting on field '" + sorting.getField() + "'");
 
 		synchronized(db.getConnection()) {
 			try {
-				dbObserver.jobUpdate(DbOp.DB_QUERY, 0, 1);
+				masterActList.getActListDbObserver().jobUpdate(DbOp.DB_QUERY, 0, 1);
 				PreparedStatement rowGetter
 					= db.getConnection().prepareStatement(
-							"SELECT value, row FROM entries WHERE field = ? ORDER BY LOWER(LTRIM(value))"
-							+ (sorting.getOrder() ? " DESC" : ""));
+							"SELECT value, row FROM entries WHERE field = ? "
+							+ "ORDER BY LTRIM(value)*1" + (sorting.getOrder() ? " DESC" : "")
+							+ ", LOWER(LTRIM(value))" + (sorting.getOrder() ? " DESC" : ""));
 				rowGetter.setInt(1, sorting.getFieldId());
 				ResultSet set = rowGetter.executeQuery();
 				try {
 					i = 0;
 					while(set.next()) {
-						if ( (i % 500) == 0 )
-							dbObserver.jobUpdate(DbOp.DB_FETCH, i, total);
+						if ( (i % (total > 3000 ? 1000 : 100)) == 0 ) {
+							System.out.println("Fetching act order ... "
+										+ Integer.toString(i) + "/" + Integer.toString(total));
+							masterActList.getActListDbObserver().jobUpdate(DbOp.DB_FETCH, i, total);
+						}
 						String value = set.getString(1);
 						int row = set.getInt(2);
 						results.add(new SortingResult(value, row));
@@ -181,18 +186,20 @@ public class SortedActList implements ActList {
 	}
 
 	private List<Integer[]> getRowIntervals(List<SortingResult> results) {
-		Vector<Integer[]> out = new Vector<Integer[]>();
+		Vector<Integer[]> out = new Vector<Integer[]>(128);
 		Integer[] interval = null;
 
 		Collections.sort(results);
 
 		int startRow, endRow;
 
+		int i = 0;
 		for (SortingResult result : results) {
 			if (interval == null) {
 				interval = new Integer[2];
 				interval[0] = new Integer(result.getActRow());
 				interval[1] = new Integer(result.getActRow());
+				i++;
 			} else if ( interval[1].equals(result.getActRow()-1) ) {
 				interval[1] = new Integer(result.getActRow());
 			} else {
@@ -200,10 +207,13 @@ public class SortedActList implements ActList {
 				interval = new Integer[2];
 				interval[0] = new Integer(result.getActRow());
 				interval[1] = new Integer(result.getActRow());
+				i++;
 			}
 		}
 		if (interval != null)
 			out.add(interval);
+
+		//System.out.println("Generated " + Integer.toString(i) + " intervals");
 
 		return out;
 	}
@@ -216,7 +226,7 @@ public class SortedActList implements ActList {
 
 		Util.check(sorting.getFieldId() >= 0);
 
-		System.out.println("Sorting on field '" + sorting.getField() + "'");
+		//System.out.println("(2) Sorting on field '" + sorting.getField() + "'");
 
 		boolean first = true;
 		String query = "SELECT value, row FROM entries WHERE field = ? AND (";
@@ -230,7 +240,10 @@ public class SortedActList implements ActList {
 					+ " AND row <= " + Integer.toString(interval[1]) + ")";
 			first = false;
 		}
-		query += ") ORDER BY LOWER(LTRIM(value))";
+		query += ") ORDER BY LTRIM(value)*1";
+		if (sorting.getOrder())
+			query += " DESC";
+		query += ", LOWER(LTRIM(value))";
 		if (sorting.getOrder())
 			query += " DESC";
 
@@ -299,12 +312,12 @@ public class SortedActList implements ActList {
 
 
 		// then find all the non-unique results ..
-		int startidx, endidx;
+		int startidx, endidx, total = results.size();
 
-		for (startidx = 0; startidx < results.size(); startidx++) {
+		for (startidx = 0; startidx < total; startidx++) {
 			if (results.get(startidx).getValue() == null)
 				continue;
-			for (endidx = startidx + 1; endidx < results.size(); endidx++) {
+			for (endidx = startidx + 1; endidx < total; endidx++) {
 				if (results.get(endidx).getValue() == null
 						|| !results.get(endidx).getValue().equals(results.get(startidx).getValue())) {
 					break;
@@ -312,9 +325,11 @@ public class SortedActList implements ActList {
 			}
 
 			// .. and sort them
-			System.out.println("Sorting: Sorting " + Integer.toString(depth) + " left "
-					+ Integer.toString(endidx - startidx - 1) + " elements unsorted (from "
-					+ Integer.toString(startidx) + " to " + Integer.toString(endidx - 1) + ")");
+			if (depth == 1)
+				masterActList.getActListDbObserver().jobUpdate(DbOp.DB_SORT, endidx, total);
+			//System.out.println("Sorting: Sorting " + Integer.toString(depth) + " left "
+			//		+ Integer.toString(endidx - startidx) + " elements unsorted (from "
+			//		+ Integer.toString(startidx) + " to " + Integer.toString(endidx - 1) + ")");
 			Util.check(startidx < (endidx - 1));
 			sortResults(results.subList(startidx, endidx), nextSortingCriteria, depth);
 
@@ -325,14 +340,12 @@ public class SortedActList implements ActList {
 	public void refresh() {
 		masterActList.refresh();
 
-		dbObserver.startOfJobBatch("Triage des actes", 3);
+		masterActList.getActListDbObserver().startOfJobBatch("Tri des actes", 3);
 		try {
 			List<SortingResult> results = getSortedList(sortingRule.get(0));
 
-			dbObserver.jobUpdate(DbOp.DB_SORT, 0, 2);
 			sortIdenticalResults(results, sortingRule.subList(1, sortingRule.size()), 1);
 
-			dbObserver.jobUpdate(DbOp.DB_SORT, 1, 2);
 			this.positionToActRow = new Vector<Integer>(masterActList.getRowCount());
 			this.actRowToPosition = new Vector<Integer>(masterActList.getRowCount());
 			((Vector<Integer>)actRowToPosition).setSize(masterActList.getRowCount());
@@ -344,7 +357,7 @@ public class SortedActList implements ActList {
 				i++;
 			}
 		} finally {
-			dbObserver.endOfJobBatch();
+			masterActList.getActListDbObserver().endOfJobBatch();
 		}
 
 		System.out.println("Sorting done");

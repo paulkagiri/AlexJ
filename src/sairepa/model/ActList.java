@@ -41,6 +41,7 @@ public interface ActList extends Iterable<Act>
       public void endOfJobBatch();
   }
   public void setActListDbObserver(ActListDbObserver obs);
+  public ActListDbObserver getActListDbObserver();
 
   public static interface ActListIterator extends ListIterator<Act> {
     public void add(Act a);

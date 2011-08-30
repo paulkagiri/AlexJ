@@ -8,11 +8,9 @@ public class InMemoryActList implements ActList
 	private ActList dbActList;
 	private List<Act> acts;
 
-	protected InMemoryActList(ActList dbActList, ActList.ActListDbObserver dbObserver) {
+	protected InMemoryActList(ActList dbActList) {
 		assert(dbActList != null && !(dbActList instanceof InMemoryActList));
 		this.dbActList = dbActList;
-		if (dbObserver != null)
-			dbActList.setActListDbObserver(dbObserver);
 		refresh();
 	}
 
@@ -54,12 +52,11 @@ public class InMemoryActList implements ActList
 	 * Returns an InMemoryActList if possible (== if enought memory is available), otherwise,
 	 * returns actList
 	 */
-	public static ActList encapsulate(ActList actList, ActList.ActListDbObserver obs)
+	public static ActList encapsulate(ActList actList)
 	{
-		actList.setActListDbObserver(obs);
 		try {
 			assert(!(actList instanceof InMemoryActList));
-			return new InMemoryActList(actList, obs);
+			return new InMemoryActList(actList);
 		} catch (OutOfMemoryError e) {
 			System.err.println("OutOfMemoryError: Woops! Let's fall back on direct DB " +
 					"access");
@@ -69,10 +66,6 @@ public class InMemoryActList implements ActList
 			e.printStackTrace();
 			return actList;
 		}
-	}
-
-	public static ActList encapsulate(ActList actList) {
-		return encapsulate(actList, null);
 	}
 
 	public ActList getSortedActList(List<ActSorting> sortingRule) {
@@ -109,6 +102,10 @@ public class InMemoryActList implements ActList
 
 	public void setActListDbObserver(ActList.ActListDbObserver obs) {
 		dbActList.setActListDbObserver(obs);
+	}
+
+	public ActList.ActListDbObserver getActListDbObserver() {
+		return dbActList.getActListDbObserver();
 	}
 
 	public ActListIterator iterator() {

@@ -50,6 +50,10 @@ public class DbActList implements ActList
 		this.dbObserver = obs;
 	}
 
+  	public ActListDbObserver getActListDbObserver() {
+		return this.dbObserver;
+	}
+
 	public void computeRowCount() throws SQLException {
 		synchronized(db.getConnection()) {
 			PreparedStatement st
@@ -148,6 +152,8 @@ public class DbActList implements ActList
 
 						if ( row != currentRow ) {
 							if ( row % (total > 3000 ? 1000 : 100) == 0 ) {
+								System.out.println("Fetching acts ... "
+										+ Integer.toString(row) + "/" + Integer.toString(total));
 								dbObserver.jobUpdate(ActList.DbOp.DB_FETCH, row, total);
 							}
 
