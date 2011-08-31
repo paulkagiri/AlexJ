@@ -101,7 +101,7 @@ public class SplashScreen extends JDialog implements ProgressionObserver
 
 			while (loop) {
 				synchronized(this) {
-					if (oldProgression != progression || !oldTxt.equals(txt)) {
+					if (oldProgression != progression || (oldTxt != txt && !oldTxt.equals(txt))) {
 						bar.setValue(progression);
 						bar.setString(txt);
 						oldProgression = progression;

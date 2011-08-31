@@ -112,10 +112,12 @@ public class SortedActList implements ActList {
 	protected class SortingResult implements Comparable<SortingResult> {
 		private String value;
 		private int actRow;
+		private int position;
 
-		public SortingResult(String value, int actRow) {
+		public SortingResult(String value, int actRow, int position) {
 			this.value = value;
 			this.actRow = actRow;
+			this.position = position;
 		}
 
 		/**
@@ -129,168 +131,136 @@ public class SortedActList implements ActList {
 			return value;
 		}
 
+		public void setValue(String v) {
+			this.value = v;
+		}
+		
 		public int getActRow() {
 			return actRow;
 		}
 
+		public int getPosition() {
+			return position;
+		}
+
+		// comparaison
+		// Results are ordered based on their order in a SortingResultSet
+
+		private SortingResultSet refSet = null;
+		public void setReferenceSet(SortingResultSet refSet) {
+			this.refSet = refSet;
+		}
+
 		public int compareTo(SortingResult r) {
-			return new Integer(actRow).compareTo(new Integer(r.getActRow()));
+			int thisPosition = refSet.getRowToPosition().get(this.getActRow()).getPosition();
+			int rPosition = refSet.getRowToPosition().get(r.getActRow()).getPosition();
+			return new Integer(thisPosition).compareTo(new Integer(rPosition));
 		}
 	}
 
-	/**
-	 * Return the whole act list, sorted as requested by the given sorting rule element
-	 * @return a list: index = visual row ; value = act row + value
-	 */
-	private List<SortingResult> getSortedList(ActSorting sorting) {
-		int i = 0, total = masterActList.getRowCount();
+	protected class SortingResultSet {
+		private int nbResults;
+		private List<SortingResult> positionToRow;
+		private List<SortingResult> rowToPosition;
 
-		Util.check(sorting.getFieldId() >= 0);
+		public SortingResultSet(ActSorting sorting, int nbResults) {
+			this.nbResults = nbResults;
 
-		Vector<SortingResult> results = new Vector<SortingResult>(masterActList.getRowCount());
+			positionToRow = getSortedList(sorting);
 
-		System.out.println("(1) Sorting on field '" + sorting.getField() + "'");
+			rowToPosition = new Vector<SortingResult>(nbResults);
+			((Vector<SortingResult>)rowToPosition).setSize(nbResults);
+			for (SortingResult r : positionToRow) {
+				rowToPosition.set(r.getActRow(), r);
+			}
+		}
 
-		synchronized(db.getConnection()) {
-			try {
-				masterActList.getActListDbObserver().jobUpdate(DbOp.DB_QUERY, 0, 1);
-				PreparedStatement rowGetter
-					= db.getConnection().prepareStatement(
-							"SELECT value, row FROM entries WHERE field = ? "
-							+ "ORDER BY LTRIM(value)*1" + (sorting.getOrder() ? " DESC" : "")
-							+ ", LOWER(LTRIM(value))" + (sorting.getOrder() ? " DESC" : ""));
-				rowGetter.setInt(1, sorting.getFieldId());
-				ResultSet set = rowGetter.executeQuery();
+		/**
+		 * Return the whole act list, sorted as requested by the given sorting rule element
+		 * @return a list: index = visual row ; value = act row + value
+		 */
+		private List<SortingResult> getSortedList(ActSorting sorting) {
+			int i = 0, total = nbResults;
+
+			Util.check(sorting.getFieldId() >= 0);
+
+			Vector<SortingResult> results = new Vector<SortingResult>(nbResults);
+
+			System.out.println("Sorting on field '" + sorting.getField() + "'");
+
+			synchronized(db.getConnection()) {
 				try {
-					i = 0;
-					while(set.next()) {
-						if ( (i % (total > 3000 ? 1000 : 100)) == 0 ) {
-							System.out.println("Fetching act order ... "
-										+ Integer.toString(i) + "/" + Integer.toString(total));
+					masterActList.getActListDbObserver().jobUpdate(DbOp.DB_QUERY, 0, 1);
+					PreparedStatement rowGetter
+						= db.getConnection().prepareStatement(
+								"SELECT value, row FROM entries WHERE field = ? "
+								+ "ORDER BY LTRIM(value)*1" + (sorting.getOrder() ? " DESC" : "")
+								+ ", LOWER(LTRIM(value))" + (sorting.getOrder() ? " DESC" : ""));
+					rowGetter.setInt(1, sorting.getFieldId());
+					ResultSet set = rowGetter.executeQuery();
+					try {
+						i = 0;
+						while(set.next()) {
+							if ( (i % (total > 3000 ? 1000 : 100)) == 0 ) {
+								System.out.println("Fetching act order ... "
+											+ Integer.toString(i) + "/" + Integer.toString(total));
+							}
 							masterActList.getActListDbObserver().jobUpdate(DbOp.DB_FETCH, i, total);
+							String value = set.getString(1);
+							int row = set.getInt(2);
+							results.add(new SortingResult(value, row, i));
+							i++;
 						}
-						String value = set.getString(1);
-						int row = set.getInt(2);
-						results.add(new SortingResult(value, row));
-						i++;
+					} finally {
+						set.close();
 					}
-				} finally {
-					set.close();
+				} catch (SQLException e) {
+					throw new RuntimeException("SQLException", e);
 				}
-			} catch (SQLException e) {
-				throw new RuntimeException("SQLException", e);
 			}
+
+			return results;
 		}
 
-		return results;
-	}
-
-	private List<Integer[]> getRowIntervals(List<SortingResult> results) {
-		Vector<Integer[]> out = new Vector<Integer[]>(128);
-		Integer[] interval = null;
-
-		Collections.sort(results);
-
-		int startRow, endRow;
-
-		int i = 0;
-		for (SortingResult result : results) {
-			if (interval == null) {
-				interval = new Integer[2];
-				interval[0] = new Integer(result.getActRow());
-				interval[1] = new Integer(result.getActRow());
-				i++;
-			} else if ( interval[1].equals(result.getActRow()-1) ) {
-				interval[1] = new Integer(result.getActRow());
-			} else {
-				out.add(interval);
-				interval = new Integer[2];
-				interval[0] = new Integer(result.getActRow());
-				interval[1] = new Integer(result.getActRow());
-				i++;
-			}
+		public List<SortingResult> getPositionToRow() {
+			return positionToRow;
 		}
-		if (interval != null)
-			out.add(interval);
 
-		//System.out.println("Generated " + Integer.toString(i) + " intervals");
-
-		return out;
+		public List<SortingResult> getRowToPosition() {
+			return rowToPosition;
+		}
 	}
 
 	private void sortResults(List<SortingResult> results,
-			List<ActSorting> nextSortingCriteria,
-			int depth) {
-		ActSorting sorting = nextSortingCriteria.get(0);
-		List<Integer[]> rowIntervals = getRowIntervals(results);
-
-		Util.check(sorting.getFieldId() >= 0);
-
-		System.out.println("(2) Sorting on field '" + sorting.getField() + "'");
-
-		boolean first = true;
-		String query = "SELECT value, row FROM entries WHERE field = ? AND (";
-		for (Integer[] interval : rowIntervals) {
-			if (!first)
-				query += " OR ";
-			if (interval[0] == interval[1])
-				query += "row = "+ Integer.toString(interval[0]);
-			else
-				query += "(" + Integer.toString(interval[0]) + " <= row"
-					+ " AND row <= " + Integer.toString(interval[1]) + ")";
-			first = false;
+			SortingResultSet baseSet) {
+		for (SortingResult sr : results) {
+			sr.setReferenceSet(baseSet);
 		}
-		query += ") ORDER BY LTRIM(value)*1";
-		if (sorting.getOrder())
-			query += " DESC";
-		query += ", LOWER(LTRIM(value))";
-		if (sorting.getOrder())
-			query += " DESC";
-
-		int i = 0;
-		synchronized(db.getConnection()) {
-			try {
-				PreparedStatement rowGetter
-					= db.getConnection().prepareStatement(query);
-				rowGetter.setInt(1, sorting.getFieldId());
-				ResultSet set = rowGetter.executeQuery();
-				try {
-					while(set.next()) {
-						String value = set.getString(1);
-						int row = set.getInt(2);
-						results.set(i, new SortingResult(value, row));
-						i++;
-					}
-				} finally {
-					set.close();
-				}
-			} catch (SQLException e) {
-				throw new RuntimeException("SQLException. Query was: " + query, e);
-			}
+		java.util.Collections.sort(results);
+		for (SortingResult sr : results) {
+			// result inherit values from the baseSet
+			sr.setValue(baseSet.getRowToPosition().get(sr.getActRow()).getValue());
 		}
-
-		// Recursion
-		sortIdenticalResults(results,
-				nextSortingCriteria.subList(1, nextSortingCriteria.size()),
-				depth+1);
 	}
 
-	private void sortIdenticalResults(List<SortingResult> results,
-			List<ActSorting> nextSortingCriteria,
-			int depth) {
-		if (nextSortingCriteria.size() <= 0)
-			return;
+	/* Sort inputSet according to baseSet
+	 */
+	private boolean sortIdenticalResults(
+			SortingResultSet inputSet,
+			SortingResultSet baseSet) {
+		List<SortingResult> results = inputSet.getPositionToRow();
 
 		// first validate unique results
 		SortingResult ppreviousResult = null, previousResult = null;
 		boolean hasUnsortedResults = false;
 
 		for (SortingResult result : results) {
-			if ( previousResult != null ) {
+			if ( previousResult != null && previousResult.getValue() != null) {
 				if ( (ppreviousResult == null
 							|| ppreviousResult.getValue() == null
 							|| !ppreviousResult.getValue().equals(previousResult.getValue()) )
-						&& (!previousResult.getValue().equals(result.getValue())) )
+						&& (result.getValue() == null
+							|| !previousResult.getValue().equals(result.getValue())) )
 					previousResult.validate();
 				else
 					hasUnsortedResults = true;
@@ -308,8 +278,7 @@ public class SortedActList implements ActList {
 			hasUnsortedResults = true;
 
 		if (!hasUnsortedResults)
-			return;
-
+			return false;
 
 		// then find all the non-unique results ..
 		int startidx, endidx, total = results.size();
@@ -325,36 +294,49 @@ public class SortedActList implements ActList {
 			}
 
 			// .. and sort them
-			if (depth == 1)
-				masterActList.getActListDbObserver().jobUpdate(DbOp.DB_SORT, endidx, total);
-			System.out.println("Sorting: Sorting " + Integer.toString(depth) + " left "
+			System.out.println("Sorting: Previous sortings left "
 					+ Integer.toString(endidx - startidx) + " elements unsorted (from "
 					+ Integer.toString(startidx) + " to " + Integer.toString(endidx - 1) + ")");
 			Util.check(startidx < (endidx - 1));
-			sortResults(results.subList(startidx, endidx), nextSortingCriteria, depth);
+			sortResults(results.subList(startidx, endidx), baseSet);
 
 			startidx = endidx - 1;
 		}
+
+		return true;
 	}
 
 	public void refresh() {
 		masterActList.refresh();
 
-		masterActList.getActListDbObserver().startOfJobBatch("Tri des actes", 3);
+		masterActList.getActListDbObserver().startOfJobBatch("Tri des actes",
+				(2 * sortingRule.size()) + 1);
 		try {
-			List<SortingResult> results = getSortedList(sortingRule.get(0));
+			List<SortingResultSet> resultSets = new Vector<SortingResultSet>(sortingRule.size());
+			int i;
+			int total = masterActList.getRowCount();
 
-			sortIdenticalResults(results, sortingRule.subList(1, sortingRule.size()), 1);
+			for (ActSorting sorting : sortingRule) {
+				resultSets.add(new SortingResultSet(sorting, total));
+			}
 
-			this.positionToActRow = new Vector<Integer>(masterActList.getRowCount());
-			this.actRowToPosition = new Vector<Integer>(masterActList.getRowCount());
-			((Vector<Integer>)actRowToPosition).setSize(masterActList.getRowCount());
-
-			int i = 0;
-			for (SortingResult result : results) {
-				positionToActRow.add(result.getActRow());
-				actRowToPosition.set(result.getActRow(), i);
+			i = 0;
+			for (SortingResultSet set : resultSets.subList(1, resultSets.size())) {
+				masterActList.getActListDbObserver().jobUpdate(DbOp.DB_SORT, i, resultSets.size()-1);
+				if (!sortIdenticalResults(resultSets.get(0), set))
+					break;
 				i++;
+			}
+
+			positionToActRow = new Vector<Integer>(total);
+			((Vector<Integer>)positionToActRow).setSize(total);
+			actRowToPosition = new Vector<Integer>(total);
+			((Vector<Integer>)actRowToPosition).setSize(total);
+			int pos = 0;
+			for (SortingResult r : resultSets.get(0).getPositionToRow()) {
+				positionToActRow.set(pos, r.getActRow());
+				actRowToPosition.set(r.getActRow(), pos);
+				pos++;
 			}
 		} finally {
 			masterActList.getActListDbObserver().endOfJobBatch();
