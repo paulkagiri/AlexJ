@@ -13,7 +13,7 @@ import sairepa.model.structs.*;
 public class Model
 {
   private final File projectDir;
-  private final Hsqldb db;
+  private final DbHandler db;
   private final ClientFile clientFile;
   private final ActListFactoryLayout factories;
   private final BackupManager backupManager;
@@ -25,7 +25,7 @@ public class Model
     this.projectDir = projectDir;
     this.clientFile = clientFile;
 
-    db = new Hsqldb();
+    db = new DbHandler();
 
     factories = new ActListFactoryLayout(this,
 	new String[] {
@@ -66,7 +66,7 @@ public class Model
     return prncvDb;
   }
 
-  public Hsqldb getDb() {
+  public DbHandler getDb() {
     return db;
   }
 
@@ -130,33 +130,31 @@ public class Model
   }
 
   private void createTables() throws SQLException {
-    try {
-      executeQuery("CREATE TABLE IF NOT EXISTS files ("
-		   + "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
-		   + "file VARCHAR NOT NULL, " // "dir/file.dbf"
-		   + "lastDbfSync TIMESTAMP NULL, "
-		   + "UNIQUE (file)"
-		   + ");");
-      executeQuery("CREATE TABLE IF NOT EXISTS fields ("
-		   + "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
-		   + "file INTEGER NOT NULL, "
-		   + "name VARCHAR NOT NULL, "
-		   + "UNIQUE (file, name), "
-		   + "FOREIGN KEY (file) REFERENCES files (id)"
-		   + ");");
-      executeQuery("CREATE TABLE IF NOT EXISTS entries ("
-		   + "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
-		   + "field INTEGER NOT NULL, "
-		   + "row INTEGER NOT NULL, "
-		   + "value VARCHAR NOT NULL, "
-		   + "UNIQUE (field, row), "
-		   + "FOREIGN KEY (field) REFERENCES fields (id)"
-		   + ");");
-    } catch(SQLException e) {
-      // Probably a "table already exists", no worry on
-      // this point.
-      System.out.println("SQLException : " + e.toString());
-    }
+    executeQuery("CREATE TABLE IF NOT EXISTS files ("
+	+ "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
+	+ "file VARCHAR NOT NULL, " // "dir/file.dbf"
+	+ "lastDbfSync TIMESTAMP NULL, "
+	+ "UNIQUE (file)"
+	+ ");");
+    executeQuery("CREATE TABLE IF NOT EXISTS fields ("
+	+ "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
+	+ "file INTEGER NOT NULL, "
+	+ "name VARCHAR NOT NULL, "
+	+ "UNIQUE (file, name), "
+	+ "FOREIGN KEY (file) REFERENCES files (id)"
+	+ ");");
+    executeQuery("CREATE TABLE IF NOT EXISTS entries ("
+	+ "id INTEGER NOT NULL PRIMARY KEY ASC AUTOINCREMENT, "
+	+ "field INTEGER NOT NULL, "
+	+ "row INTEGER NOT NULL, "
+	+ "value VARCHAR NOT NULL, "
+	+ "UNIQUE (field, row), "
+	+ "FOREIGN KEY (field) REFERENCES fields (id)"
+	+ ");");
+
+    executeQuery("CREATE INDEX IF NOT EXISTS idx_filenames ON files (file);");
+    executeQuery("CREATE INDEX IF NOT EXISTS idx_fieldnames ON fields (file, name);");
+    executeQuery("CREATE INDEX IF NOT EXISTS idx_entries ON entries (field, row);");
   }
 
   private void executeQuery(final String query) throws java.sql.SQLException {

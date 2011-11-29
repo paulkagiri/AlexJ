@@ -152,7 +152,8 @@ public class ActionSave implements ActionListener
       return;
     File f = fileChooser.getSelectedFile();
 
-    SplashScreen ss = new SplashScreen("Sauvegarde");
+    SplashScreen ss = new SplashScreen(view.getMainWindow(),
+	"Sauvegarde", null);
     ss.start();
     try {
 	ss.start();

@@ -19,10 +19,16 @@ public interface ActList extends Iterable<Act>
   public FieldLayout getFields();
   public int getRowCount();
 
-  public enum DbHandling {
-      DB_QUERY(),
-	  DB_FETCH(),
-	  DB_SORT(),
+  /**
+   * Internal to the model. Do not use outside of it.
+   * @return the id of the file this act list is attached to
+   */
+  public int getFileId();
+
+  public enum DbOp {
+    DB_QUERY(),
+    DB_FETCH(),
+    DB_SORT(),
   }
 
   /**
@@ -30,11 +36,12 @@ public interface ActList extends Iterable<Act>
    * or manipulation is started
    */
   public static interface ActListDbObserver {
-      public void startOfJobBatch(int nmbJob);
-      public void jobUpdate(DbHandling job, int currentPosition, int endOfJobPosition);
+      public void startOfJobBatch(String description, int nmbJob);
+      public void jobUpdate(DbOp job, int currentPosition, int endOfJobPosition);
       public void endOfJobBatch();
   }
   public void setActListDbObserver(ActListDbObserver obs);
+  public ActListDbObserver getActListDbObserver();
 
   public static interface ActListIterator extends ListIterator<Act> {
     public void add(Act a);
@@ -58,7 +65,7 @@ public interface ActList extends Iterable<Act>
    * @param sortedBy field name ; can be null
    * @return beware: can return this !
    */
-  public ActList getSortedActList(String sortedBy, boolean desc);
+  public ActList getSortedActList(List<ActSorting> sortingRule);
 
   public void insert(Act act);
   public void insert(Act act, int row);

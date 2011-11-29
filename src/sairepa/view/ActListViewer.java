@@ -10,6 +10,8 @@ import java.awt.event.InputMethodListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Vector;
+
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -33,6 +35,7 @@ import sairepa.model.ActEntry;
 import sairepa.model.ActField;
 import sairepa.model.ActList;
 import sairepa.model.ActListFactory;
+import sairepa.model.ActSorting;
 import sairepa.model.Util;
 
 public class ActListViewer extends Viewer
@@ -44,14 +47,13 @@ public class ActListViewer extends Viewer
   private ActListTableModel model;
   private Table table;
 
-  public ActListViewer(ActList actList) {
-    super(actList,
-	  ActListViewerFactory.NAME,
-	  ActListViewerFactory.ICON);
+  public ActListViewer(ActList actList, boolean allowReordering) {
+    super(actList, ActListViewerFactory.NAME);
     this.actList = actList;
     this.setLayout(new BorderLayout());
     model = new ActListTableModel();
     table = new Table(model);
+    table.setReorderingState(allowReordering);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     table.addReorderingListener(this);
     table.setRowSelectionAllowed(true);
@@ -186,12 +188,15 @@ public class ActListViewer extends Viewer
   }
 
   public void reorder(int columnIndex, boolean desc) {
+    Vector<ActSorting> sortingRule = new Vector<ActSorting>();
+
     if (columnIndex == 0) {
-      actList = actList.getSortedActList(null, desc);
+      sortingRule.add(new ActSorting(null, desc));
     } else {
       String colName = model.getColumnName(columnIndex);
-      actList = actList.getSortedActList(colName, desc);
+      sortingRule.add(new ActSorting(colName, desc));
     }
+    actList = actList.getSortedActList(sortingRule);
     refresh();
   }
 

@@ -25,7 +25,6 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -68,7 +67,7 @@ public class ActViewer extends Viewer implements ActionListener
 	private MainWindow mainWindow;
 
 	public ActViewer(MainWindow mainWindow, ActList actList) {
-		super(actList, ActViewerFactory.NAME, ActViewerFactory.ICON);
+		super(actList, ActViewerFactory.NAME);
 		this.actList = actList;
 		this.mainWindow = mainWindow;
 		prepareUI(actList);

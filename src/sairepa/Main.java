@@ -70,7 +70,7 @@ public class Main {
 			return;
 		}
 
-		SplashScreen ss = new SplashScreen(APPLICATION_NAME,
+		SplashScreen ss = new SplashScreen(APPLICATION_NAME, null,
 				new Font("Dialog", Font.BOLD, 32));
 		ss.start();
 

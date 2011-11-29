@@ -47,6 +47,7 @@ public class MainWindow extends JFrame implements ChangeListener {
   private final static ViewerFactory[] viewerFactories = new ViewerFactory[] {
     new ActViewerFactory(),
     new ActListViewerFactory(),
+    new SortedActListViewerFactory(),
   };
 
   /**
@@ -65,7 +66,7 @@ public class MainWindow extends JFrame implements ChangeListener {
 
     this.getContentPane().add(tabs = new CloseableTabbedPane(), BorderLayout.CENTER);
     this.getContentPane().add(tabOpenerScrollPane =
-                              new JScrollPane(tabOpener = createTabSelecter(model)),
+                              	new JScrollPane(tabOpener = createTabSelecter(model)),
 			      BorderLayout.WEST);
 
     tabs.addChangeListener(this);
@@ -216,7 +217,8 @@ public class MainWindow extends JFrame implements ChangeListener {
   }
 
   public void closeAllViewers() {
-    Vector<Viewer> copy = (Vector<Viewer>)viewers.clone();
+    Vector<Viewer> copy = new Vector<Viewer>();
+    java.util.Collections.copy(copy, viewers);
     for (Viewer v : copy)
       removeViewer(v);
   }

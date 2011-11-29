@@ -5,6 +5,7 @@ import java.awt.Cursor;
 import sairepa.model.ActListFactory;
 import sairepa.model.Model;
 import sairepa.model.Util;
+import sairepa.view.SplashScreen;
 import sairepa.view.TabSelecter;
 import sairepa.view.View;
 import sairepa.view.Viewer;
@@ -30,7 +31,7 @@ public class TabController implements TabSelecter.TabSelecterObserver
 			/* TODO(Jflesch): swing thingies shouldn't be done here */
 			view.getMainWindow().getContentPane().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			Viewer v = viewerFactory.createViewer(view.getMainWindow(),
-					viewerFactory.extractActList(actListFactory));
+					actListFactory.getActList(new SplashScreen.DbObserver()));
 			Util.check(v != null);
 			v.addObserver(new ViewerController(model, view, controller));
 			view.getMainWindow().addViewer(v);

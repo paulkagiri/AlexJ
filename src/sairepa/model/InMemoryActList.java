@@ -8,12 +8,10 @@ public class InMemoryActList implements ActList
 	private ActList dbActList;
 	private List<Act> acts;
 
-	protected InMemoryActList(ActList dbActList, ActList.ActListDbObserver dbObserver) {
+	protected InMemoryActList(ActList dbActList) {
 		assert(dbActList != null && !(dbActList instanceof InMemoryActList));
 		this.dbActList = dbActList;
-		if (dbObserver != null)
-			dbActList.setActListDbObserver(dbObserver);
-		refresh();
+		refreshMemList();
 	}
 
 	public ActListFactory getFactory() {
@@ -54,12 +52,11 @@ public class InMemoryActList implements ActList
 	 * Returns an InMemoryActList if possible (== if enought memory is available), otherwise,
 	 * returns actList
 	 */
-	public static ActList encapsulate(ActList actList, ActList.ActListDbObserver obs)
+	public static ActList encapsulate(ActList actList)
 	{
-		actList.setActListDbObserver(obs);
 		try {
 			assert(!(actList instanceof InMemoryActList));
-			return new InMemoryActList(actList, obs);
+			return new InMemoryActList(actList);
 		} catch (OutOfMemoryError e) {
 			System.err.println("OutOfMemoryError: Woops! Let's fall back on direct DB " +
 					"access");
@@ -71,14 +68,10 @@ public class InMemoryActList implements ActList
 		}
 	}
 
-	public static ActList encapsulate(ActList actList) {
-		return encapsulate(actList, null);
-	}
-
-	public ActList getSortedActList(String sortedBy, boolean desc) {
+	public ActList getSortedActList(List<ActSorting> sortingRule) {
 		try {
-			dbActList = dbActList.getSortedActList(sortedBy, desc);
-			refresh();
+			dbActList = dbActList.getSortedActList(sortingRule);
+			refreshMemList();
 		} catch (OutOfMemoryError e) {
 			System.err.println("OutOfMemoryError: Woops! JVM probably screwed up because " +
 					"it's unexpected here ; anyway let's fall back on direct DB " +
@@ -94,21 +87,25 @@ public class InMemoryActList implements ActList
 
 	public void insert(Act act) {
 		dbActList.insert(act);
-		refresh();
+		refreshMemList();
 	}
 
 	public void insert(Act act, int row) {
 		dbActList.insert(act, row);
-		refresh();
+		refreshMemList();
 	}
 
 	public void delete(Act act) {
 		dbActList.delete(act);
-		refresh();
+		refreshMemList();
 	}
 
 	public void setActListDbObserver(ActList.ActListDbObserver obs) {
 		dbActList.setActListDbObserver(obs);
+	}
+
+	public ActList.ActListDbObserver getActListDbObserver() {
+		return dbActList.getActListDbObserver();
 	}
 
 	public ActListIterator iterator() {
@@ -122,7 +119,10 @@ public class InMemoryActList implements ActList
 
 	public void refresh() {
 		dbActList.refresh();
+		refreshMemList();
+	}
 
+	public void refreshMemList() {
 		// reload the content of the act list in memory
 		int current = 0;
 		int total = dbActList.getRowCount();
@@ -138,15 +138,20 @@ public class InMemoryActList implements ActList
 	}
 
 	public void refresh(Act a) {
+		dbActList.refresh(a);
 		try {
 			Act ourAct = getAct(a.getRow());
 			if ( ourAct == null ) {
-				refresh();
+				refreshMemList();
 				return;
 			}
 			ourAct.reload();
 		} catch (ArrayIndexOutOfBoundsException e) {
-			refresh();
+			refreshMemList();
 		}
+	}
+
+	public int getFileId() {
+		return dbActList.getFileId();
 	}
 }
