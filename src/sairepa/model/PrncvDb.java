@@ -20,11 +20,48 @@ public class PrncvDb
 {
 	public static final int NMB_CARS = 6;
 
-	public static final String[] EXCEPTIONS = {
+	public static final String[] TRUNCATE_EXCEPTIONS = {
 		"Christ"
 	};
 
+	private static class PrefixName {
+		private String prefix;
+		private Sex sex;
+
+		public PrefixName(String prefix, Sex sex) {
+			this.prefix = prefix;
+			this.sex = sex;
+		}
+
+		public String getPrefix() {
+			return prefix;
+		}
+
+		public Sex getSex() {
+			return sex;
+		}
+
+		public boolean matchName(String name, Sex sex) {
+			if (this.sex != Sex.UNKNOWN && this.sex != sex)
+				return false;
+			return name.toLowerCase().startsWith(this.prefix.toLowerCase());
+		}
+	}
+
+	public static final PrefixName[] PREFIX_NAME_TO_IGNORE = {
+		new PrefixName("Joan", Sex.MALE),
+		new PrefixName("Johan", Sex.MALE),
+		new PrefixName("Hans", Sex.MALE),
+		new PrefixName("Hanns", Sex.MALE),
+		new PrefixName("Anne", Sex.FEMALE),
+		new PrefixName("Anna", Sex.FEMALE),
+		new PrefixName("Marie", Sex.FEMALE),
+		new PrefixName("Maria", Sex.FEMALE),
+	};
+
+	public static final String NAME_SEPARATORS = "[ :.-]";
 	public static final String UNKNOWN = "????????";
+
 	private Map[] prncvs = new Map[2];
 
 	public PrncvDb() {
@@ -36,7 +73,7 @@ public class PrncvDb
 	}
 
 	public String truncate(String str) {
-		for (String exception : EXCEPTIONS) {
+		for (String exception : TRUNCATE_EXCEPTIONS) {
 			if (str.startsWith(exception)) {
 				return str;
 			}
@@ -115,15 +152,62 @@ public class PrncvDb
 		}
 	}
 
-	public String getPrncv(String lu, Sex sex) {
+	/**
+	 * @brief get a Prncv for a given single prn (first name).
+	 */
+	private String getSinglePrncv(String singleName, Sex sex) {
 		Util.check(sex != Sex.UNKNOWN);
-		if ("-".equals(lu.trim())) return "-";
-		System.out.println("(1) Prncv: '" + lu + "' / " +sex.toString());
-		lu = Util.trim(lu);
-		lu = truncate(lu);
-		System.out.println("(2) Prncv: '" + lu + "' / " +sex.toString());
-		String cv = (String)prncvs[sex.toInteger()].get(lu);
+		if ("-".equals(singleName.trim())) return "-";
+		System.out.println("(1) Prncv: '" + singleName + "' / " +sex.toString());
+		singleName = Util.trim(singleName);
+		singleName = truncate(singleName);
+		System.out.println("(2) Prncv: '" + singleName + "' / " +sex.toString());
+		String cv = (String)prncvs[sex.toInteger()].get(singleName);
 		return ((cv == null) ? UNKNOWN : cv);
+	}
+
+	/**
+	 * @brief get the prncv corresponding to the prn (first name) (taking into account
+	 *  that a person can have multiple first names)
+	 */
+	public String getPrncv(String prn, Sex sex) {
+		Util.check(sex != Sex.UNKNOWN);
+		if ("-".equals(prn.trim())) return "-";
+		System.out.println("(0) Prvncv: '" + prn + "' / " + sex.toString());
+		prn = Util.trim(prn);
+		
+		String[] prns = prn.split(NAME_SEPARATORS);
+
+		/* we have to identify the 3 first names, however, between
+		 * 2 names, there may be many separators --> we have to remake
+		 * the array
+		 */
+		String[] names = new String[3];
+		int src = 0;
+		int dst = 0;
+		for (src = 0, dst = 0 ; src < prns.length && dst < names.length ; src++) {
+			if ("".equals(prns[src].trim()))
+				continue;
+			names[dst] = prns[src];
+			dst++;
+		}
+
+		if (dst <= 0)
+			return "-";
+		if (dst <= 1)
+			return getSinglePrncv(names[0], sex);
+
+		int offset = 0;
+		for (PrefixName prefix : PREFIX_NAME_TO_IGNORE) {
+			if (prefix.matchName(names[0], sex)) {
+				offset = 1;
+				break;
+			}
+		}
+
+		if (names[offset + 1] != null)
+			return getSinglePrncv(names[offset + 1], sex);
+		return getSinglePrncv(names[offset], sex);
 	}
 
 	public final static int MIN_SRC_LENGTH = 1;
