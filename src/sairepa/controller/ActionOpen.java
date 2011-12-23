@@ -49,6 +49,8 @@ public class ActionOpen implements ActionListener
       while (entries.hasMoreElements()) {
 	ZipEntry entry = entries.nextElement();
 	InputStream in = zip.getInputStream(entry);
+
+	System.out.println("Restoring: " + entry.getName().toString());
 	try {
 	  FileOutputStream out = new FileOutputStream(Util.getFile(model.getProjectDir(), entry.getName()));
 	  try {
