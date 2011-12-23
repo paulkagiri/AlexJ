@@ -157,9 +157,13 @@ public class Model
     executeQuery("CREATE INDEX IF NOT EXISTS idx_entries ON entries (field, row);");
   }
 
-  private void executeQuery(final String query) throws java.sql.SQLException {
+  private void executeQuery(final String query) throws SQLException {
     final Statement stmt = db.getConnection().createStatement();
     stmt.execute(query);
     stmt.close();
+  }
+
+  public void deleteDb() throws SQLException {
+	db.delete();
   }
 }

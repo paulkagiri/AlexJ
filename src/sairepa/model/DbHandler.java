@@ -20,8 +20,12 @@ public class DbHandler {
       System.err.println("ClassNotFoundException: " + e.toString());
       e.printStackTrace(System.err);
       throw new SQLException(
-           "Cannot init database (ClassNotFoundException)");
+	  "Cannot init database (ClassNotFoundException)");
     }
+  }
+
+  private String getDbFilename() {
+    return sairepa.Main.APPLICATION_NAME + "_" + this.project + ".db";
   }
 
   public void connect(String projectName) throws java.sql.SQLException {
@@ -33,9 +37,13 @@ public class DbHandler {
       project = projectName;
       lockProject(project); // throw a runtime exception if can't
 
-      connection = DriverManager.getConnection("jdbc:sqlite:" + sairepa.Main.APPLICATION_NAME + "_" + projectName + ".db");
+      connection = DriverManager.getConnection("jdbc:sqlite:" + getDbFilename());
       connection.setAutoCommit(true);
     }
+  }
+
+  public void delete() {
+	new File(getDbFilename()).delete();
   }
 
   public void disconnect() throws java.sql.SQLException {
@@ -58,15 +66,15 @@ public class DbHandler {
     try {
       b = f.createNewFile();
     } catch (IOException e) {
-	/* TODO(Jflesch): l10n */
+      /* TODO(Jflesch): l10n */
       throw new RuntimeException("Erreur lors de la verification du verrou du projet '" + project + "'.", e);
     }
 
     if (!b) {
-	/* TODO(Jflesch): l10n */
+      /* TODO(Jflesch): l10n */
       throw new RuntimeException("Ce projet semble etre deja utilise par une autre instance de " + sairepa.Main.APPLICATION_NAME + ". " +
-				 "Si ce n'est pas le cas, veuillez effacer le fichier '" + project + ".lock' " +
-				 "du repertoire " + sairepa.Main.APPLICATION_NAME);
+	  "Si ce n'est pas le cas, veuillez effacer le fichier '" + project + ".lock' " +
+	  "du repertoire " + sairepa.Main.APPLICATION_NAME);
     } else {
       f.deleteOnExit();
     }

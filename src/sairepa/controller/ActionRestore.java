@@ -50,6 +50,7 @@ public class ActionRestore implements ActionListener
     sc.start();
     try {
       model.close(ProgressionObserver.DUMB_OBSERVER);
+      model.deleteDb(); /* will force a reload of the DBF files */
       model.getBackupManager().restore(d, sc);
       // we don't need to purge the DB, because when we will reinitialize the model,
       // it will see that the dbf are more recent than the DB

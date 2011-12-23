@@ -156,7 +156,6 @@ public class ActionSave implements ActionListener
 	"Sauvegarde", null);
     ss.start();
     try {
-	ss.start();
 	model.save(ss);
 
 	ss.setProgression(90, "Creation du ZIP");

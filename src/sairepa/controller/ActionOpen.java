@@ -79,6 +79,8 @@ public class ActionOpen implements ActionListener
       while (entries.hasMoreElements()) {
 	LhaHeader entry = ((LhaHeader)entries.nextElement());
 	InputStream in = lha.getInputStream(entry);
+
+	System.out.println("Restoring: " + entry.getPath().toString());
 	try {
 	  FileOutputStream out = new FileOutputStream(Util.getFile(model.getProjectDir(), entry.getPath()));
 	  try {
@@ -113,6 +115,8 @@ public class ActionOpen implements ActionListener
       return;
     File f = fileChooser.getSelectedFile();
 
+    System.out.println("Will restore: " + f.toString());
+
     view.getMainWindow().closeAllViewers();
     view.getMainWindow().setVisible(false);
 
@@ -121,6 +125,7 @@ public class ActionOpen implements ActionListener
     ss.setProgression(0, "Unziping");
     try {
 	model.close(ProgressionObserver.DUMB_OBSERVER);
+	model.deleteDb(); /* will force a reload of the DBF files */
 
 	if (f.getName().toLowerCase().endsWith(".lzh")) {
 	    openLha(f);
@@ -135,6 +140,8 @@ public class ActionOpen implements ActionListener
     } finally {
 	ss.stop();
     }
+
+    System.out.println(f.toString() + " restored");
 
     view.getMainWindow().setVisible(true);
   }
